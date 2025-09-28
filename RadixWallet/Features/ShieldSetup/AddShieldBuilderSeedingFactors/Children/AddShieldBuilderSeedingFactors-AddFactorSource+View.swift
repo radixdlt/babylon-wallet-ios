@@ -1,14 +1,14 @@
 import SwiftUI
 
-// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource.View
-extension AddShieldBuilderSeedingFactors.AddFactorSource {
+// MARK: - AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd.View
+extension AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd {
 	struct View: SwiftUI.View {
-		let store: StoreOf<AddShieldBuilderSeedingFactors.AddFactorSource>
+		let store: StoreOf<AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
-					VStack(spacing: .large2) {
+					VStack(spacing: .medium3) {
 						Image(.addShieldBuilderSeedingFactorsAdd)
 
 						Text(store.title)
@@ -36,6 +36,7 @@ extension AddShieldBuilderSeedingFactors.AddFactorSource {
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, .medium3)
 				}
+				.background(.secondaryBackground)
 				.footer {
 					VStack(spacing: .medium2) {
 						Button(store.addButtonTitle) {
@@ -78,7 +79,7 @@ extension AddShieldBuilderSeedingFactors.AddFactorSource {
 	}
 }
 
-private extension AddShieldBuilderSeedingFactors.AddFactorSource.State {
+private extension AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd.State {
 	var title: String {
 		switch mode {
 		case .hardware:

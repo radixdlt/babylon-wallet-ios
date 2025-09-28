@@ -13,7 +13,7 @@ extension AddShieldBuilderSeedingFactors {
 		@Reducer(state: .hashable, action: .equatable)
 		enum Path {
 			case intro
-			case addFactor(AddShieldBuilderSeedingFactors.AddFactorSource)
+			case addFactor(AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd)
 			case completion
 		}
 
@@ -37,19 +37,19 @@ extension AddShieldBuilderSeedingFactors {
 		struct Destination: DestinationReducer {
 			@CasePathable
 			enum State: Sendable, Hashable {
-				case addLedger(AddLedgerFactorSource.State)
+				case addFactorSource(AddFactorSource.Coordinator.State)
 				case todo
 			}
 
 			@CasePathable
 			enum Action: Sendable, Equatable {
-				case addLedger(AddLedgerFactorSource.Action)
+				case addFactorSource(AddFactorSource.Coordinator.Action)
 				case todo(Never)
 			}
 
 			var body: some ReducerOf<Self> {
-				Scope(state: \.addLedger, action: \.addLedger) {
-					AddLedgerFactorSource()
+				Scope(state: \.addFactorSource, action: \.addFactorSource) {
+					AddFactorSource.Coordinator()
 				}
 			}
 		}
@@ -88,16 +88,9 @@ extension AddShieldBuilderSeedingFactors {
 
 		func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 			switch presentedAction {
-			case let .addLedger(.delegate(action)):
-				switch action {
-				case .completed:
-					state.destination = nil
-					return determineNextStepEffect()
-				case .failedToAddLedger:
-					state.destination = nil
-					return .none
-				}
-
+			case let .addFactorSource(.delegate(.finished)):
+				state.destination = nil
+				return determineNextStepEffect()
 			default:
 				return .none
 			}
@@ -121,15 +114,7 @@ private extension AddShieldBuilderSeedingFactors.Coordinator {
 	}
 
 	func addFactorSourceEffect(_ state: inout State, kind: FactorSourceKind) -> Effect<Action> {
-		switch kind {
-		case .ledgerHqHardwareWallet:
-			state.destination = .addLedger(.init())
-			return .none
-		case .arculusCard, .password, .offDeviceMnemonic:
-			state.destination = .todo
-			return .none
-		case .device:
-			fatalError("Factor Source not supported")
-		}
+		state.destination = .addFactorSource(.init(mode: .preselectedKind(kind), context: .newFactorSource))
+		return .none
 	}
 }

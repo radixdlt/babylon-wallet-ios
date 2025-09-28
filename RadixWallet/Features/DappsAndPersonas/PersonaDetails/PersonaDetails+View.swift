@@ -18,7 +18,7 @@ extension PersonaDetails {
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
-		let factorSourceRow: FactorSourcesList.Row?
+		let securityState: PersonaDetails.State.SecurityState?
 	}
 }
 
@@ -94,6 +94,9 @@ private extension View {
 			.enterMnemonic(with: destinationStore)
 			.confirmForgetAlert(with: destinationStore)
 			.confirmHideAlert(with: destinationStore)
+			.selectShield(with: destinationStore)
+			.applyShield(with: destinationStore)
+			.shieldDetails(with: destinationStore)
 	}
 
 	private func dAppDetails(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
@@ -139,6 +142,24 @@ private extension View {
 			}
 		}
 	}
+
+	private func selectShield(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.selectShield, action: \.selectShield)) { store in
+			SelectShield.View(store: store)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) { store in
+			ApplyShield.Coordinator.View(store: store)
+		}
+	}
+
+	private func shieldDetails(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.shieldDetails, action: \.shieldDetails)) {
+			EntityShieldDetails.View(store: $0)
+		}
+	}
 }
 
 // MARK: - Extensions
@@ -149,7 +170,7 @@ private extension PersonaDetails.State {
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,
-			factorSourceRow: factorSourceRow
+			securityState: securityState
 		)
 	}
 
@@ -277,16 +298,17 @@ private extension PersonaDetails.State {
 		case let .dApp(_, authorizedPersonaData):
 			.init(
 				dAppInfo: dAppInfo,
-				personaName: persona.displayName.rawValue,
+				personaName: persona.displayName.rawValue, isOnStokenet: persona.networkId == .stokenet,
 				personaData: authorizedPersonaData.sharedPersonaData,
-				factorSourceRow: factorSourceRow
+				securityState: securityState
 			)
 		case .general:
 			.init(
 				dAppInfo: nil,
 				personaName: persona.displayName.rawValue,
+				isOnStokenet: persona.networkId == .stokenet,
 				personaData: persona.personaData,
-				factorSourceRow: factorSourceRow
+				securityState: securityState
 			)
 		}
 	}
@@ -310,7 +332,8 @@ extension PersonaDetails.View {
 			let fullName: String?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
-			let factorSourceRow: FactorSourcesList.Row?
+			let securityState: PersonaDetails.State.SecurityState?
+			let isOnStokenet: Bool
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -320,15 +343,17 @@ extension PersonaDetails.View {
 			init(
 				dAppInfo: DappInfo?,
 				personaName: String,
+				isOnStokenet: Bool,
 				personaData: PersonaData?,
-				factorSourceRow: FactorSourcesList.Row?
+				securityState: PersonaDetails.State.SecurityState?
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
 				self.fullName = personaData?.name?.value.formatted
 				self.emailAddresses = personaData?.emailAddresses.collection.map(\.value.email)
 				self.phoneNumbers = personaData?.phoneNumbers.collection.map(\.value.number)
-				self.factorSourceRow = factorSourceRow
+				self.securityState = securityState
+				self.isOnStokenet = isOnStokenet
 			}
 		}
 
@@ -340,30 +365,59 @@ extension PersonaDetails.View {
 					VPair(heading: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
 
 					Separator()
+					if let securityState = viewStore.securityState {
+						switch securityState {
+						case let .unsecurified(fsRow):
+							HStack {
+								Text("Secured with")
+									.textStyle(.body1HighImportance)
+									.foregroundColor(.secondaryText)
 
-					if let factorSourceRow = viewStore.factorSourceRow {
-						Text("Secured with")
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.secondaryText)
+								Spacer()
 
-						FactorSourceCard(
-							kind: .instance(
-								factorSource: factorSourceRow.integrity.factorSource,
-								kind: .extended
-							),
-							mode: .display,
-							messages: factorSourceRow.messages,
-							onAction: { action in
-								switch action {
-								case .messageTapped:
-									viewStore.send(.view(.factorSourceMessageTapped(factorSourceRow)))
-								case .removeTapped:
-									break
+								if viewStore.isOnStokenet {
+									Button("Apply Shield") {
+										store.send(.view(.applyShieldButtonTapped))
+									}
+									.buttonStyle(.blueText)
 								}
 							}
-						)
-						.onTapGesture {
-							viewStore.send(.view(.factorSourceCardTapped))
+
+							FactorSourceCard(
+								kind: .instance(
+									factorSource: fsRow.integrity.factorSource,
+									kind: .extended
+								),
+								mode: .display,
+								messages: fsRow.messages,
+								onAction: { action in
+									switch action {
+									case .messageTapped:
+										viewStore.send(.view(.factorSourceMessageTapped(fsRow)))
+									case .removeTapped:
+										break
+									}
+								}
+							)
+							.onTapGesture {
+								viewStore.send(.view(.factorSourceCardTapped(fsRow)))
+							}
+						case .securified:
+							Text("Secured with")
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.secondaryText)
+							PlainListRow(viewState: .init(
+								rowCoreViewState: .init(context: .personaDetails, title: "Security Shield", subtitle: "View security shield details"),
+								icon: {
+									Image(.transactionReviewUpdateShield)
+										.resizable()
+										.frame(.smaller)
+								}
+							))
+							.background(.secondaryBackground)
+							.onTapGesture {
+								store.send(.view(.viewShieldDetailsRowTapped))
+							}
 						}
 					}
 

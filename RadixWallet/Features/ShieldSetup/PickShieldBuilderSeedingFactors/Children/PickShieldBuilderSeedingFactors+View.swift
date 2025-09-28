@@ -9,7 +9,7 @@ extension PickShieldBuilderSeedingFactors.State {
 	var statusMessageInfo: ShieldStatusMessageInfo? {
 		switch selectedFactorSourcesStatus {
 		case .invalid:
-			.general(type: .error, text: L10n.ShieldSetupStatus.invalidCombination)
+			.general(type: .warning, text: L10n.ShieldSetupStatus.unsafeCombination)
 		case .insufficient:
 			.general(type: .error, text: L10n.ShieldSetupStatus.SelectFactors.atLeastOneFactor)
 		case .suboptimal:
@@ -20,7 +20,12 @@ extension PickShieldBuilderSeedingFactors.State {
 	}
 
 	var isValidSelection: Bool {
-		selectedFactorSourcesStatus == .optimal || selectedFactorSourcesStatus == .suboptimal
+		switch selectedFactorSourcesStatus {
+		case .invalid, .optimal, .suboptimal:
+			true
+		case .insufficient:
+			false
+		}
 	}
 
 	var shouldShowPasswordMessage: Bool {
@@ -42,6 +47,7 @@ extension PickShieldBuilderSeedingFactors {
 						.animation(.default, value: store.statusMessageInfo?.type)
 						.animation(.default, value: store.shouldShowPasswordMessage)
 				}
+				.background(.secondaryBackground)
 				.footer {
 					Button(L10n.ShieldSetupSelectFactors.buildButtonTitle) {
 						store.send(.view(.continueButtonTapped))

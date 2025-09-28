@@ -34,8 +34,8 @@ extension FactorSourceDetail {
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
-//					.header(L10n.FactorSources.Detail.test),
-//					spotCheckRow(viewStore),
+					//					.header(L10n.FactorSources.Detail.test),
+					//					spotCheckRow(viewStore),
 				]
 			case .arculusCard:
 				[
@@ -43,6 +43,11 @@ extension FactorSourceDetail {
 					renameRow(),
 					changePinRow(),
 					forgotPinRow(),
+				]
+			case .offDeviceMnemonic:
+				[
+					.header(L10n.FactorSources.Detail.manage),
+					renameRow(),
 				]
 			default:
 				[

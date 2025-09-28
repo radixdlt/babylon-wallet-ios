@@ -3,6 +3,7 @@ import ComposableArchitecture
 // MARK: - SecurityCenter
 struct SecurityCenter: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
+		var isStokenet: Bool = false
 		var problems: [SecurityProblem] = []
 		var actionsRequired: Set<SecurityProblemKind> {
 			Set(problems.map(\.kind))
@@ -21,9 +22,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.State)
 			case deviceFactorSources(FactorSourcesList.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
-			// case securityShieldsSetup(ShieldSetupCoordinator.State)
-			// case securityShieldsList(ShieldsList.State)
-			// case applyShield(ApplyShield.Coordinator.State)
+			case securityShieldsSetup(ShieldSetupCoordinator.State)
+			case securityShieldsList(ShieldsList.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
@@ -32,9 +33,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			case securityFactors(SecurityFactors.Action)
 			case deviceFactorSources(FactorSourcesList.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
-			// case securityShieldsSetup(ShieldSetupCoordinator.Action)
-			// case securityShieldsList(ShieldsList.Action)
-			// case applyShield(ApplyShield.Coordinator.Action)
+			case securityShieldsSetup(ShieldSetupCoordinator.Action)
+			case securityShieldsList(ShieldsList.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -50,15 +51,15 @@ struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
 			}
-			// Scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup) {
-			// 	ShieldSetupCoordinator()
-			// }
-			// Scope(state: \.securityShieldsList, action: \.securityShieldsList) {
-			// 	ShieldsList()
-			// }
-			// Scope(state: \.applyShield, action: \.applyShield) {
-			// 	ApplyShield.Coordinator()
-			// }
+			Scope(state: \.securityShieldsSetup, action: \.securityShieldsSetup) {
+				ShieldSetupCoordinator()
+			}
+			Scope(state: \.securityShieldsList, action: \.securityShieldsList) {
+				ShieldsList()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
+			}
 		}
 	}
 
@@ -70,6 +71,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case setProblems([SecurityProblem])
+		case setIsStokenet(Bool)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -82,11 +84,16 @@ struct SecurityCenter: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
 			return securityProblemsEffect()
+				.merge(with: .run { send in
+					let isStokenet = await gatewaysClient.getCurrentGateway().network.id == .stokenet
+					await send(.internal(.setIsStokenet(isStokenet)))
+				})
 
 		case let .problemTapped(problem):
 			switch problem {
@@ -104,12 +111,12 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .cardTapped(type):
 			switch type {
 			case .securityShields:
-				// let shields = (try? SargonOs.shared.securityStructuresOfFactorSourceIds()) ?? []
-				// if shields.isEmpty {
-				// 	state.destination = .securityShieldsSetup(.init())
-				// } else {
-				// 	state.destination = .securityShieldsList(.init())
-				// }
+				let shields = (try? SargonOs.shared.securityStructuresOfFactorSourceIds()) ?? []
+				if shields.isEmpty {
+					state.destination = .securityShieldsSetup(.init())
+				} else {
+					state.destination = .securityShieldsList(.init())
+				}
 				return .none
 
 			case .securityFactors:
@@ -128,6 +135,9 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		case let .setProblems(problems):
 			state.problems = problems
 			return .none
+		case let .setIsStokenet(isStokenet):
+			state.isStokenet = isStokenet
+			return .none
 		}
 	}
 
@@ -137,15 +147,15 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
 			state.destination = nil
 			return .none
-		// case let .securityShieldsSetup(.delegate(.finished(shieldID))):
-		// 	state.destination = .applyShield(.init(shieldID: shieldID))
-		// 	return .none
-		// case .applyShield(.delegate(.skipped)):
-		// 	state.destination = .securityShieldsList(.init())
-		// 	return .none
-		// case .applyShield(.delegate(.finished)):
-		// 	state.destination = nil
-		// 	return .none
+		case let .securityShieldsSetup(.delegate(.finished(securityStructure))):
+			state.destination = .applyShield(.init(securityStructure: securityStructure))
+			return .none
+		case .applyShield(.delegate(.skipped)):
+			state.destination = .securityShieldsList(.init())
+			return .none
+		case .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}

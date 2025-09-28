@@ -44,9 +44,9 @@ private extension SecurityFactors.View {
 			.header(L10n.SecurityFactors.hardware),
 			model(kind: .ledgerHqHardwareWallet),
 			model(kind: .arculusCard),
-//			.header(L10n.SecurityFactors.information),
+			.header(L10n.SecurityFactors.information),
 //			model(kind: .password),
-//			model(kind: .offDeviceMnemonic),
+			model(kind: .offDeviceMnemonic),
 		]
 	}
 

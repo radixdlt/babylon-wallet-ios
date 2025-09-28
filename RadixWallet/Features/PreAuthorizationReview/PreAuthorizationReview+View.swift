@@ -226,9 +226,16 @@ private extension View {
 	func destinations(with store: StoreOf<PreAuthorizationReview>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: \.destination)
 		return rawManifestAlert(with: destinationStore)
+			.tooManyFactorsSkipped(with: destinationStore)
 	}
 
 	private func rawManifestAlert(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.rawManifestAlert, action: \.rawManifestAlert))
+	}
+
+	private func tooManyFactorsSkipped(with destinationStore: PresentationStoreOf<PreAuthorizationReview.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped)) {
+			SigningTooManyFactorsSkipped.View(store: $0)
+		}
 	}
 }

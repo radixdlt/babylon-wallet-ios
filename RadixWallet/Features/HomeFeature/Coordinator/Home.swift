@@ -517,8 +517,13 @@ struct Home: Sendable, FeatureReducer {
 
 extension Home.AccountRow.State {
 	mutating func updateFactorSource(from factorSources: FactorSources) {
-		if let fsId = accountWithInfo.account.unsecuredControllingFactorInstance?.factorSourceID {
-			factorSource = factorSources[id: fsId.asGeneral]
+		switch accountWithInfo.account.securityState {
+		case let .unsecured(control):
+			if let fs = factorSources[id: control.transactionSigning.factorSourceId.asGeneral] {
+				securityState = .unsecurified(fs)
+			}
+		case .securified:
+			securityState = .securified
 		}
 	}
 }

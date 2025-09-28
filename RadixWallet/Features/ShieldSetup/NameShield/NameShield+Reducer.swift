@@ -22,7 +22,7 @@ struct NameShield: FeatureReducer, Sendable {
 	}
 
 	enum DelegateAction: Equatable, Sendable {
-		case finished(SecurityStructureId)
+		case finished(SecurityStructureOfFactorSources)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -49,7 +49,8 @@ struct NameShield: FeatureReducer, Sendable {
 			return .run { [shieldBuilder = state.shieldBuilder] send in
 				let shield = try shieldBuilder.build()
 				try await SargonOs.shared.addSecurityStructureOfFactorSourceIds(structureIds: shield)
-				await send(.delegate(.finished(shield.metadata.id)))
+				let factorSourcesShield = try SargonOS.shared.securityStructureOfFactorSourcesFromSecurityStructureOfFactorSourceIds(structureOfIds: shield)
+				await send(.delegate(.finished(factorSourcesShield)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}

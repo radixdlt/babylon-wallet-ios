@@ -10,7 +10,7 @@ extension ShieldSetupOnboarding {
 			WithPerceptionTracking {
 				coreView
 					.safeAreaInset(edge: .bottom, spacing: .zero) {
-						VStack(spacing: .large3) {
+						VStack(spacing: .medium3) {
 							positionIndicator
 							let title = store.isLastStep ? L10n.ShieldSetupOnboarding.startButtonTitle : L10n.ShieldSetupOnboarding.nextButtonTitle
 							Button(title) {
@@ -39,6 +39,7 @@ extension ShieldSetupOnboarding {
 			.tabViewStyle(.page(indexDisplayMode: .never))
 			.animation(.easeInOut, value: store.selectedStepIndex)
 			.transition(.slide)
+			.background(.primaryBackground)
 		}
 
 		@ViewBuilder

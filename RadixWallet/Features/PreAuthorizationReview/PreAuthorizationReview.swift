@@ -41,26 +41,32 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case builtSubintent(Subintent)
 		case updateSecondsToExpiration(Date)
 		case resetToApprovable
+		case tooManyFactorsSkipped(Subintent)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
 		case signedPreAuthorization(SignedSubintent)
 		case failed(TransactionFailure)
+		case dismiss
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case rawManifestAlert(AlertState<Never>)
+			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case rawManifestAlert(Never)
+			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.Action)
 		}
 
 		var body: some ReducerOf<Self> {
-			EmptyReducer()
+			Scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped) {
+				SigningTooManyFactorsSkipped()
+			}
 		}
 	}
 
@@ -161,8 +167,8 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 			} catch: { error, send in
 				await send(.internal(.resetToApprovable))
-				if let error = error as? CommonError, error == .HostInteractionAborted {
-					// We don't show any error since user aborted signing intentionally
+				if let error = error as? CommonError, error == .SigningFailedTooManyFactorSourcesNeglected {
+					await send(.internal(.tooManyFactorsSkipped(subintent)))
 				} else {
 					errorQueue.schedule(error)
 				}
@@ -175,6 +181,10 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		case .resetToApprovable:
 			return resetToApprovable(&state)
+
+		case let .tooManyFactorsSkipped(subintent):
+			state.destination = .tooManyFactorSkipped(.init(intent: .preAuth(subintent)))
+			return .none
 		}
 	}
 
@@ -186,6 +196,17 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .tooManyFactorSkipped(.delegate(.restart(.preAuth(subintent)))):
+			.send(.internal(.builtSubintent(subintent)))
+		case .tooManyFactorSkipped(.delegate(.cancel)):
+			.send(.delegate(.dismiss))
+		default:
+			.none
 		}
 	}
 }

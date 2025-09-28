@@ -25,6 +25,7 @@ extension ChooseAccountsForShield {
 					.multilineTextAlignment(.center)
 					.foregroundStyle(.primaryText)
 				}
+				.background(.primaryBackground)
 				.footer {
 					VStack(spacing: .medium3) {
 						WithControlRequirements(
@@ -35,7 +36,7 @@ extension ChooseAccountsForShield {
 								.buttonStyle(.primaryRectangular)
 						}
 
-						Button(L10n.ShieldWizardApplyShield.ChooseEntities.skipButton) {
+						Button("Choose Persona") {
 							viewStore.send(.view(.skipButtonTapped))
 						}
 						.buttonStyle(.primaryText())

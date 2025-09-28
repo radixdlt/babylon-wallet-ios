@@ -1,24 +1,25 @@
 import SwiftUI
 
-// MARK: - ShieldSetupCoordinator.View
-extension ShieldSetupCoordinator {
+// MARK: - EditSecurityShieldCoordinator.View
+extension EditSecurityShieldCoordinator {
 	struct View: SwiftUI.View {
-		@Perception.Bindable var store: StoreOf<ShieldSetupCoordinator>
+		@Perception.Bindable var store: StoreOf<EditSecurityShieldCoordinator>
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				NavigationStack(path: $store.scope(state: \.path, action: \.child.path)) {
-					ShieldSetupOnboarding.View(store: store.onboarding)
+					RolesSetupCoordinator.View(store: store.rolesSetup)
+						.toolbar {
+							ToolbarItem(placement: .topBarLeading) {
+								CloseButton {
+									store.send(.view(.closeButtonTapped))
+								}
+							}
+						}
 				} destination: { destination in
 					switch destination.case {
-					case let .addShieldBuilderSeedingFactors(store):
-						AddShieldBuilderSeedingFactors.Coordinator.View(store: store)
-					case let .pickShieldBuilderSeedingFactors(store):
-						PickShieldBuilderSeedingFactorsCoordinator.View(store: store)
 					case let .rolesSetup(store):
 						RolesSetupCoordinator.View(store: store)
-					case let .nameShield(store):
-						NameShield.View(store: store)
 					}
 				}
 			}
@@ -26,8 +27,8 @@ extension ShieldSetupCoordinator {
 	}
 }
 
-private extension StoreOf<ShieldSetupCoordinator> {
-	var onboarding: StoreOf<ShieldSetupOnboarding> {
-		scope(state: \.onboarding, action: \.child.onboarding)
+private extension StoreOf<EditSecurityShieldCoordinator> {
+	var rolesSetup: StoreOf<RolesSetupCoordinator> {
+		scope(state: \.rolesSetup, action: \.child.rolesSetup)
 	}
 }

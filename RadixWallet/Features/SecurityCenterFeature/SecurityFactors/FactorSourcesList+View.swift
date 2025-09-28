@@ -10,14 +10,17 @@ extension FactorSourcesList {
 						header(store.kind.details)
 
 						ForEachStatic(store.rows) { row in
-							card(row)
+							WithPerceptionTracking {
+								card(row)
+							}
 						}
 
-						Button(store.addTitle) {
-							store.send(.view(.addButtonTapped))
+						if store.context == .display {
+							Button(store.addTitle) {
+								store.send(.view(.addButtonTapped))
+							}
+							.buttonStyle(.secondaryRectangular)
 						}
-						.buttonStyle(.secondaryRectangular)
-
 //						let infoContent = store.kind.infoLinkContent
 //						InfoButton(infoContent.item, label: infoContent.title)
 					}

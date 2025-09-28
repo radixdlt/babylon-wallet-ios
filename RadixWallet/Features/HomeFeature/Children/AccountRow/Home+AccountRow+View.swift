@@ -38,8 +38,13 @@ extension Home.AccountRow {
 					tags.append(.legacy)
 				}
 
-				if let fs = state.factorSource {
+				switch state.securityState {
+				case let .unsecurified(fs):
 					tags.append(.factorSource(fs))
+				case .securified:
+					tags.append(.shielded)
+				case .none:
+					break
 				}
 
 				return tags

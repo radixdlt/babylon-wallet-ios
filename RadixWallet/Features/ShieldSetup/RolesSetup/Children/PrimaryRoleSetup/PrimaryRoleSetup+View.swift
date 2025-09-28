@@ -80,6 +80,7 @@ extension PrimaryRoleSetup {
 						.animation(.default, value: store.authenticationSigningFactor)
 						.animation(.default, value: store.isOverrideSectionExpanded)
 				}
+				.background(.primaryBackground)
 				.radixToolbar(title: L10n.ShieldWizardRegularAccess.Step.title)
 				.footer {
 					Button(L10n.Common.continue) {
@@ -227,7 +228,7 @@ extension PrimaryRoleSetup {
 				HStack {
 					Text(L10n.ShieldWizardRegularAccess.Override.title)
 						.textStyle(.body1Header)
-						.foregroundStyle(.primaryText)
+						.foregroundStyle(.primaryTextInverse)
 
 					Spacer()
 

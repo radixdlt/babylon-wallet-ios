@@ -236,11 +236,13 @@ extension FeatureReducer {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		let fsInstance = entity.unsecuredControllingFactorInstance!.factorInstance
-		let fsID: FactorSourceIdFromHash = try fsInstance.factorSourceID.extract()
-
 		switch problem {
 		case .problem3:
+			guard let fsInstance = entity.unsecuredControllingFactorInstance?.factorInstance else {
+				throw FailureToHandleSecurityProblem()
+			}
+			let fsID: FactorSourceIdFromHash = try fsInstance.factorSourceID.extract()
+
 			let mwp = try secureStorageClient.loadMnemonic(
 				factorSourceID: fsID,
 				notifyIfMissing: true
@@ -253,6 +255,10 @@ extension FeatureReducer {
 			return .displayMnemonic(.init(mnemonic: mwp.mnemonic, factorSourceID: fsID))
 
 		case .problem9:
+			guard let fsInstance = entity.unsecuredControllingFactorInstance?.factorInstance else {
+				throw FailureToHandleSecurityProblem()
+			}
+
 			let factorSource = try await factorSourcesClient.getFactorSource(of: fsInstance)?.asDevice
 
 			guard let factorSource else {

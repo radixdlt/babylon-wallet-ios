@@ -20,7 +20,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		var kinds: [FactorSourceKind] {
 			switch context {
 			case .createAccount, .createPersona, .accountRecovery(false):
-				[.device, .ledgerHqHardwareWallet, .arculusCard]
+				[.device, .ledgerHqHardwareWallet, .arculusCard, .offDeviceMnemonic]
 			case .accountRecovery(true):
 				[.device, .ledgerHqHardwareWallet]
 			}
@@ -239,8 +239,8 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	}
 
 	func entitiesEffect(state: State) -> Effect<Action> {
-		.run { send in
-			let result = try await factorSourcesClient.entititesLinkedToFactorSourceKinds([.device, .ledgerHqHardwareWallet, .arculusCard])
+		.run { [kinds = state.kinds] send in
+			let result = try await factorSourcesClient.entititesLinkedToFactorSourceKinds(Set(kinds))
 			await send(.internal(.setEntities(result)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)

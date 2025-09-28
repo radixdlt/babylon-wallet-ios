@@ -91,7 +91,7 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			"Add a New Ledger Nano"
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.offDeviceMnemonicTitle
+			L10n.AddFactorSource.OffDeviceMnemonic.title
 		case .arculusCard:
 			"Add a New Arculus Card"
 		case .password:
@@ -106,7 +106,7 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			"Ledger Nanos are hardware signing devices you can connect to your Radix Wallet with a USB cable and computer."
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.offDeviceMnemonicDescription
+			L10n.AddFactorSource.OffDeviceMnemonic.description
 		case .arculusCard:
 			"Arculus Cards are hardware signing devices you tap to your phone to sign a transaction."
 		case .password:
@@ -121,7 +121,7 @@ extension FactorSourceKind {
 		case .ledgerHqHardwareWallet:
 			"Name your New Ledger Nano"
 		case .offDeviceMnemonic:
-			L10n.FactorSources.Card.offDeviceMnemonicTitle
+			L10n.AddFactorSource.OffDeviceMnemonic.nameTitle
 		case .arculusCard:
 			"Name your New Arculus Card"
 		case .password:

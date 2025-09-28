@@ -21,7 +21,7 @@ extension InteractionReview {
 		private var coreView: some SwiftUI.View {
 			entity
 			VStack(spacing: .medium3) {
-				factorsHeader
+				// factorsHeader
 				primaryRoleFactors
 				performShieldRecoveryFactors
 			}
@@ -108,7 +108,7 @@ extension InteractionReview {
 						note: L10n.TransactionReview.UpdateShield.primaryOverrideMessage
 					)
 
-					factorsList(viewState.primaryOverrideFactors)
+					factorsList(viewState.primaryOverrideFactors, combinationLabel: L10n.TransactionReview.UpdateShield.combinationLabel)
 				}
 
 				if let factorSource = viewState.authenticationSigningFactor {
@@ -156,7 +156,7 @@ extension InteractionReview {
 					note: L10n.TransactionReview.UpdateShield.nonPrimaryOverrideMessage
 				)
 
-				factorsList(viewState.recoveryFactors)
+				factorsList(viewState.recoveryFactors, combinationLabel: L10n.TransactionReview.UpdateShield.combinationLabel)
 			}
 		}
 
@@ -167,18 +167,24 @@ extension InteractionReview {
 					note: L10n.TransactionReview.UpdateShield.nonPrimaryOverrideMessage
 				)
 
-				factorsList(viewState.confirmationFactors)
+				factorsList(viewState.confirmationFactors, combinationLabel: L10n.TransactionReview.UpdateShield.combinationLabel)
 			}
 		}
 
-		private func factorsList(_ factorSources: [FactorSource]) -> some SwiftUI.View {
+		private func factorsList(_ factorSources: [FactorSource], combinationLabel: String? = nil) -> some SwiftUI.View {
 			VStack(spacing: .small2) {
 				ForEach(factorSources, id: \.self) { factorSource in
-					FactorSourcePreviewCard(factorSource: factorSource)
+					FactorSourceCard(
+						kind: .instance(
+							factorSource: factorSource,
+							kind: .short(showDetails: false)
+						),
+						mode: .display
+					)
 
 					let isLastFactor = factorSource == factorSources.last
-					if !isLastFactor {
-						Text(L10n.TransactionReview.UpdateShield.combinationLabel)
+					if let combinationLabel, !isLastFactor {
+						Text(combinationLabel)
 							.textStyle(.body1Link)
 							.foregroundStyle(.primaryText)
 					}
@@ -204,7 +210,7 @@ extension InteractionReview {
 					.roundedCorners(strokeColor: .border, radius: .small2)
 			}
 			.padding(.medium3)
-			.background(.app.lightError)
+			.background(.lightError)
 			.frame(maxWidth: .infinity)
 			.roundedCorners(radius: .small1)
 		}

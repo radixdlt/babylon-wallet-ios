@@ -5,7 +5,7 @@ extension ApplyShield {
 	struct Coordinator: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
-			let shieldID: SecurityStructureId
+			let securityStructure: SecurityStructureOfFactorSources
 			var selectedAccounts: [AccountAddress] = []
 			var selectedPersonas: [IdentityAddress] = []
 
@@ -13,11 +13,15 @@ extension ApplyShield {
 			var path: StackState<Path.State> = .init()
 
 			init(
-				shieldID: SecurityStructureId,
+				securityStructure: SecurityStructureOfFactorSources,
+				selectedAccounts: [AccountAddress] = [],
+				selectedPersonas: [IdentityAddress] = [],
 				root: Path.State? = nil
 			) {
-				self.shieldID = shieldID
-				self.root = root ?? .intro(.init(shieldID: shieldID))
+				self.securityStructure = securityStructure
+				self.root = root ?? .intro(.init(shieldID: securityStructure.metadata.id))
+				self.selectedAccounts = selectedAccounts
+				self.selectedPersonas = selectedPersonas
 			}
 		}
 
@@ -62,12 +66,12 @@ extension ApplyShield {
 			switch viewAction {
 			case .applyButtonTapped:
 				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
-				return .run { [shieldID = state.shieldID] send in
-					let interaction = try await SargonOs.shared.makeInteractionForApplyingSecurityShield(securityShieldId: shieldID, addresses: addresses)
+				return .run { [securityStructure = state.securityStructure] send in
+					let manifest = try await SargonOs.shared.makeSetupSecurityShieldManifest(securityStructure: securityStructure, address: addresses.first!)
 
 					Task {
 						let result = await dappInteractionClient.addWalletInteraction(
-							.batchOfTransactions(interaction),
+							.transaction(.init(send: .init(transactionManifest: manifest))),
 							.shieldUpdate
 						)
 
@@ -101,23 +105,25 @@ extension ApplyShield {
 			case .root(.intro(.delegate(.started))):
 				state.path.append(.chooseAccounts(.init(
 					chooseAccounts: .init(
-						context: .permission(.atLeast(1)),
-						canCreateNewAccount: false,
-						showSelectAllAccounts: true
+						context: .permission(.exactly(1)),
+						canCreateNewAccount: false
 					)
 				)))
 				return .none
 			case .root(.intro(.delegate(.skipped))):
 				return .send(.delegate(.skipped))
 			case let .path(.element(id: _, action: .chooseAccounts(.delegate(.finished(accounts))))):
+				if accounts.isEmpty {
+					state.path.append(.choosePersonas(.init(
+						choosePersonas: .init(
+							selectionRequirement: .exactly(1)
+						),
+						canBeSkipped: false
+					)))
+					return .none
+				}
 				state.selectedAccounts = accounts
-				state.path.append(.choosePersonas(.init(
-					choosePersonas: .init(
-						selectionRequirement: .atLeast(1),
-						showSelectAllPersonas: true
-					),
-					canBeSkipped: !accounts.isEmpty
-				)))
+				state.path.append(.completion)
 				return .none
 			case let .path(.element(id: _, action: .choosePersonas(.delegate(.finished(personas))))):
 				state.selectedPersonas = personas

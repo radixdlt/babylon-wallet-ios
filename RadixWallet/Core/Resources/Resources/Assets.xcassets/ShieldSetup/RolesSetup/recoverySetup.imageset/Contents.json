@@ -3,6 +3,16 @@
     {
       "filename" : "recoverySetup.pdf",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "recoverySetupDark.pdf",
+      "idiom" : "universal"
     }
   ],
   "info" : {

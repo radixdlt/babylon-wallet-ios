@@ -42,7 +42,7 @@ extension ApplyShield.Coordinator {
 					ChoosePersonasForShield.View(store: store)
 				}
 			case .completion:
-				ApplyShield.CompletionView {
+				ApplyShield.CompletionView(factorSources: SargonOS.shared.sortedFactorSourcesFromSecurityStructure(structure: self.store.state.securityStructure).asIdentified()) {
 					self.store.send(.view(.applyButtonTapped))
 				}
 			}

@@ -98,7 +98,7 @@ extension AddFactorSource {
 						let versionRequirement = try await arculusCardClient.validateMinFirmwareVersion()
 						await send(.internal(.handleArculusCardIdentification(versionRequirement)))
 					} catch: { _, _ in }
-				case .device:
+				case .device, .offDeviceMnemonic:
 					return .send(.delegate(.completed))
 				default:
 					fatalError("Unhandled fs kind \(state.kind)")

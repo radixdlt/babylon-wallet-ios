@@ -2,31 +2,33 @@ import SwiftUI
 
 extension ApplyShield {
 	struct CompletionView: SwiftUI.View {
+		let factorSources: FactorSources
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
-			VStack(spacing: .huge2) {
-				Image(.shieldSetupOnboardingIntro)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.centered
-					.padding(.bottom, .small3)
+			ScrollView {
+				VStack(spacing: .huge2) {
+					VStack(spacing: .medium2) {
+						Text(L10n.ShieldWizardApplyShield.ApplyShield.title)
+							.textStyle(.sheetTitle)
 
-				VStack(spacing: .medium2) {
-					Text(L10n.ShieldWizardApplyShield.ApplyShield.title)
-						.textStyle(.sheetTitle)
+						Text(L10n.ShieldWizardApplyShield.ApplyShield.subtitle)
+							.textStyle(.body1HighImportance)
+					}
+					.foregroundStyle(.primaryText)
+					.multilineTextAlignment(.center)
 
-					Text(L10n.ShieldWizardApplyShield.ApplyShield.subtitle)
-						.textStyle(.body1HighImportance)
+					VStack(spacing: .medium3) {
+						ForEach(factorSources) { factorSource in
+							FactorSourceCard(kind: .instance(factorSource: factorSource, kind: .short(showDetails: false)), mode: .display)
+						}
+					}
 				}
-				.foregroundStyle(.primaryText)
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .large2)
-
-				Spacer()
+				.padding([.horizontal, .bottom], .large2)
 			}
+			.background(.secondaryBackground)
 			.footer {
-				Button(L10n.ShieldWizardApplyShield.ApplyShield.saveButton, action: action)
+				Button("Apply", action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		}

@@ -94,6 +94,11 @@ extension AccountCard {
 						.resizable()
 						.frame(.icon)
 				}
+				if case .shielded = tag {
+					Image(.transactionReviewUpdateShield)
+						.resizable()
+						.frame(.icon)
+				}
 			}
 		}
 		.foregroundColor(.app.whiteTransparent)
@@ -106,6 +111,7 @@ enum AccountCardTag: Hashable, Sendable {
 	case legacy
 	case dAppDefinition
 	case factorSource(FactorSource)
+	case shielded
 }
 
 // MARK: - AccountCard.Kind
@@ -228,6 +234,8 @@ extension AccountCardTag {
 			L10n.HomePage.AccountsTag.legacySoftware
 		case let .factorSource(fs):
 			fs.name
+		case .shielded:
+			"Shielded"
 		}
 	}
 }

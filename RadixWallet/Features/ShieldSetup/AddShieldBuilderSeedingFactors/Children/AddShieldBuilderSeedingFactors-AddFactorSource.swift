@@ -1,7 +1,7 @@
-// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource
+// MARK: - AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd
 extension AddShieldBuilderSeedingFactors {
 	@Reducer
-	struct AddFactorSource: Sendable, FeatureReducer {
+	struct SelectFactorSourceToAdd: Sendable, FeatureReducer {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let mode: Mode
@@ -42,8 +42,8 @@ extension AddShieldBuilderSeedingFactors {
 	}
 }
 
-// MARK: - AddShieldBuilderSeedingFactors.AddFactorSource.State.Mode
-extension AddShieldBuilderSeedingFactors.AddFactorSource.State {
+// MARK: - AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd.State.Mode
+extension AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd.State {
 	enum Mode {
 		case hardware
 		case any

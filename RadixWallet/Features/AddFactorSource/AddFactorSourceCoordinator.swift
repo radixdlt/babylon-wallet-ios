@@ -155,6 +155,8 @@ extension FactorSourceStrategy {
 			self = Self.ledger(context: context)
 		case .arculusCard:
 			self = Self.arculus(context: context)
+		case .offDeviceMnemonic:
+			self = Self.offDeviceMnemonic(context: context)
 		default:
 			fatalError("Unsupported kind \(kind)")
 		}
@@ -193,6 +195,38 @@ extension FactorSourceStrategy {
 					} else {
 						state.path.append(.confirmSeedPhrase(.init(factorSourceKind: .device)))
 					}
+					return .none
+
+				case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):
+					state.path.append(.nameFactorSource(.init(context: context, factorSourceInput: createFactorSourceInput(state: state, context: context))))
+					return .none
+
+				default:
+					return .none
+				}
+			}
+		)
+	}
+
+	static func offDeviceMnemonic(context: AddFactorSource.Context) -> Self {
+		@Sendable
+		func createFactorSourceInput(state: AddFactorSource.Coordinator.State, context: AddFactorSource.Context) -> AddFactorSource.NameFactorSource.State.FactorSourceInput {
+			let mwp = state.mnemonicBuilder.getMnemonicWithPassphrase()
+			let fs = newOffDeviceMnemonicFactorSourceFromMnemonicWithPassphrase(mwp: mwp, hint: .init(label: .init(value: "Mnemonic"), wordCount: mwp.mnemonic.wordCount))
+			return .offDeviceMnemonic(fs, mwp)
+		}
+
+		return Self(
+			kind: .offDeviceMnemonic,
+			context: context,
+			handleCompletion: { action, state in
+				switch action {
+				case .root(.intro(.delegate(.completed))), .path(.element(id: _, action: .intro(.delegate(.completed)))):
+					state.path.append(.deviceSeedPhrase(.init(context: context, factorSourceKind: .offDeviceMnemonic)))
+					return .none
+
+				case .path(.element(id: _, action: .deviceSeedPhrase(.delegate(.completed)))):
+					state.path.append(.nameFactorSource(.init(context: context, factorSourceInput: createFactorSourceInput(state: state, context: context))))
 					return .none
 
 				case .path(.element(id: _, action: .confirmSeedPhrase(.delegate(.validated)))):

@@ -59,6 +59,7 @@ extension RecoveryRoleSetup {
 						.animation(.default, value: store.recoveryFactors)
 						.animation(.default, value: store.confirmationFactors)
 				}
+				.background(.primaryBackground)
 				.radixToolbar(title: L10n.ShieldWizardRecovery.Step.title)
 				.footer {
 					Button(L10n.Common.continue) {
@@ -243,7 +244,7 @@ extension RecoveryRoleSetup {
 				}
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
-				.foregroundStyle(.primaryText)
+				.foregroundStyle(.white)
 				.background(.error)
 
 				VStack(spacing: .medium2) {
@@ -276,7 +277,7 @@ extension RecoveryRoleSetup {
 				}
 				.padding([.horizontal, .bottom], .medium3)
 				.padding(.top, .medium3)
-				.background(.app.lightError)
+				.background(.lightError)
 			}
 			.frame(maxWidth: .infinity)
 			.roundedCorners(radius: .small1)

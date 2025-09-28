@@ -4,8 +4,13 @@ import SwiftUI
 // MARK: - AccountPreferences
 struct AccountPreferences: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
+		enum SecurityState: Hashable {
+			case unsecurified(FactorSourcesList.Row)
+			case securified
+		}
+
 		var account: Account
-		var factorSourceRow: FactorSourcesList.Row?
+		var securityState: SecurityState?
 		var faucetButtonState: ControlState
 		var address: AccountAddress { account.address }
 		var isOnMainnet: Bool { account.networkID == .mainnet }
@@ -30,8 +35,9 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case hideAccountTapped
 		case deleteAccountTapped
 		case faucetButtonTapped
-		case factorSourceCardTapped
+		case factorSourceCardTapped(FactorSourcesList.Row)
 		case factorSourceMessageTapped(FactorSourcesList.Row)
+		case applyShieldButtonTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -40,7 +46,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
 		case refreshAccountCompleted(TaskResult<OnLedgerEntity.OnLedgerAccount>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		case factorSourceLoaded(FactorSourceIntegrity)
+		case securityStateDetermined(State.SecurityState)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -60,6 +66,9 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case factorSourceDetail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicForFactorSource.State)
+			case selectShield(SelectShield.State)
+			case applyShield(ApplyShield.Coordinator.State)
+			case shieldDetails(EntityShieldDetails.State)
 		}
 
 		@CasePathable
@@ -72,6 +81,9 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case factorSourceDetail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicForFactorSource.Action)
+			case selectShield(SelectShield.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
+			case shieldDetails(EntityShieldDetails.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -95,6 +107,15 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			}
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicForFactorSource()
+			}
+			Scope(state: \.selectShield, action: \.selectShield) {
+				SelectShield()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
+			}
+			Scope(state: \.shieldDetails, action: \.shieldDetails) {
+				EntityShieldDetails()
 			}
 		}
 	}
@@ -129,7 +150,6 @@ struct AccountPreferences: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
-			.merge(with: loadFactorSource(state: state))
 
 		case let .rowTapped(row):
 			return destination(for: row, &state)
@@ -147,11 +167,8 @@ struct AccountPreferences: Sendable, FeatureReducer {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
 
-		case .factorSourceCardTapped:
-			guard let integrity = state.factorSourceRow?.integrity else {
-				return .none
-			}
-			state.destination = .factorSourceDetail(.init(integrity: integrity))
+		case let .factorSourceCardTapped(row):
+			state.destination = .factorSourceDetail(.init(integrity: row.integrity))
 			return .none
 
 		case let .factorSourceMessageTapped(row):
@@ -174,6 +191,10 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			case .none:
 				return .none
 			}
+
+		case .applyShieldButtonTapped:
+			state.destination = .selectShield(.init())
+			return .none
 		}
 	}
 
@@ -181,7 +202,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .accountUpdated(updated):
 			state.account = updated
-			return .none
+			return loadSecState(state: state)
 
 		case let .isAllowedToUseFaucet(.success(value)):
 			state.faucetButtonState = value ? .enabled : .disabled
@@ -209,13 +230,8 @@ struct AccountPreferences: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .factorSourceLoaded(fs):
-			state.factorSourceRow = .init(
-				integrity: fs,
-				linkedEntities: .init(accounts: [], personas: [], hasHiddenEntities: false),
-				status: .init(integrity: fs),
-				selectability: .selectable
-			)
+		case let .securityStateDetermined(securityState):
+			state.securityState = securityState
 			return .none
 		}
 	}
@@ -239,10 +255,16 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			return .none
 		case .enterMnemonic(.delegate(.imported)):
 			state.destination = nil
-			return loadFactorSource(state: state)
+			return loadSecState(state: state)
 		case .displayMnemonic(.delegate(.backedUp)):
 			state.destination = nil
-			return loadFactorSource(state: state)
+			return loadSecState(state: state)
+		case let .selectShield(.delegate(.confirmed(shield))):
+			state.destination = .applyShield(.init(securityStructure: shield, selectedAccounts: [state.account.address], root: .completion))
+			return .none
+		case .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}
@@ -258,16 +280,23 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadFactorSource(state: State) -> Effect<Action> {
-		guard let unsecuredFI = state.account.unsecuredControllingFactorInstance?.factorInstance else {
-			return .none
-		}
-
-		return .run { send in
-			if let fs = try? await factorSourcesClient.getFactorSource(of: unsecuredFI) {
-				let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: fs)
-				await send(.internal(.factorSourceLoaded(integrity)))
+	private func loadSecState(state: State) -> Effect<Action> {
+		switch state.account.securityState {
+		case let .unsecured(control):
+			.run { send in
+				if let fs = try? await factorSourcesClient.getFactorSource(of: control.transactionSigning.factorInstance) {
+					let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: fs)
+					let factorSourceRowState = FactorSourcesList.Row(
+						integrity: integrity,
+						linkedEntities: .init(accounts: [], personas: [], hasHiddenEntities: false),
+						status: .init(integrity: integrity),
+						selectability: .selectable
+					)
+					await send(.internal(.securityStateDetermined(.unsecurified(factorSourceRowState))))
+				}
 			}
+		case .securified:
+			.send(.internal(.securityStateDetermined(.securified)))
 		}
 	}
 }
@@ -337,6 +366,10 @@ extension AccountPreferences {
 
 		case .dev(.devPreferences):
 			state.destination = .devPreferences(.init(account: state.account))
+			return .none
+
+		case .securifiedWith(.shield):
+			state.destination = .shieldDetails(.init(entityAddress: .account(state.account.address)))
 			return .none
 		}
 	}

@@ -181,6 +181,8 @@ extension DebugInspectFactorSourceView {
 				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
 			case let .ledger(ledgerFactorSource):
 				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
+			case let .arculusCard(arculusFactorSource):
+				Text(arculusFactorSource.asGeneral.name)
 			default: fatalError("DISCREPANCY: Found non .device | .ledger factor source. A real world user cannot possible have this.")
 			}
 			FactorSourceCommonView(common: factorSource.common)
