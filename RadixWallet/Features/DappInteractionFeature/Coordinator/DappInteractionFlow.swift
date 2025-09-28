@@ -594,6 +594,9 @@ extension DappInteractionFlow {
 		case let .preAuthorizationReview(.delegate(.failed(error))):
 			return handleTransactionFailure(error)
 
+		case .preAuthorizationReview(.delegate(.dismiss)):
+			return .send(.delegate(.dismiss))
+
 		default:
 			return .none
 		}

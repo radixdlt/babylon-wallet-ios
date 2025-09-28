@@ -14,10 +14,14 @@ extension ApplyShield {
 
 			init(
 				securityStructure: SecurityStructureOfFactorSources,
+				selectedAccounts: [AccountAddress] = [],
+				selectedPersonas: [IdentityAddress] = [],
 				root: Path.State? = nil
 			) {
 				self.securityStructure = securityStructure
 				self.root = root ?? .intro(.init(shieldID: securityStructure.metadata.id))
+				self.selectedAccounts = selectedAccounts
+				self.selectedPersonas = selectedPersonas
 			}
 		}
 

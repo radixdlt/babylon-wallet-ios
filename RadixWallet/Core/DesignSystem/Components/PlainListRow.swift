@@ -128,7 +128,7 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
 		.frame(minHeight: .plainListRowMinHeight)
-		.background(Color.primaryBackground)
+		.background(viewState.rowCoreViewState.context == .personaDetails ? Color.secondaryBackground : Color.primaryBackground)
 		.foregroundStyle(Color.primaryText)
 		.contentShape(Rectangle())
 	}
@@ -251,7 +251,7 @@ struct PlainListRowCore: View {
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch context {
-		case .toggle, .settings, .dappAndPersona, .compactPersona:
+		case .toggle, .settings, .dappAndPersona, .compactPersona, .personaDetails:
 			.body1Header
 		case .hiddenPersona:
 			.body1HighImportance
@@ -262,14 +262,14 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle, .hiddenPersona:
 			.body2Regular
-		case .settings, .dappAndPersona, .compactPersona:
+		case .settings, .dappAndPersona, .compactPersona, .personaDetails:
 			detail == nil ? .body1Regular : .body2Regular
 		}
 	}
 
 	var titleForegroundColor: Color {
 		switch context {
-		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona:
+		case .toggle, .hiddenPersona, .settings(isError: false), .dappAndPersona, .compactPersona, .personaDetails:
 			Color.primaryText
 		case .settings(isError: true):
 			.error
@@ -280,7 +280,7 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle, .hiddenPersona:
 			.secondaryText
-		case .settings(isError: false), .dappAndPersona, .compactPersona:
+		case .settings(isError: false), .dappAndPersona, .compactPersona, .personaDetails:
 			Color.primaryText
 		case .settings(isError: true):
 			.error
@@ -289,7 +289,7 @@ private extension PlainListRowCore.ViewState {
 
 	var titleLineLimit: Int? {
 		switch context {
-		case .settings, .dappAndPersona, .hiddenPersona, .compactPersona:
+		case .settings, .dappAndPersona, .hiddenPersona, .compactPersona, .personaDetails:
 			1
 		case .toggle:
 			nil
@@ -300,7 +300,7 @@ private extension PlainListRowCore.ViewState {
 		switch context {
 		case .toggle, .hiddenPersona, .compactPersona:
 			2
-		case .settings, .dappAndPersona:
+		case .settings, .dappAndPersona, .personaDetails:
 			3
 		}
 	}
@@ -315,6 +315,8 @@ private extension PlainListRowCore.ViewState {
 			.medium3
 		case .compactPersona:
 			.small1
+		case .personaDetails:
+			.zero
 		}
 	}
 
@@ -324,6 +326,8 @@ private extension PlainListRowCore.ViewState {
 			.medium3
 		case .dappAndPersona:
 			.medium1
+		case .personaDetails:
+			.zero
 		}
 	}
 
@@ -345,6 +349,7 @@ extension PlainListRowCore.ViewState {
 		case dappAndPersona
 		case hiddenPersona
 		case compactPersona
+		case personaDetails
 
 		static var settings: Self {
 			.settings(isError: false)

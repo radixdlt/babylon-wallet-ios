@@ -17,8 +17,13 @@ struct PersonaDetails: Sendable, FeatureReducer {
 	// MARK: - State
 
 	struct State: Sendable, Hashable {
+		enum SecurityState: Hashable {
+			case unsecurified(FactorSourcesList.Row)
+			case securified
+		}
+
 		var mode: Mode
-		var factorSourceRow: FactorSourcesList.Row?
+		var securityState: SecurityState?
 
 		enum Mode: Sendable, Hashable {
 			case general(dApps: IdentifiedArrayOf<DappInfo>)
@@ -64,8 +69,10 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
 		case hidePersonaTapped
-		case factorSourceCardTapped
+		case factorSourceCardTapped(FactorSourcesList.Row)
 		case factorSourceMessageTapped(FactorSourcesList.Row)
+		case applyShieldButtonTapped
+		case viewShieldDetailsRowTapped
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -80,7 +87,8 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		case dAppLoaded(AuthorizedDappDetailed)
-		case factorSourceLoaded(FactorSourceIntegrity)
+		case securityStateDetermined(State.SecurityState)
+		case reloadPersona
 	}
 
 	// MARK: - Destination
@@ -93,6 +101,9 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			case factorSourceDetail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicForFactorSource.State)
+			case selectShield(SelectShield.State)
+			case applyShield(ApplyShield.Coordinator.State)
+			case shieldDetails(EntityShieldDetails.State)
 
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
 			case confirmHideAlert(AlertState<Action.ConfirmHideAlert>)
@@ -105,6 +116,9 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			case factorSourceDetail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicForFactorSource.Action)
+			case selectShield(SelectShield.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
+			case shieldDetails(EntityShieldDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
 			case confirmHideAlert(ConfirmHideAlert)
@@ -137,6 +151,15 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicForFactorSource()
 			}
+			Scope(state: \.selectShield, action: \.selectShield) {
+				SelectShield()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
+			}
+			Scope(state: \.shieldDetails, action: \.shieldDetails) {
+				EntityShieldDetails()
+			}
 		}
 	}
 
@@ -154,9 +177,9 @@ struct PersonaDetails: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			let loadFSEffect = loadFactorSource(state: state)
-			guard case let .general(dApps) = state.mode else { return loadFSEffect }
-			return loadFSEffect.merge(with: .run { send in
+			let loadSecStateffect = loadSecState(state: state)
+			guard case let .general(dApps) = state.mode else { return loadSecStateffect }
+			return loadSecStateffect.merge(with: .run { send in
 				await send(.internal(.dAppsUpdated(addingDappMetadata(to: dApps))))
 			})
 
@@ -194,11 +217,8 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			state.destination = .confirmHideAlert(.confirmHide)
 			return .none
 
-		case .factorSourceCardTapped:
-			guard let integrity = state.factorSourceRow?.integrity else {
-				return .none
-			}
-			state.destination = .factorSourceDetail(.init(integrity: integrity))
+		case let .factorSourceCardTapped(row):
+			state.destination = .factorSourceDetail(.init(integrity: row.integrity))
 			return .none
 
 		case let .factorSourceMessageTapped(row):
@@ -221,6 +241,14 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			case .none:
 				return .none
 			}
+
+		case .applyShieldButtonTapped:
+			state.destination = .selectShield(.init())
+			return .none
+
+		case .viewShieldDetailsRowTapped:
+			state.destination = .shieldDetails(.init(entityAddress: .identity(state.persona.address)))
+			return .none
 		}
 	}
 
@@ -252,14 +280,12 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			state.destination = .dAppDetails(.init(dApp: dApp, context: .personaDetails))
 			return .none
 
-		case let .factorSourceLoaded(fs):
-			state.factorSourceRow = .init(
-				integrity: fs,
-				linkedEntities: .init(accounts: [], personas: [], hasHiddenEntities: false),
-				status: .init(integrity: fs),
-				selectability: .selectable
-			)
+		case let .securityStateDetermined(securityState):
+			state.securityState = securityState
 			return .none
+
+		case .reloadPersona:
+			return reloadEffect(state: state, notifyDelegate: false)
 		}
 	}
 
@@ -302,11 +328,22 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .enterMnemonic(.delegate(.imported)):
 			state.destination = nil
-			return loadFactorSource(state: state)
+			return loadSecState(state: state)
 
 		case .displayMnemonic(.delegate(.backedUp)):
 			state.destination = nil
-			return loadFactorSource(state: state)
+			return loadSecState(state: state)
+
+		case let .selectShield(.delegate(.confirmed(shield))):
+			state.destination = .applyShield(.init(securityStructure: shield, selectedPersonas: [state.persona.address], root: .completion))
+			return .none
+
+		case .applyShield(.delegate(.finished)):
+			state.destination = nil
+			return .run { [address = state.persona.address] send in
+				_ = try await personasClient.personaUpdates(address).first()
+				await send(.internal(.reloadPersona))
+			}
 
 		default:
 			return .none
@@ -378,16 +415,23 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case personaNotPresentInDapp(Persona.ID, AuthorizedDapp.ID)
 	}
 
-	private func loadFactorSource(state: State) -> Effect<Action> {
-		guard let unsecuredFI = state.persona.unsecuredControllingFactorInstance?.factorInstance else {
-			return .none
-		}
-
-		return .run { send in
-			if let fs = try? await factorSourcesClient.getFactorSource(of: unsecuredFI) {
-				let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: fs)
-				await send(.internal(.factorSourceLoaded(integrity)))
+	private func loadSecState(state: State) -> Effect<Action> {
+		switch state.persona.securityState {
+		case let .unsecured(control):
+			.run { send in
+				if let fs = try? await factorSourcesClient.getFactorSource(of: control.transactionSigning.factorInstance) {
+					let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: fs)
+					let factorSourceRowState = FactorSourcesList.Row(
+						integrity: integrity,
+						linkedEntities: .init(accounts: [], personas: [], hasHiddenEntities: false),
+						status: .init(integrity: integrity),
+						selectability: .selectable
+					)
+					await send(.internal(.securityStateDetermined(.unsecurified(factorSourceRowState))))
+				}
 			}
+		case .securified:
+			.send(.internal(.securityStateDetermined(.securified)))
 		}
 	}
 }

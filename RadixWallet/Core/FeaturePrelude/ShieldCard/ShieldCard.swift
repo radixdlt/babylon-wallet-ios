@@ -5,6 +5,7 @@ import SwiftUI
 struct ShieldCard: View {
 	let shield: SecurityStructureOfFactorSources
 	let mode: Mode
+	@Environment(\.colorScheme) var colorScheme
 
 	var body: some View {
 		card
@@ -39,13 +40,13 @@ struct ShieldCard: View {
 
 			if case let .selection(isSelected) = mode {
 				RadioButton(
-					appearance: .dark,
+					appearance: colorScheme == .light ? .dark : .light,
 					isSelected: isSelected
 				)
 			}
 		}
 		.padding(.vertical, verticalPadding)
-//		.padding(.horizontal, .small1)
+		.padding(.horizontal, .small1)
 		.background(.primaryBackground)
 		.roundedCorners(radius: .small1)
 		.cardShadow
@@ -84,7 +85,7 @@ extension SecurityStructureOfFactorSources {
 	}
 }
 
-// MARK: ShieldCard.Mode
+// MARK: - ShieldCard.Mode
 extension ShieldCard {
 	enum Mode: Equatable, Sendable {
 		case display

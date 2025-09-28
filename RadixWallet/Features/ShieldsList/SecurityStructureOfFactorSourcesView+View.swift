@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - SecurityStructureOfFactorSourcesView.View
 struct SecurityStructureOfFactorSourcesView: View {
 	let structure: SecurityStructureOfFactorSources
+	let onFactorSourceTapped: (FactorSource) -> Void
 
 	var body: some SwiftUI.View {
 		VStack(spacing: .medium3) {
@@ -129,6 +130,9 @@ struct SecurityStructureOfFactorSourcesView: View {
 					),
 					mode: .display
 				)
+				.onTapGesture {
+					onFactorSourceTapped(factorSource)
+				}
 
 				let isLastFactor = factorSource == factorSources.last
 				if let combinationLabel, !isLastFactor {
@@ -163,42 +167,3 @@ struct SecurityStructureOfFactorSourcesView: View {
 		.roundedCorners(radius: .small1)
 	}
 }
-
-//
-// extension InteractionReview.ShieldView.ViewState {
-//    private func filteredFactors(for roleFactors: KeyPath<MatrixOfFactorSourceIDs, [FactorSourceId]>) -> [FactorSource] {
-//        allFactorSourcesFromProfile.filter { shield.matrixOfFactors[keyPath: roleFactors].contains($0.factorSourceID) }
-//    }
-//
-//    var primaryThresholdFactors: [FactorSource] {
-//        filteredFactors(for: \.primaryRole.thresholdFactors)
-//    }
-//
-//    var primaryOverrideFactors: [FactorSource] {
-//        filteredFactors(for: \.primaryRole.overrideFactors)
-//    }
-//
-//    var recoveryFactors: [FactorSource] {
-//        filteredFactors(for: \.recoveryRole.overrideFactors)
-//    }
-//
-//    var confirmationFactors: [FactorSource] {
-//        filteredFactors(for: \.confirmationRole.overrideFactors)
-//    }
-//
-//    var authenticationSigningFactor: FactorSource? {
-//        allFactorSourcesFromProfile.first { $0.factorSourceID == shield.authenticationSigningFactor }
-//    }
-//
-//    var periodUntilAutoConfirm: TimePeriod {
-//        shield.matrixOfFactors.timeUntilDelayedConfirmationIsCallable
-//    }
-//
-//    var threshold: Threshold {
-//        shield.matrixOfFactors.primaryRole.threshold
-//    }
-//
-//    var shieldName: DisplayName {
-//        shield.metadata.displayName
-//    }
-// }

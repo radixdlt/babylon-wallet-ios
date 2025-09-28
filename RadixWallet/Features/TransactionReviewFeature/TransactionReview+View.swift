@@ -234,6 +234,7 @@ private extension View {
 			.customizeFees(with: destinationStore)
 			.submitting(with: destinationStore)
 			.rawTransactionAlert(with: destinationStore)
+			.tooManyFactorsSkipped(with: destinationStore)
 	}
 
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
@@ -265,6 +266,12 @@ private extension View {
 
 	private func rawTransactionAlert(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		alert(store: destinationStore.scope(state: \.rawTransactionAlert, action: \.rawTransactionAlert))
+	}
+
+	private func tooManyFactorsSkipped(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped)) {
+			SigningTooManyFactorsSkipped.View(store: $0)
+		}
 	}
 }
 

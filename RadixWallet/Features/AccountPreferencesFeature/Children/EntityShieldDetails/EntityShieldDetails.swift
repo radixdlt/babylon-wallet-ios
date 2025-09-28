@@ -1,11 +1,12 @@
-// MARK: - ShieldTemplateDetails
+// MARK: - EntityShieldDetails
 @Reducer
-struct ShieldTemplateDetails: Sendable, FeatureReducer {
+struct EntityShieldDetails: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
-		@Shared(.shieldBuilder) var shieldBuilder
+		let entityAddress: AddressOfAccountOrPersona
 
-		var structure: SecurityStructureOfFactorSources
+		@Shared(.shieldBuilder) var shieldBuilder
+		var structure: SecurityStructureOfFactorSources?
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -14,9 +15,8 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	enum ViewAction: Sendable, Equatable {
+		case task
 		case editFactorsTapped
-		case applyButtonTapped
-		case renameButtonTapped
 		case onFactorSourceTapped(FactorSource)
 	}
 
@@ -29,28 +29,18 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case editShieldFactors(EditSecurityShieldCoordinator.State)
-			case applyShield(ApplyShield.Coordinator.State)
-			case rename(RenameLabel.State)
 			case factorSourceDetails(FactorSourceDetail.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case editShieldFactors(EditSecurityShieldCoordinator.Action)
-			case applyShield(ApplyShield.Coordinator.Action)
-			case rename(RenameLabel.Action)
 			case factorSourceDetails(FactorSourceDetail.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.editShieldFactors, action: \.editShieldFactors) {
 				EditSecurityShieldCoordinator()
-			}
-			Scope(state: \.applyShield, action: \.applyShield) {
-				ApplyShield.Coordinator()
-			}
-			Scope(state: \.rename, action: \.rename) {
-				RenameLabel()
 			}
 			Scope(state: \.factorSourceDetails, action: \.factorSourceDetails) {
 				FactorSourceDetail()
@@ -72,21 +62,20 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .task:
+			do {
+				state.structure = try SargonOS.shared.securityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: state.entityAddress)
+			} catch {
+				errorQueue.schedule(error)
+			}
+			return .none
 		case .editFactorsTapped:
-			state.$shieldBuilder.withLock { [structure = state.structure] sharedValue in
+			guard let structure = state.structure else { return .none }
+			state.$shieldBuilder.withLock { [structure] sharedValue in
 				sharedValue = SecurityShieldBuilder.withSecurityStructureOfFactorSources(securityStructureOfFactorSources: structure)
 			}
 			state.destination = .editShieldFactors(.init())
 			return .none
-
-		case .applyButtonTapped:
-			state.destination = .applyShield(.init(securityStructure: state.structure))
-			return .none
-
-		case .renameButtonTapped:
-			state.destination = .rename(.init(kind: .shield(state.structure)))
-			return .none
-
 		case let .onFactorSourceTapped(factorSource):
 			return .run { send in
 				let integrity = try await SargonOS.shared.factorSourceIntegrity(factorSource: factorSource)
@@ -126,12 +115,6 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 				errorQueue.schedule(err)
 			}
 		case .editShieldFactors(.delegate(.cancelled)):
-			state.destination = nil
-			return .none
-		case .applyShield(.delegate(.finished)):
-			state.destination = nil
-			return .none
-		case .applyShield(.delegate(.skipped)):
 			state.destination = nil
 			return .none
 		default:

@@ -5,7 +5,7 @@ extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(
 			account: account,
-			factorSourceRow: factorSourceRow,
+			securityState: securityState,
 			sections: {
 				var sections: [AccountPreferences.ViewState.Section] = [
 					.init(
@@ -19,6 +19,17 @@ extension AccountPreferences.State {
 						rows: [.thirdPartyDeposits(account.onLedgerSettings.thirdPartyDeposits.depositRule)]
 					),
 				]
+
+				if case .securified = securityState {
+					sections.insert(
+						.init(
+							id: .securifiedWith,
+							title: "Secured with",
+							rows: [.shield]
+						),
+						at: 0
+					)
+				}
 
 				#if DEBUG
 				addDevAccountPreferencesSection(to: &sections)
@@ -47,7 +58,7 @@ extension AccountPreferences {
 	struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Account
-		let factorSourceRow: FactorSourcesList.Row?
+		let securityState: AccountPreferences.State.SecurityState?
 		let sections: [Section]
 		let faucetButtonState: ControlState
 		let isOnMainnet: Bool
@@ -67,36 +78,7 @@ extension AccountPreferences {
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
 					header: {
-						VStack(alignment: .leading) {
-							AccountCard(account: viewStore.account)
-							if let factorSourceRow = viewStore.factorSourceRow {
-								Text("Secured with")
-									.textStyle(.body1HighImportance)
-									.foregroundColor(.secondaryText)
-									.padding(.top, .medium3)
-
-								FactorSourceCard(
-									kind: .instance(
-										factorSource: factorSourceRow.integrity.factorSource,
-										kind: .extended
-									),
-									mode: .display,
-									messages: factorSourceRow.messages,
-									onAction: { action in
-										switch action {
-										case .messageTapped:
-											store.send(.view(.factorSourceMessageTapped(factorSourceRow)))
-										case .removeTapped:
-											break
-										}
-									}
-								)
-								.padding(.bottom, .medium3)
-								.onTapGesture {
-									viewStore.send(.factorSourceCardTapped)
-								}
-							}
-						}
+						header(with: viewStore)
 					},
 					footer: { footer(with: viewStore) }
 				)
@@ -112,6 +94,49 @@ extension AccountPreferences {
 }
 
 extension AccountPreferences.View {
+	@ViewBuilder
+	private func header(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		VStack(alignment: .leading) {
+			AccountCard(account: viewStore.account)
+			if case let .unsecurified(factorSourceRow) = viewStore.securityState {
+				HStack {
+					Text("Secured with")
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.secondaryText)
+						.padding(.top, .medium3)
+
+					Spacer()
+
+					Button("Apply Shield") {
+						store.send(.view(.applyShieldButtonTapped))
+					}
+					.buttonStyle(.blueText)
+				}
+
+				FactorSourceCard(
+					kind: .instance(
+						factorSource: factorSourceRow.integrity.factorSource,
+						kind: .extended
+					),
+					mode: .display,
+					messages: factorSourceRow.messages,
+					onAction: { action in
+						switch action {
+						case .messageTapped:
+							store.send(.view(.factorSourceMessageTapped(factorSourceRow)))
+						case .removeTapped:
+							break
+						}
+					}
+				)
+				.padding(.bottom, .medium3)
+				.onTapGesture {
+					viewStore.send(.factorSourceCardTapped(factorSourceRow))
+				}
+			}
+		}
+	}
+
 	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		VStack {
@@ -171,9 +196,12 @@ private extension View {
 			.devAccountPreferences(with: destinationStore)
 			.hideAccount(with: destinationStore, store: store)
 			.deleteAccount(with: destinationStore, store: store)
-			.factorSourceDetails(with: destinationStore, store: store)
+			.factorSourceDetails(with: destinationStore)
+			.shieldDetails(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
+			.selectShield(with: destinationStore)
+			.applyShield(with: destinationStore)
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
@@ -208,9 +236,15 @@ private extension View {
 		}
 	}
 
-	private func factorSourceDetails(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>, store: StoreOf<AccountPreferences>) -> some View {
+	private func factorSourceDetails(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetail, action: \.factorSourceDetail)) {
 			FactorSourceDetail.View(store: $0)
+		}
+	}
+
+	private func shieldDetails(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.shieldDetails, action: \.shieldDetails)) {
+			EntityShieldDetails.View(store: $0)
 		}
 	}
 
@@ -227,19 +261,37 @@ private extension View {
 			}
 		}
 	}
+
+	private func selectShield(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.selectShield, action: \.selectShield)) { store in
+			SelectShield.View(store: store)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) { store in
+			ApplyShield.Coordinator.View(store: store)
+		}
+	}
 }
 
 // MARK: - AccountPreferences.Section
 extension AccountPreferences {
 	enum Section: Hashable, Sendable {
+		case securifiedWith
 		case personalize
 		case onLedgerBehaviour
 		case development
 
 		enum SectionRow: Hashable, Sendable {
+			case securifiedWith(SecurifiedWithRow)
 			case personalize(PersonalizeRow)
 			case onLedger(OnLedgerBehaviourRow)
 			case dev(DevelopmentRow)
+		}
+
+		enum SecurifiedWithRow: Hashable, Sendable {
+			case shield
 		}
 
 		enum PersonalizeRow: Hashable, Sendable {
@@ -260,6 +312,15 @@ extension AccountPreferences {
 }
 
 extension PreferenceSection.Row where RowId == AccountPreferences.Section.SectionRow {
+	static var shield: Self {
+		.init(
+			id: .securifiedWith(.shield),
+			title: "Security Shield",
+			subtitle: "View security shield details",
+			icon: .asset(.transactionReviewUpdateShield)
+		)
+	}
+
 	static var accountLabel: Self {
 		.init(
 			id: .personalize(.accountLabel),

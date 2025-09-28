@@ -110,6 +110,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 		case resetToApprovable
 		case showRawManifest(String)
+		case tooManyFactorsSkipped(TransactionIntent)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -126,6 +127,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case submitting(SubmitTransaction.State)
 			case customizeFees(CustomizeFees.State)
 			case rawTransactionAlert(AlertState<Never>)
+			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.State)
 		}
 
 		@CasePathable
@@ -134,6 +136,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case submitting(SubmitTransaction.Action)
 			case customizeFees(CustomizeFees.Action)
 			case rawTransactionAlert(Never)
+			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -145,6 +148,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: \.submitting, action: \.submitting) {
 				SubmitTransaction()
+			}
+			Scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped) {
+				SigningTooManyFactorsSkipped()
 			}
 		}
 	}
@@ -319,8 +325,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
 			} catch: { error, send in
 				await send(.internal(.resetToApprovable))
-				if let error = error as? CommonError, error == .HostInteractionAborted {
-					// We don't show any error since user aborted signing intentionally
+				if let error = error as? CommonError, error == .SigningFailedTooManyFactorSourcesNeglected {
+					await send(.internal(.tooManyFactorsSkipped(intent)))
+					// Show too many factors skipped sheet
 				} else {
 					errorQueue.schedule(error)
 				}
@@ -373,6 +380,10 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .showRawManifest(manifest):
 			state.displayMode = .raw(manifest: manifest)
 			return .none
+
+		case let .tooManyFactorsSkipped(intent):
+			state.destination = .tooManyFactorSkipped(.init(intent: .transaction(intent)))
+			return .none
 		}
 	}
 
@@ -405,6 +416,16 @@ struct TransactionReview: Sendable, FeatureReducer {
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
 			return delayedShortEffect(for: .delegate(.dismiss))
+
+		case .tooManyFactorSkipped(.delegate(.cancel)):
+			state.destination = nil
+			return delayedShortEffect(for: .delegate(.dismiss))
+
+		case let .tooManyFactorSkipped(.delegate(.restart(.transaction(intent)))):
+			return .send(.internal(.buildTransactionIntentResult(.success(intent))))
+
+		case .tooManyFactorSkipped(.delegate(.restart(.preAuth))):
+			fatalError("Bad implementation, tried to restart with subintent")
 
 		default:
 			return .none

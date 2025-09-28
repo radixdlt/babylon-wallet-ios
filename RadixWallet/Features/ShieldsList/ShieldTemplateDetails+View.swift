@@ -21,7 +21,10 @@ extension ShieldTemplateDetails {
 						}
 
 						Card {
-							SecurityStructureOfFactorSourcesView(structure: store.structure)
+							SecurityStructureOfFactorSourcesView(
+								structure: store.structure,
+								onFactorSourceTapped: { store.send(.view(.onFactorSourceTapped($0))) }
+							)
 						}
 					}
 					.padding([.horizontal, .bottom], .medium3)
@@ -57,6 +60,7 @@ private extension View {
 		return editFactors(with: destinationStore)
 			.applyShield(with: destinationStore)
 			.updateShieldName(with: destinationStore)
+			.factorSourceDetail(with: destinationStore)
 	}
 
 	private func editFactors(with destinationStore: PresentationStoreOf<ShieldTemplateDetails.Destination>) -> some View {
@@ -74,6 +78,12 @@ private extension View {
 	private func updateShieldName(with destinationStore: PresentationStoreOf<ShieldTemplateDetails.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.rename, action: \.rename)) {
 			RenameLabel.View(store: $0)
+		}
+	}
+
+	private func factorSourceDetail(with destinationStore: PresentationStoreOf<ShieldTemplateDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetails, action: \.factorSourceDetails)) {
+			FactorSourceDetail.View(store: $0)
 		}
 	}
 }

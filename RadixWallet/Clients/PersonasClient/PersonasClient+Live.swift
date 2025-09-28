@@ -38,6 +38,12 @@ extension PersonasClient: DependencyKey {
 			},
 			hasSomePersonaOnCurrentNetwork: {
 				await profileStore.profile().network?.hasSomePersona() ?? false
+			},
+			personaUpdates: { address in
+				await profileStore.personaValues().compactMap {
+					$0.first { $0.address == address }
+				}
+				.eraseToAnyAsyncSequence()
 			}
 		)
 	}
