@@ -266,7 +266,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case let .reloaded(persona, mode):
 			state.persona = persona
 			state.mode = mode
-			return .none
+			return loadSecState(state: state)
 
 		case let .hideLoader(controlStateKeyPath):
 			state[keyPath: controlStateKeyPath] = .enabled

@@ -53,7 +53,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Equatable, Sendable {
-		case selectedFactorSource(FactorSource)
+		case selectedFactorSource(FactorSource, context: State.Context)
 	}
 
 	struct Destination: DestinationReducer {
@@ -147,7 +147,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 				state.destination = .addNewP2PLink(.init(root: .ledgerConnectionIntro))
 				return .none
 			}
-			return .send(.delegate(.selectedFactorSource(row.integrity.factorSource)))
+			return .send(.delegate(.selectedFactorSource(row.integrity.factorSource, context: state.context)))
 
 		case .addSecurityFactorTapped:
 			let context: AddFactorSource.Context = switch state.context {
@@ -199,7 +199,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 			guard let selectedFactorSource = state.selectedFactorSource?.integrity.factorSource else {
 				return .none
 			}
-			return .send(.delegate(.selectedFactorSource(selectedFactorSource)))
+			return .send(.delegate(.selectedFactorSource(selectedFactorSource, context: state.context)))
 		case .displayMnemonic(.delegate(.backedUp)):
 			state.destination = nil
 			return entitiesEffect(state: state)

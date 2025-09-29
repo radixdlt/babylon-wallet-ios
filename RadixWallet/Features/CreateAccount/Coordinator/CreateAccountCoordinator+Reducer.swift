@@ -101,7 +101,7 @@ extension CreateAccountCoordinator {
 			state.path.append(.selectFactorSource(.init(context: .createAccount)))
 			return .none
 
-		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
+		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs, _))))):
 			return createAccount(state: &state, factorSource: fs)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
