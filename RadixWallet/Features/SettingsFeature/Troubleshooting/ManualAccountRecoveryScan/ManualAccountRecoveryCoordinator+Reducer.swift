@@ -93,8 +93,14 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
-		case let .selectFactorSource(.delegate(.selectedFactorSource(fs))):
-			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: fs.factorSourceID.extract()!, olympia: fs.supportsOlympia))))
+		case let .selectFactorSource(.delegate(.selectedFactorSource(fs, context))):
+			let isOlympiaRecovery = switch context {
+			case let .accountRecovery(isOlympia):
+				isOlympia
+			default:
+				false
+			}
+			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: fs.factorSourceID.extract()!, olympia: isOlympiaRecovery))))
 			return .none
 
 		case .accountRecoveryScan(.delegate(.dismissed)):

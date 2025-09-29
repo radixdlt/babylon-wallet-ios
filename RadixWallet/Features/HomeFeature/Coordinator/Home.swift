@@ -242,6 +242,7 @@ struct Home: Sendable, FeatureReducer {
 					// which probably has already loaded its resources & fiat worth.
 					var row = state.accountRows.first(where: { $0.id == account.address }) ??
 						.init(account: account, problems: state.problems)
+					row.account = account
 					row.updateFactorSource(from: state.factorSources)
 					return row
 				}

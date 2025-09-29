@@ -133,7 +133,7 @@ extension CreatePersonaCoordinator {
 			state.path.append(.selectFactorSource(.init(context: .createPersona)))
 			return .none
 
-		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs))))):
+		case let .path(.element(_, action: .selectFactorSource(.delegate(.selectedFactorSource(fs, _))))):
 			let name = state.name
 			let personaData = state.personaData
 			return .run { send in
