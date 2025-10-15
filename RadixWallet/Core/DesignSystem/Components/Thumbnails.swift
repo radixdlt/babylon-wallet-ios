@@ -216,9 +216,11 @@ struct LoadableImage<Placeholder: View>: View {
 			LazyImage(url: url) { state in
 				if state.isLoading {
 					loadingView
-				} else if let image = state.image {
-					imageView(image: image, imageSize: state.imageContainer?.image.size)
-				} else {
+				}
+				//                else if let image = state.image {
+//					imageView(image: image, imageSize: state.imageContainer?.image.size)
+//				}
+				else {
 					brokenImageView
 					let error = state.error?.legibleDescription ?? ""
 					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(error)")

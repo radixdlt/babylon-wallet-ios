@@ -67,7 +67,7 @@ extension ApplyShield {
 			case .applyButtonTapped:
 				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
 				return .run { [securityStructure = state.securityStructure] send in
-					let manifest = try await SargonOs.shared.makeSetupSecurityShieldManifest(securityStructure: securityStructure, address: addresses.first!)
+					let manifest = try await SargonOs.shared.makeUpdateSecurityShieldManifest(securityStructure: securityStructure, address: addresses.first!)
 
 					Task {
 						let result = await dappInteractionClient.addWalletInteraction(
