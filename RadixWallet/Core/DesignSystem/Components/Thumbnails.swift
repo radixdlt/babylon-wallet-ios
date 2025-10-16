@@ -38,7 +38,7 @@ struct Thumbnail: View {
 				.frame(size)
 
 		case .token(.other):
-			circularImage(placeholder: AssetResource.token)
+			circularImage(placeholder: AssetResource.token, placeholders: .init(brokenImage: .asset(.init(name: "tokenIcon"))))
 
 		case .poolUnit, .lsu:
 			circularImage(placeholder: AssetResource.poolUnits, placeholderBackground: true)
@@ -60,8 +60,8 @@ struct Thumbnail: View {
 		}
 	}
 
-	private func circularImage(placeholder: ImageAsset, placeholderBackground: Bool = false) -> some View {
-		baseImage(placeholder: placeholder, placeholderBackground: placeholderBackground)
+	private func circularImage(placeholder: ImageAsset, placeholderBackground: Bool = false, placeholders: LoadableImagePlaceholderBehaviour = .default) -> some View {
+		baseImage(placeholder: placeholder, placeholderBackground: placeholderBackground, placeholders: placeholders)
 			.clipShape(Circle())
 			.frame(size)
 	}
@@ -72,8 +72,8 @@ struct Thumbnail: View {
 			.frame(size)
 	}
 
-	private func baseImage(placeholder: ImageAsset, placeholderBackground: Bool) -> some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
+	private func baseImage(placeholder: ImageAsset, placeholderBackground: Bool, placeholders: LoadableImagePlaceholderBehaviour = .default) -> some View {
+		LoadableImage(url: url, size: .fixedSize(size), placeholders: placeholders) {
 			ZStack {
 				if placeholderBackground {
 					Rectangle()
