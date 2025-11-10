@@ -299,6 +299,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			let reviewedTransaction = ReviewedTransaction(
 				transactionManifest: preview.transactionManifest,
+				executionSummary: preview.analyzedManifestToReview,
 				networkID: preview.networkID,
 				feePayer: .loading,
 				transactionFee: preview.transactionFee,
@@ -314,8 +315,19 @@ struct TransactionReview: Sendable, FeatureReducer {
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .buildTransactionIntentResult(.success(intent)):
+			guard let reviewedTx = state.reviewedTransaction else {
+				return .none
+			}
 			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
-				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
+				let signedIntent = try await SargonOS.shared.signTransaction(
+					transactionIntent: intent,
+					executionSummary: reviewedTx.executionSummary
+				)
+
+				//                if isAccessControllerTimedRecoveryManifest(manifest: signedIntent.intent.manifest) {
+				//                    let x = 10
+				//                    // User needs first to confirm the timed recovery
+				//                } else {
 				let notarizedTransaction = try await transactionClient.notarizeTransaction(
 					.init(
 						signedIntent: signedIntent,
@@ -323,6 +335,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 					)
 				)
 				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
+				// }
 			} catch: { error, send in
 				await send(.internal(.resetToApprovable))
 				if let error = error as? CommonError, error == .SigningFailedTooManyFactorSourcesNeglected {
@@ -723,6 +736,7 @@ struct TransactionReviewFailure: LocalizedError {
 // MARK: - ReviewedTransaction
 struct ReviewedTransaction: Hashable, Sendable {
 	let transactionManifest: TransactionManifest
+	let executionSummary: ExecutionSummary
 	let networkID: NetworkID
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 

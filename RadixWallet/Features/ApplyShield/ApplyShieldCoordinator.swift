@@ -83,7 +83,7 @@ extension ApplyShield {
 								let txID = tx.send.transactionIntentHash
 								if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 									// TODO: Use a client which wraps SargonOS so this features becomes testable
-									try await SargonOs.shared.markEntitiesAsSecurified(entityAddresses: addresses)
+									try await SargonOs.shared.commitProvisionalSecurityState(entityAddress: addresses.first!)
 								}
 								return
 							}
