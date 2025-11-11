@@ -82,6 +82,8 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				await state.setTokenPrices(prices)
 			}
+
+			let prices = try! await SargonOS.shared.fetchNftPrices(nftIds: [.init("resource_rdx1ngsnjtypwayhkwnyu0swmh2ryu398xtq6gt5lz82n4tyyvs6qyd4wn:{410c43777ae29890-75fb67848fdb2c27-b9d4bce503f0c3c0-39e899816dfeba0c}")], currency: .usd)
 		}
 
 		@Sendable
