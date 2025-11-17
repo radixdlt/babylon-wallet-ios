@@ -187,7 +187,8 @@ extension Loadable {
 	}
 
     func errorFallback(_ fallback: Value) -> Loadable<Value> {
-        if case .failure = self {
+        if case let .failure(error) = self {
+            assertionFailure("error")
             return .success(fallback)
         }
         return self
@@ -287,6 +288,19 @@ extension Loadable {
 			.failure(error)
 		}
 	}
+    
+    func concat3<OtherValue1, OtherValue2>(_ other: Loadable<OtherValue1>, _ other2: Loadable<OtherValue2>) -> Loadable<(Value, OtherValue1, OtherValue2)> {
+        switch (self, other, other2) {
+        case (.idle, _, _), (_, .idle, _), (_, _, .idle):
+            .idle
+        case (.loading, _, _), (_, .loading, _), (_, _, .loading):
+            .loading
+        case let (.success(thisValue), .success(otherValue), .success(otherValue2)):
+            .success((thisValue, otherValue, otherValue2))
+        case let (.failure(error), _, _), let (_, .failure(error), _), let (_, _, .failure(error)):
+            .failure(error)
+        }
+    }
 
     func flatten<InnerValue>() -> Loadable<InnerValue> where Value == Loadable<InnerValue> {
         switch self {

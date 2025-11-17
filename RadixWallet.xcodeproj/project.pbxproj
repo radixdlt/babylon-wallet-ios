@@ -877,6 +877,7 @@
 		A03194222E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03194202E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift */; };
 		A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */; };
 		A033153C2EC22BED00B93EA3 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A033153B2EC22BED00B93EA3 /* Sargon */; };
+		A03AE62D2EC9FF680037B161 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03AE62C2EC9FF630037B161 /* MessageView.swift */; };
 		A03DD84B2DDD9150008F7723 /* DAppTagsSelection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */; };
 		A03DD84C2DDD9150008F7723 /* DAppTagsSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */; };
 		A04207F42DE9DDB600FE2947 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A04207F32DE9DDB600FE2947 /* Sargon */; };
@@ -2274,6 +2275,7 @@
 		A018C8742E0030C100461852 /* BlogPostsClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPostsClient+Test.swift"; sourceTree = "<group>"; };
 		A031941F2E411A640015C231 /* ArculusForgotPIN-EnterNewPIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusForgotPIN-EnterNewPIN.swift"; sourceTree = "<group>"; };
 		A03194202E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusForgotPIN-EnterNewPIN+View.swift"; sourceTree = "<group>"; };
+		A03AE62C2EC9FF630037B161 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		A03DD8492DDD9150008F7723 /* DAppTagsSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppTagsSelection.swift; sourceTree = "<group>"; };
 		A03DD84A2DDD9150008F7723 /* DAppTagsSelection+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppTagsSelection+View.swift"; sourceTree = "<group>"; };
 		A04AA7E02E12E08B00F38E67 /* SelectFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFactorSource.swift; sourceTree = "<group>"; };
@@ -5806,6 +5808,7 @@
 		5B27FBE82CC70AC2002975BE /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				A03AE62C2EC9FF630037B161 /* MessageView.swift */,
 				5B27FBD82CC67655002975BE /* HeadingView.swift */,
 				5B27FBEB2CC70E87002975BE /* ExpandableHeadingView.swift */,
 				5B03E3D42CC1487400E10A64 /* TransferLineView.swift */,
@@ -9320,6 +9323,7 @@
 				48CFC5E42ADC10DA00E77A5C /* AppearanceID+Extra.swift in Sources */,
 				A40815532C7E0D08005E65B9 /* AccountAuthorizedDepositorsResourceBadge.swift in Sources */,
 				A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */,
+				A03AE62D2EC9FF680037B161 /* MessageView.swift in Sources */,
 				48CFC5AE2ADC10DA00E77A5C /* CheckmarkView.swift in Sources */,
 				48CFC6912ADC10DB00E77A5C /* MigratedAccount.swift in Sources */,
 				A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */,

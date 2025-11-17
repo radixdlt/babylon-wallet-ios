@@ -146,33 +146,6 @@ extension GatewayAPIClient {
 			)
 		}
 	}
-
-	func fetchEntityNonFungibleResourceIdsPage(
-		_ accountAddress: String,
-		resourceAddress: String,
-		vaultAddress: String
-	) -> @Sendable (PageCursor?) async throws -> PaginatedResourceResponse<String> {
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-
-		return { pageCursor in
-			let request = GatewayAPI.StateEntityNonFungibleIdsPageRequest(
-				atLedgerState: pageCursor?.ledgerState.selector,
-				cursor: pageCursor?.nextPageCursor,
-				address: accountAddress,
-				vaultAddress: vaultAddress,
-				resourceAddress: resourceAddress
-			)
-			let response = try await gatewayAPIClient.getEntityNonFungibleIdsPage(request)
-
-			return .init(
-				loadedItems: response.items,
-				totalCount: response.totalCount,
-				cursor: response.nextCursor.map {
-					PageCursor(ledgerState: response.ledgerState, nextPageCursor: $0)
-				}
-			)
-		}
-	}
 }
 
 // MARK: - Pagination
