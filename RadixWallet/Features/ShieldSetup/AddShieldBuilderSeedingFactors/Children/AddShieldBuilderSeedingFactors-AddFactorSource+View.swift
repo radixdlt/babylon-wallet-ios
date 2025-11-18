@@ -103,7 +103,12 @@ private extension AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd.State {
 		case .hardware:
 			[.arculusCard, .ledgerHqHardwareWallet]
 		case .any:
-			[.password, .arculusCard, .ledgerHqHardwareWallet, .offDeviceMnemonic]
+			[
+				// .password,
+				.arculusCard,
+				.ledgerHqHardwareWallet,
+				.offDeviceMnemonic,
+			]
 		}
 	}
 
