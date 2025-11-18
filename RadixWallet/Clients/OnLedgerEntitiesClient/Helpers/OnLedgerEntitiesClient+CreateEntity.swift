@@ -606,6 +606,11 @@ extension OnLedgerEntitiesClient {
 		let resource: OnLedgerEntity.Resource
 		var stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
+
+	struct OwnedNonFungibleId: Hashable, Sendable {
+		let id: NonFungibleGlobalID
+		var fiatWorth: FiatWorth?
+	}
 }
 
 extension OnLedgerEntity.Metadata {

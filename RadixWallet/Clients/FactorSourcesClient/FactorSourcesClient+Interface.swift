@@ -160,13 +160,13 @@ extension FactorSourcesClient {
 	func getFactorSources(
 		matching filter: (FactorSource) -> Bool
 	) async throws -> IdentifiedArrayOf<FactorSource> {
-		try await IdentifiedArrayOf(uniqueElements: getFactorSources().filter(filter))
+		try await getFactorSources().filter(filter).asIdentified()
 	}
 
 	func getFactorSources<Source: FactorSourceProtocol>(
 		type _: Source.Type
 	) async throws -> IdentifiedArrayOf<Source> {
-		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
+		try await getFactorSources().compactMap { $0.extract(Source.self) }.asIdentified()
 	}
 
 	func entitiesLinkedToFactorSourceKind(kind: FactorSourceKind) async throws -> [EntitiesLinkedToFactorSource] {

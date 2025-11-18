@@ -30,6 +30,7 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case closeButtonTapped
+		case onDissapear
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -51,6 +52,8 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 				.merge(with: startTimer())
 		case .closeButtonTapped:
 			.send(.delegate(.dismiss(state.request)))
+		case .onDissapear:
+			.cancel(id: CancellableId.expirationTimer)
 		}
 	}
 

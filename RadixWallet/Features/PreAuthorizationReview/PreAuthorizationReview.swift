@@ -9,7 +9,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let nonce: Nonce
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		let dAppMetadata: DappMetadata
-		let message: String?
+		let message: Message
 
 		var preview: PreAuthorizationPreview?
 
@@ -243,7 +243,7 @@ private extension PreAuthorizationReview {
 				intentDiscriminator: .secureRandom(),
 				manifest: preview.manifest,
 				expiration: expiration,
-				message: message
+				message: message.plaintext
 			))
 			await send(.internal(.builtSubintent(subintent)))
 		} catch: { error, send in

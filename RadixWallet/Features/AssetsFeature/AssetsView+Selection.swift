@@ -43,7 +43,7 @@ extension AssetsView.State {
 
 		return .init(
 			fungibleResources: selectedFungibleResources,
-			nonFungibleResources: IdentifiedArrayOf(uniqueElements: selectedNonFungibleTokensPerResource),
+			nonFungibleResources: selectedNonFungibleTokensPerResource.asIdentified(),
 			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
 		)
 	}

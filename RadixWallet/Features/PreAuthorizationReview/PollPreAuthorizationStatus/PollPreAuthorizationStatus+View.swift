@@ -50,6 +50,9 @@ extension PollPreAuthorizationStatus {
 				.onFirstTask { @MainActor in
 					store.send(.view(.onFirstTask))
 				}
+				.onDisappear {
+					store.send(.view(.onDissapear))
+				}
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.height(height), .large])
 				.presentationBackground(.blur)

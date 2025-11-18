@@ -27,29 +27,7 @@ extension DeviceFactorSourceClient {
 	) async throws -> [HdSignatureOfTransactionIntentHash] {
 		let factorSourceId = input.factorSourceId
 		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
-
-		var signatures = Set<HdSignatureOfTransactionIntentHash>()
-
-		for transaction in input.perTransaction {
-			let payloadId = transaction.payload.decompile().hash()
-			let hashedData = payloadId.hash
-			let transactionSignatures = try await sign(
-				factorSourceId: factorSourceId,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hashedData: hashedData,
-				ownedFactorInstances: transaction.ownedFactorInstances
-			)
-
-			signatures.formUnion(
-				transactionSignatures.map {
-					.init(
-						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
-						signature: $0.signatureWithPublicKey
-					)
-				})
-		}
-
-		return Array(signatures)
+		return mnemonicWithPassphrase.signTransaction(input: input)
 	}
 
 	func signSubintent(
@@ -57,29 +35,7 @@ extension DeviceFactorSourceClient {
 	) async throws -> [HdSignatureOfSubintentHash] {
 		let factorSourceId = input.factorSourceId
 		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
-
-		var signatures = Set<HdSignatureOfSubintentHash>()
-
-		for transaction in input.perTransaction {
-			let payloadId = transaction.payload.decompile().hash()
-			let hashedData = payloadId.hash
-			let transactionSignatures = try await sign(
-				factorSourceId: factorSourceId,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hashedData: hashedData,
-				ownedFactorInstances: transaction.ownedFactorInstances
-			)
-
-			signatures.formUnion(
-				transactionSignatures.map {
-					.init(
-						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
-						signature: $0.signatureWithPublicKey
-					)
-				})
-		}
-
-		return Array(signatures)
+		return mnemonicWithPassphrase.signSubintent(input: input)
 	}
 
 	func signAuth(
@@ -87,30 +43,7 @@ extension DeviceFactorSourceClient {
 	) async throws -> [HdSignatureOfAuthIntentHash] {
 		let factorSourceId = input.factorSourceId
 		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
-
-		var signatures = Set<HdSignatureOfAuthIntentHash>()
-
-		for transaction in input.perTransaction {
-			let payloadId = transaction.payload.hash()
-			let hashedData = payloadId.payload.hash()
-
-			let transactionSignatures = try await sign(
-				factorSourceId: factorSourceId,
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hashedData: hashedData,
-				ownedFactorInstances: transaction.ownedFactorInstances
-			)
-
-			signatures.formUnion(
-				transactionSignatures.map {
-					.init(
-						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
-						signature: $0.signatureWithPublicKey
-					)
-				})
-		}
-
-		return Array(signatures)
+		return mnemonicWithPassphrase.signAuth(input: input)
 	}
 
 	private func loadMnemonic(factorSourceId: FactorSourceIdFromHash) throws -> MnemonicWithPassphrase {
@@ -141,6 +74,114 @@ extension DeviceFactorSourceClient {
 			}
 
 			let signatureWithPublicKey = mnemonicWithPassphrase.sign(hash: hashedData, path: factorInstance.derivationPath)
+
+			signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
+		}
+
+		return signatures
+	}
+}
+
+extension MnemonicWithPassphrase {
+	func signTransaction(
+		input: PerFactorSourceInputOfTransactionIntent
+	) -> [HdSignatureOfTransactionIntentHash] {
+		let factorSourceId = input.factorSourceId
+
+		var signatures = Set<HdSignatureOfTransactionIntentHash>()
+
+		for transaction in input.perTransaction {
+			let payloadId = transaction.payload.decompile().hash()
+			let hashedData = payloadId.hash
+			let transactionSignatures = sign(
+				factorSourceId: factorSourceId,
+				hashedData: hashedData,
+				ownedFactorInstances: transaction.ownedFactorInstances
+			)
+
+			signatures.formUnion(
+				transactionSignatures.map {
+					.init(
+						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
+						signature: $0.signatureWithPublicKey
+					)
+				})
+		}
+
+		return Array(signatures)
+	}
+
+	func signSubintent(
+		input: PerFactorSourceInputOfSubintent
+	) -> [HdSignatureOfSubintentHash] {
+		let factorSourceId = input.factorSourceId
+		var signatures = Set<HdSignatureOfSubintentHash>()
+
+		for transaction in input.perTransaction {
+			let payloadId = transaction.payload.decompile().hash()
+			let hashedData = payloadId.hash
+			let transactionSignatures = sign(
+				factorSourceId: factorSourceId,
+				hashedData: hashedData,
+				ownedFactorInstances: transaction.ownedFactorInstances
+			)
+
+			signatures.formUnion(
+				transactionSignatures.map {
+					.init(
+						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
+						signature: $0.signatureWithPublicKey
+					)
+				})
+		}
+
+		return Array(signatures)
+	}
+
+	func signAuth(
+		input: PerFactorSourceInputOfAuthIntent
+	) -> [HdSignatureOfAuthIntentHash] {
+		let factorSourceId = input.factorSourceId
+		var signatures = Set<HdSignatureOfAuthIntentHash>()
+
+		for transaction in input.perTransaction {
+			let payloadId = transaction.payload.hash()
+			let hashedData = payloadId.payload.hash()
+
+			let transactionSignatures = sign(
+				factorSourceId: factorSourceId,
+				hashedData: hashedData,
+				ownedFactorInstances: transaction.ownedFactorInstances
+			)
+
+			signatures.formUnion(
+				transactionSignatures.map {
+					.init(
+						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
+						signature: $0.signatureWithPublicKey
+					)
+				})
+		}
+
+		return Array(signatures)
+	}
+
+	func sign(
+		factorSourceId: FactorSourceIDFromHash,
+		hashedData: Hash,
+		ownedFactorInstances: [OwnedFactorInstance]
+	) -> Set<SignatureOfEntity> {
+		var signatures = Set<SignatureOfEntity>()
+
+		for ownedFactorInstance in ownedFactorInstances {
+			let factorInstance = ownedFactorInstance.factorInstance
+			if factorInstance.factorSourceID != factorSourceId {
+				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
+				loggerGlobal.critical(.init(stringLiteral: errMsg))
+				assertionFailure(errMsg)
+			}
+
+			let signatureWithPublicKey = sign(hash: hashedData, path: factorInstance.derivationPath)
 
 			signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
 		}
