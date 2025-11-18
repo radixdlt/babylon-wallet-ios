@@ -1,5 +1,5 @@
 {
-  "originHash" : "4b64df4b57029bc7ce25b260638c807316389aee1815a6f028e8bb21f53dccde",
+  "originHash" : "6b94e0eb320ec6c8c1a053d44943a65601188689fde363b63b79c54111e00a0e",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -209,6 +209,15 @@
       }
     },
     {
+      "identity" : "sargon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/radixdlt/sargon",
+      "state" : {
+        "revision" : "524a1659b6348d41e76115e835d601865e680e0b",
+        "version" : "1.2.39"
+      }
+    },
+    {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/GhenadieVP/ScreenshotPreventing-iOS",
@@ -295,6 +304,15 @@
       "state" : {
         "revision" : "eefcdaa88d2e2fd82e3405dfb6eb45872011a0b5",
         "version" : "1.9.3"
+      }
+    },
+    {
+      "identity" : "swift-dependencies-additions",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tgrapperon/swift-dependencies-additions",
+      "state" : {
+        "revision" : "7b1d88ec23f80b0b5d4832d51af7647fa5062d8e",
+        "version" : "1.1.1"
       }
     },
     {
