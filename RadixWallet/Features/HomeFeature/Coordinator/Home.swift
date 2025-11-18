@@ -538,9 +538,3 @@ extension Home.State {
 		accounts.map(\.address)
 	}
 }
-
-extension Account {
-	var address: AccountAddress {
-		try! AccountAddress(validatingAddress: "account_rdx12xl2meqtelz47mwp3nzd72jkwyallg5yxr9hkc75ac4qztsxulfpew")
-	}
-}
