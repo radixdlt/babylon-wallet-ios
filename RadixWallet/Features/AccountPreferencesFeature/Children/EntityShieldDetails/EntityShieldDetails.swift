@@ -30,12 +30,14 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case editShieldFactors(EditSecurityShieldCoordinator.State)
 			case factorSourceDetails(FactorSourceDetail.State)
+			case applyShield(ApplyShield.Coordinator.State)
 		}
 
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case editShieldFactors(EditSecurityShieldCoordinator.Action)
 			case factorSourceDetails(FactorSourceDetail.Action)
+			case applyShield(ApplyShield.Coordinator.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -44,6 +46,9 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			}
 			Scope(state: \.factorSourceDetails, action: \.factorSourceDetails) {
 				FactorSourceDetail()
+			}
+			Scope(state: \.applyShield, action: \.applyShield) {
+				ApplyShield.Coordinator()
 			}
 		}
 	}
@@ -104,17 +109,18 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .editShieldFactors(.delegate(.updated)):
-			state.destination = nil
-			return .run { [state] send in
+			do {
 				let secStructureOfFactorSourceIds = try state.shieldBuilder.build()
-				try await SargonOS.shared.updateSecurityStructureOfFactorSourceIds(structureIds: secStructureOfFactorSourceIds)
-				let updatedStructure = try SargonOS.shared.securityStructureOfFactorSourcesFromSecurityStructureOfFactorSourceIds(structureOfIds: secStructureOfFactorSourceIds)
-				await send(.internal(.secStructureUpdated(updatedStructure)))
-				overlayWindowClient.scheduleHUD(.succeeded)
-			} catch: { err, _ in
-				errorQueue.schedule(err)
+				let securityStructure = try SargonOs.shared.securityStructureOfFactorSourcesFromSecurityStructureOfFactorSourceIds(structureOfIds: secStructureOfFactorSourceIds)
+				state.destination = .applyShield(.init(securityStructure: securityStructure, entityAddress: state.entityAddress, root: .completion))
+			} catch {
+				errorQueue.schedule(error)
 			}
+			return .none
 		case .editShieldFactors(.delegate(.cancelled)):
+			state.destination = nil
+			return .none
+		case .applyShield(.delegate(.finished)):
 			state.destination = nil
 			return .none
 		default:

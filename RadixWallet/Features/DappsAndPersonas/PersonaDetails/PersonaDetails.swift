@@ -335,7 +335,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			return loadSecState(state: state)
 
 		case let .selectShield(.delegate(.confirmed(shield))):
-			state.destination = .applyShield(.init(securityStructure: shield, selectedPersonas: [state.persona.address], root: .completion))
+			state.destination = .applyShield(.init(securityStructure: shield, entityAddress: .identity(state.persona.address), root: .completion))
 			return .none
 
 		case .applyShield(.delegate(.finished)):

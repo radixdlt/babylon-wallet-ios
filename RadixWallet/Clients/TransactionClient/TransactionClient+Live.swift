@@ -27,6 +27,77 @@ struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	}
 }
 
+extension MyEntitiesInvolvedInTransaction {
+	static func fromInput(
+		allAccounts: [Account],
+		allPersonas: [Persona],
+		addressesOfPersonasRequiringAuth: [IdentityAddress],
+		addressesOfAccountsRequiringAuth: [AccountAddress],
+		addressesOfAccountsWithdrawnFrom: any Collection<AccountAddress>,
+		addressesOfAccountsDepositedInto: any Collection<AccountAddress>
+	) throws -> Self {
+		func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Account? {
+			allAccounts.first { $0.address == accountAddress }
+		}
+
+		func identityFromComponentAddress(_ identityAddress: IdentityAddress) -> Persona? {
+			allPersonas.first { $0.address == identityAddress }
+		}
+
+		func mapAccount(_ addresses: any Collection<AccountAddress>) throws -> OrderedSet<Account> {
+			try .init(validating: addresses.compactMap(accountFromComponentAddress))
+		}
+
+		func mapIdentity(_ addresses: any Collection<IdentityAddress>) throws -> OrderedSet<Persona> {
+			try .init(validating: addresses.compactMap(identityFromComponentAddress))
+		}
+
+		return try MyEntitiesInvolvedInTransaction(
+			identitiesRequiringAuth: mapIdentity(addressesOfPersonasRequiringAuth),
+			accountsRequiringAuth: mapAccount(addressesOfAccountsRequiringAuth),
+			accountsWithdrawnFrom: mapAccount(addressesOfAccountsWithdrawnFrom),
+			accountsDepositedInto: mapAccount(addressesOfAccountsDepositedInto)
+		)
+	}
+
+	static func fromTransactionManifest(
+		allAccounts: [Account],
+		allPersonas: [Persona],
+		manifest: TransactionManifest
+	) throws -> Self {
+		try fromInput(
+			allAccounts: allAccounts,
+			allPersonas: allPersonas,
+			addressesOfPersonasRequiringAuth: manifest.summary.addressesOfPersonasRequiringAuth,
+			addressesOfAccountsRequiringAuth: manifest.summary.addressesOfAccountsRequiringAuth,
+			addressesOfAccountsWithdrawnFrom: manifest.summary.addressesOfAccountsWithdrawnFrom,
+			addressesOfAccountsDepositedInto: manifest.summary.addressesOfAccountsDepositedInto
+		)
+	}
+
+	static func fromExecutionSummary(
+		allAccounts: [Account],
+		allPersonas: [Persona],
+		executionSummary: ExecutionSummary
+	) throws -> Self {
+		let addressOfSecurifiedAccount: AccountAddress? = switch executionSummary.detailedClassification {
+		case let .accessControllerRecovery(acAddresses), let .accessControllerConfirmTimedRecovery(acAddresses), let .accessControllerStopTimedRecovery(acAddresses):
+			try? SargonOs.shared.entityByAccessControllerAddress(address: acAddresses.first!).asAccount().accountAddress
+		default:
+			nil
+		}
+
+		return try fromInput(
+			allAccounts: allAccounts,
+			allPersonas: allPersonas,
+			addressesOfPersonasRequiringAuth: executionSummary.addressesOfIdentitiesRequiringAuth,
+			addressesOfAccountsRequiringAuth: executionSummary.addressesOfAccountsRequiringAuth + (addressOfSecurifiedAccount.map { [$0] } ?? []),
+			addressesOfAccountsWithdrawnFrom: executionSummary.withdrawals.keys,
+			addressesOfAccountsDepositedInto: executionSummary.deposits.keys
+		)
+	}
+}
+
 extension TransactionClient {
 	struct NoFeePayerCandidate: LocalizedError {
 		var errorDescription: String? { "No account containing XRD found" }
@@ -46,27 +117,27 @@ extension TransactionClient {
 			manifest: TransactionManifest
 		) async throws -> MyEntitiesInvolvedInTransaction {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+			let allPersonas = await personasClient.getPersonasOnNetwork(networkID)
 
-			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Account? {
-				allAccounts.first { $0.address == accountAddress }
-			}
-			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Persona {
-				try await personasClient.getPersona(id: identityAddress)
-			}
-			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Account> {
-				try .init(validating: addresses.compactMap(accountFromComponentAddress))
-			}
-			func mapIdentity(_ addresses: [IdentityAddress]) async throws -> OrderedSet<Persona> {
-				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
-			}
+			return try MyEntitiesInvolvedInTransaction.fromTransactionManifest(
+				allAccounts: allAccounts.elements,
+				allPersonas: allPersonas.elements,
+				manifest: manifest
+			)
+		}
 
-			let summary = manifest.summary
+		@Sendable
+		func myEntitiesInvolvedInTransaction(
+			networkID: NetworkID,
+			executionSummary: ExecutionSummary
+		) async throws -> MyEntitiesInvolvedInTransaction {
+			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+			let allPersonas = await personasClient.getPersonasOnNetwork(networkID)
 
-			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
-				accountsRequiringAuth: mapAccount(summary.addressesOfAccountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(summary.addressesOfAccountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(summary.addressesOfAccountsDepositedInto)
+			return try MyEntitiesInvolvedInTransaction.fromExecutionSummary(
+				allAccounts: allAccounts.elements,
+				allPersonas: allPersonas.elements,
+				executionSummary: executionSummary
 			)
 		}
 
@@ -74,7 +145,7 @@ extension TransactionClient {
 		func getTransactionSigners(_ request: GetTransactionSignersRequest) async throws -> TransactionSigners {
 			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
 				networkID: request.networkID,
-				manifest: request.manifest
+				executionSummary: request.executionSummary
 			)
 
 			let intentSigning: TransactionSigners.IntentSigning = if let nonEmpty = NonEmpty(rawValue: myInvolvedEntities.entitiesRequiringAuth) {
@@ -175,7 +246,7 @@ extension TransactionClient {
 			/// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
-				manifest: preview.transactionManifest,
+				executionSummary: preview.executionSummary,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
@@ -229,7 +300,7 @@ extension TransactionClient {
 		let determineFeePayer: DetermineFeePayer = { request in
 			let involvedEntites = try await myEntitiesInvolvedInTransaction(
 				networkID: request.networkId,
-				manifest: request.manifest
+				executionSummary: request.executionSummary
 			)
 			let accounts = involvedEntites.accountsDepositedInto.elements + involvedEntites.accountsWithdrawnFrom.elements + involvedEntites.accountsRequiringAuth.elements
 			let feePayerCandidates = try await getFeePayerCandidates(refreshingBalances: true, accounts: accounts.asIdentified())
@@ -239,7 +310,7 @@ extension TransactionClient {
 				request: request,
 				feePayerCandidates: feePayerCandidates,
 				involvedEntities: involvedEntites,
-				accountWithdraws: request.accountWithdraws
+				accountWithdraws: request.executionSummary.withdrawals
 			)
 		}
 

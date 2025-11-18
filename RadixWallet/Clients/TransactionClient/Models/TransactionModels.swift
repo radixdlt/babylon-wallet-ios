@@ -152,18 +152,8 @@ struct BuildTransactionIntentRequest: Sendable {
 // MARK: - GetTransactionSignersRequest
 struct GetTransactionSignersRequest: Sendable, Hashable {
 	let networkID: NetworkID
-	let manifest: TransactionManifest
+	let executionSummary: ExecutionSummary
 	let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
-
-	init(
-		networkID: NetworkID,
-		manifest: TransactionManifest,
-		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
-	) {
-		self.networkID = networkID
-		self.manifest = manifest
-		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
-	}
 }
 
 // MARK: - ManifestReviewRequest
@@ -245,8 +235,7 @@ struct DetermineFeePayerRequest: Sendable {
 	let transactionSigners: TransactionSigners
 	let signingFactors: SigningFactors
 	let signingPurpose: SigningPurpose
-	let manifest: TransactionManifest
-	let accountWithdraws: [AccountAddress: [ResourceIndicator]]
+	let executionSummary: ExecutionSummary
 }
 
 // MARK: - DetermineFeePayerResponse
@@ -286,7 +275,7 @@ extension ExecutionSummary {
 		case .general, .transfer:
 			deposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {
-				case let .fungible(resourceAddress, indicator: .predicted(predictedDecimal)):
+				case let .fungible:
 					result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
 				default:
 					result

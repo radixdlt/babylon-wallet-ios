@@ -19,13 +19,12 @@ extension EntityShieldDetails {
 					}
 				}
 				.background(.primaryBackground)
-				//                .footer {
-				//                    Button("Edit Factors") {
-				//                        store.send(.view(.editFactorsTapped))
-				//                    }
-				//                    .buttonStyle(.secondaryRectangular(shouldExpand: true))
-				//                    .disabled(true)
-				//                }
+				.footer {
+					Button("Edit Factors") {
+						store.send(.view(.editFactorsTapped))
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				}
 				.destinations(with: store)
 			}
 			.task {
@@ -47,6 +46,7 @@ private extension View {
 		let destinationStore = store.destination
 		return editFactors(with: destinationStore)
 			.factorSourceDetail(with: destinationStore)
+			.applyShield(with: destinationStore)
 	}
 
 	private func editFactors(with destinationStore: PresentationStoreOf<EntityShieldDetails.Destination>) -> some View {
@@ -58,6 +58,12 @@ private extension View {
 	private func factorSourceDetail(with destinationStore: PresentationStoreOf<EntityShieldDetails.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetails, action: \.factorSourceDetails)) {
 			FactorSourceDetail.View(store: $0)
+		}
+	}
+
+	private func applyShield(with destinationStore: PresentationStoreOf<EntityShieldDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.applyShield, action: \.applyShield)) { store in
+			ApplyShield.Coordinator.View(store: store)
 		}
 	}
 }

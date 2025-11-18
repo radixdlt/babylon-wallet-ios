@@ -260,7 +260,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			state.destination = nil
 			return loadSecState(state: state)
 		case let .selectShield(.delegate(.confirmed(shield))):
-			state.destination = .applyShield(.init(securityStructure: shield, selectedAccounts: [state.account.address], root: .completion))
+			state.destination = .applyShield(.init(securityStructure: shield, entityAddress: .account(state.account.address), root: .completion))
 			return .none
 		case .applyShield(.delegate(.finished)):
 			state.destination = nil
