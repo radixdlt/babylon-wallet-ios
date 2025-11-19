@@ -235,6 +235,7 @@ private extension View {
 			.submitting(with: destinationStore)
 			.rawTransactionAlert(with: destinationStore)
 			.tooManyFactorsSkipped(with: destinationStore)
+			.confirmUseOfTimedRecovery(with: destinationStore)
 	}
 
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
@@ -271,6 +272,12 @@ private extension View {
 	private func tooManyFactorsSkipped(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped)) {
 			SigningTooManyFactorsSkipped.View(store: $0)
+		}
+	}
+
+	private func confirmUseOfTimedRecovery(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.confirmUseOfTimedRecovery, action: \.confirmUseOfTimedRecovery)) {
+			SigningConfirmShieldTimedRecovery.View(store: $0)
 		}
 	}
 }

@@ -29,7 +29,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 
 		var waitsForTransactionToBeComitted: Bool {
-			interactionId.isWalletAccountDepositSettingsInteraction || interactionId.isWalletAccountDeleteInteraction
+			interactionId.isWalletAccountDepositSettingsInteraction || interactionId.isWalletAccountDeleteInteraction || interactionId.isWalletShieldUpdateInteraction
 		}
 
 		var isWalletTransaction: Bool {
@@ -128,6 +128,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.State)
 			case rawTransactionAlert(AlertState<Never>)
 			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.State)
+			case confirmUseOfTimedRecovery(SigningConfirmShieldTimedRecovery.State)
 		}
 
 		@CasePathable
@@ -137,6 +138,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.Action)
 			case rawTransactionAlert(Never)
 			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.Action)
+			case confirmUseOfTimedRecovery(SigningConfirmShieldTimedRecovery.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -151,6 +153,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped) {
 				SigningTooManyFactorsSkipped()
+			}
+			Scope(state: \.confirmUseOfTimedRecovery, action: \.confirmUseOfTimedRecovery) {
+				SigningConfirmShieldTimedRecovery()
 			}
 		}
 	}
@@ -324,10 +329,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 					executionSummary: reviewedTx.executionSummary
 				)
 
-				//                if isAccessControllerTimedRecoveryManifest(manifest: signedIntent.intent.manifest) {
-				//                    let x = 10
-				//                    // User needs first to confirm the timed recovery
-				//                } else {
 				let notarizedTransaction = try await transactionClient.notarizeTransaction(
 					.init(
 						signedIntent: signedIntent,
@@ -335,7 +336,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 					)
 				)
 				await send(.internal(.notarizeResult(.success(notarizedTransaction))))
-				// }
 			} catch: { error, send in
 				await send(.internal(.resetToApprovable))
 				if let error = error as? CommonError, error == .SigningFailedTooManyFactorSourcesNeglected {
@@ -348,6 +348,28 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .notarizeResult(.success(notarizedTX)):
 			loggerGlobal.error("\(notarizedTX.notarized.signedIntent.intentSignatures.signatures)")
+			if isAccessControllerTimedRecoveryManifest(manifest: notarizedTX.intent.manifest) {
+				guard let reviewedTx = state.reviewedTransaction else {
+					return .none
+				}
+				if case let .accessControllerRecovery(acAddresses) = reviewedTx.executionSummary.detailedClassification,
+				   let acAddress = acAddresses.first
+				{
+					do {
+						let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
+						if case let .securified(secControl) = entity.securityState {
+							state.destination = .confirmUseOfTimedRecovery(.init(periodUntilAutoConfirm: secControl.securityStructure.matrixOfFactors.timeUntilDelayedConfirmationIsCallable))
+							return .none
+						} else {
+							fatalError("Recovery for an unsecurified account?")
+						}
+					} catch {
+						fatalError("No account present  for the access controller address?")
+					}
+				} else {
+					fatalError("Bad implementation: timed recovery manifest, but the classification is not recovery")
+				}
+			}
 			state.destination = .submitting(.init(
 				notarizedTX: notarizedTX,
 				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,

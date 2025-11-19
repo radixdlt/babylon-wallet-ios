@@ -921,6 +921,8 @@
 		A09F8FDE2DF6E4C300DB5614 /* Discover+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FDD2DF6E4C300DB5614 /* Discover+View.swift */; };
 		A09F8FDF2DF6E4C300DB5614 /* Discover.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F8FDC2DF6E4C300DB5614 /* Discover.swift */; };
 		A0A53EBA2E54DAA500BE36FE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0A53EB92E54DAA500BE36FE /* Sargon */; };
+		A0A556152ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A556132ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift */; };
+		A0A556162ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A556142ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift */; };
 		A0BA444C2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */; };
 		A0BA444D2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */; };
 		A0BA44512E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */; };
@@ -2312,6 +2314,8 @@
 		A09F8FD52DEF4DAA00DB5614 /* RadixNameService+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixNameService+Test.swift"; sourceTree = "<group>"; };
 		A09F8FDC2DF6E4C300DB5614 /* Discover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover.swift; sourceTree = "<group>"; };
 		A09F8FDD2DF6E4C300DB5614 /* Discover+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Discover+View.swift"; sourceTree = "<group>"; };
+		A0A556132ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningConfirmShieldTimedRecovery.swift; sourceTree = "<group>"; };
+		A0A556142ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SigningConfirmShieldTimedRecovery+View.swift"; sourceTree = "<group>"; };
 		A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldTemplateDetails.swift; sourceTree = "<group>"; };
 		A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldTemplateDetails+View.swift"; sourceTree = "<group>"; };
 		A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityStructureOfFactorSourcesView+View.swift"; sourceTree = "<group>"; };
@@ -6426,6 +6430,8 @@
 			children = (
 				A04E36322E89BAEB00895C35 /* SigningTooManyFactorsSkipped.swift */,
 				A04E36332E89BAEB00895C35 /* SigningTooManyFactorsSkipped+View.swift */,
+				A0A556132ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift */,
+				A0A556142ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift */,
 			);
 			path = Signing;
 			sourceTree = "<group>";
@@ -8625,6 +8631,8 @@
 				A05AA1472E0AC13600316B83 /* DAppDirectory+Filtering.swift in Sources */,
 				A408165D2C7E0D08005E65B9 /* ValidatorCollectionItemEffectiveFeeFactor.swift in Sources */,
 				A40815762C7E0D08005E65B9 /* EntitySchemaCollectionItem.swift in Sources */,
+				A0A556152ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift in Sources */,
+				A0A556162ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift in Sources */,
 				48CFC5E32ADC10DA00E77A5C /* AttributedString+Extra.swift in Sources */,
 				48CFC4812ADC10DA00E77A5C /* ROLAFailure.swift in Sources */,
 				A408160D2C7E0D08005E65B9 /* StateEntityDetailsResponseNonFungibleResourceDetails.swift in Sources */,
