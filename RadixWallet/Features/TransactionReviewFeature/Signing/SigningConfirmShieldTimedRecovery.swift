@@ -4,6 +4,7 @@ struct SigningConfirmShieldTimedRecovery: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let periodUntilAutoConfirm: TimePeriod
+		let notarizedTimedRecovery: NotarizeTransactionResponse
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -15,8 +16,8 @@ struct SigningConfirmShieldTimedRecovery: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case useEmergencyFallback
-		case restartSigning
+		case useEmergencyFallback(NotarizeTransactionResponse)
+		case restartSigning(TransactionIntent)
 	}
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
@@ -31,9 +32,9 @@ struct SigningConfirmShieldTimedRecovery: Sendable, FeatureReducer {
 			overlayWindowClient.showInfoLink(.init(glossaryItem: .emergencyfallback))
 			return .none
 		case .useEmergencyFallbackButtonTapped:
-			return .send(.delegate(.useEmergencyFallback))
+			return .send(.delegate(.useEmergencyFallback(state.notarizedTimedRecovery)))
 		case .restartSigningButtonTapped:
-			return .send(.delegate(.restartSigning))
+			return .send(.delegate(.restartSigning(state.notarizedTimedRecovery.intent)))
 		}
 	}
 }

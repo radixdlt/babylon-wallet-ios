@@ -349,33 +349,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .notarizeResult(.success(notarizedTX)):
 			loggerGlobal.error("\(notarizedTX.notarized.signedIntent.intentSignatures.signatures)")
 			if isAccessControllerTimedRecoveryManifest(manifest: notarizedTX.intent.manifest) {
-				guard let reviewedTx = state.reviewedTransaction else {
-					return .none
-				}
-				if case let .accessControllerRecovery(acAddresses) = reviewedTx.executionSummary.detailedClassification,
-				   let acAddress = acAddresses.first
-				{
-					do {
-						let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
-						if case let .securified(secControl) = entity.securityState {
-							state.destination = .confirmUseOfTimedRecovery(.init(periodUntilAutoConfirm: secControl.securityStructure.matrixOfFactors.timeUntilDelayedConfirmationIsCallable))
-							return .none
-						} else {
-							fatalError("Recovery for an unsecurified account?")
-						}
-					} catch {
-						fatalError("No account present  for the access controller address?")
-					}
-				} else {
-					fatalError("Bad implementation: timed recovery manifest, but the classification is not recovery")
-				}
+				return handleTimedRecoveryTransaction(&state, notarizedTX: notarizedTX)
 			}
-			state.destination = .submitting(.init(
-				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
-				route: state.p2pRoute
-			))
-			return .none
+			return submitTransaction(&state, notarizedTX: notarizedTX)
 
 		case let .buildTransactionIntentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
@@ -457,10 +433,19 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return delayedShortEffect(for: .delegate(.dismiss))
 
 		case let .tooManyFactorSkipped(.delegate(.restart(.transaction(intent)))):
+			state.destination = nil
 			return .send(.internal(.buildTransactionIntentResult(.success(intent))))
 
 		case .tooManyFactorSkipped(.delegate(.restart(.preAuth))):
 			fatalError("Bad implementation, tried to restart with subintent")
+
+		case let .confirmUseOfTimedRecovery(.delegate(.restartSigning(intent))):
+			state.destination = nil
+			return .send(.internal(.buildTransactionIntentResult(.success(intent))))
+
+		case let .confirmUseOfTimedRecovery(.delegate(.useEmergencyFallback(notarizedTX))):
+			state.destination = nil
+			return submitTransaction(&state, notarizedTX: notarizedTX)
 
 		default:
 			return .none
@@ -473,7 +458,47 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return delayedShortEffect(for: .delegate(.dismiss))
 		}
 
+		if case .confirmUseOfTimedRecovery = state.destination {
+			return resetToApprovable(&state)
+		}
+
 		return .none
+	}
+
+	private func submitTransaction(_ state: inout State, notarizedTX: NotarizeTransactionResponse) -> Effect<Action> {
+		state.destination = .submitting(.init(
+			notarizedTX: notarizedTX,
+			inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
+			route: state.p2pRoute
+		))
+		return .none
+	}
+
+	private func handleTimedRecoveryTransaction(_ state: inout State, notarizedTX: NotarizeTransactionResponse) -> Effect<Action> {
+		guard let reviewedTx = state.reviewedTransaction else {
+			return .none
+		}
+		guard case let .accessControllerRecovery(acAddresses) = reviewedTx.executionSummary.detailedClassification,
+		      let acAddress = acAddresses.first
+		else {
+			fatalError("Bad implementation: timed recovery manifest, but the classification is not recovery")
+		}
+
+		do {
+			let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
+			guard case let .securified(secControl) = entity.securityState else {
+				fatalError("Recovery for an unsecurified account?")
+			}
+			state.destination = .confirmUseOfTimedRecovery(
+				.init(
+					periodUntilAutoConfirm: secControl.securityStructure.matrixOfFactors.timeUntilDelayedConfirmationIsCallable,
+					notarizedTimedRecovery: notarizedTX
+				)
+			)
+			return .none
+		} catch {
+			fatalError("No account present  for the access controller address?")
+		}
 	}
 }
 

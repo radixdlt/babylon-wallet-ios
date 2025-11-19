@@ -4,22 +4,30 @@ import SwiftUI
 extension SigningConfirmShieldTimedRecovery {
 	struct View: SwiftUI.View {
 		let store: StoreOf<SigningConfirmShieldTimedRecovery>
+		@Environment(\.dismiss) var dismiss
 
 		var body: some SwiftUI.View {
 			WithPerceptionTracking {
 				ScrollView {
-					VStack {
+					VStack(alignment: .center, spacing: .medium1) {
+						CloseButton {
+							dismiss()
+						}
+						.flushedRight
 						Text("Cannot Update Shield Yet")
 							.textStyle(.sheetTitle)
 							.foregroundStyle(.primaryText)
+							.multilineTextAlignment(.center)
 
 						Text("You can use your timed emergency fallback to confirm Shield update or you can restart the signing process.")
 							.textStyle(.body1HighImportance)
 							.foregroundStyle(.primaryText)
+							.multilineTextAlignment(.center)
 
 						emergencyFallbackView
 					}
 				}
+				.padding(.medium3)
 				.footer {
 					VStack {
 						Button("Use Emergency Fallback") {
