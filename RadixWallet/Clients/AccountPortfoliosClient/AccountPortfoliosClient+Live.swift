@@ -42,9 +42,28 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		Self.registerSubscribers(state: state)
 
+		@Sendable
+		func fetchAllNonFungibleIds(
+			for account: OnLedgerEntity.OnLedgerAccount,
+			hiddenResources: [ResourceIdentifier],
+			cachingStrategy: OnLedgerEntitiesClient.CachingStrategy
+		) async {
+			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+			do {
+				let ids = try await onLedgerEntitiesClient.getAllOwnedNonFungibleIds(account: account, hiddenResources: hiddenResources)
+				await state.set(allNonFungibleIds: .success(ids), forAccount: account.address)
+			} catch {
+				await state.set(allNonFungibleIds: .failure(error), forAccount: account.address)
+			}
+		}
+
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, hiddenResources: [ResourceIdentifier], cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchAdditionalResourceDetails(
+			_ account: OnLedgerEntity.OnLedgerAccount,
+			hiddenResources: [ResourceIdentifier],
+			cachingStrategy: OnLedgerEntitiesClient.CachingStrategy
+		) async {
 			async let poolDetailsFetch = Task {
 				@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 				do {
@@ -54,6 +73,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					await state.set(poolDetails: .failure(error), forAccount: account.address)
 				}
 			}.result
+
 			async let stakeUnitDetails = Task {
 				@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 				do {
@@ -81,6 +101,17 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 
 				await state.setTokenPrices(prices)
+			}
+		}
+
+		@Sendable
+		func applyNonFungiblePrices(_ ids: [NonFungibleGlobalID], forceRefresh: Bool) async {
+			if !ids.isEmpty {
+				let nftPrices = await Result {
+					try await SargonOS.shared.fetchNftFiatValues(nftIds: ids, currency: state.selectedCurrency, forceFetch: forceRefresh)
+				}
+
+				await state.setNFTPrices(nftPrices)
 			}
 		}
 
@@ -144,9 +175,17 @@ extension AccountPortfoliosClient: DependencyKey {
 
 			await applyTokenPrices(Array(allResources), forceRefresh: forceRefreshPrices)
 
+			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
+				await fetchAllNonFungibleIds(for: $0, hiddenResources: hiddenResources, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
+			}
+
+			let allOwnedNfts = state.portfoliosSubject.value.wrappedValue.flatMap { $0.values.compactMap(\.nonFungibleIds.wrappedValue).flatMap(\.self) } ?? []
+			let allNfts: [NonFungibleGlobalID] = gateway == .mainnet ? allOwnedNfts.map(\.id) : []
+			await applyNonFungiblePrices(allNfts, forceRefresh: forceRefreshPrices)
+
 			// Load additional details
 			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
-				await fetchPoolAndStakeUnitsDetails($0, hiddenResources: hiddenResources, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
+				await fetchAdditionalResourceDetails($0, hiddenResources: hiddenResources, cachingStrategy: forceRefreshEntities ? .forceUpdate : .useCache)
 			}
 
 			return Array(state.portfoliosSubject.value.wrappedValue!.values)
@@ -173,7 +212,13 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 
 			await state.handlePortfolioUpdate(portfolio)
-			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, hiddenResources: hiddenResources, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+
+			await fetchAllNonFungibleIds(for: account.nonEmptyVaults, hiddenResources: hiddenResources, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+			if case let .success(nftValues) = await state.nftPrices {
+				await applyNonFungiblePrices(Array(nftValues.keys), forceRefresh: forceRefresh)
+			}
+
+			await fetchAdditionalResourceDetails(account.nonEmptyVaults, hiddenResources: hiddenResources, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
 		}

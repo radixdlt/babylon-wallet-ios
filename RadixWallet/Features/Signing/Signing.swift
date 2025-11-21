@@ -86,6 +86,9 @@ private extension Signing {
 			case let .arculusCard(arculus, pin):
 				try await signArculus(purpose: purpose, arculus: arculus, pin: pin)
 
+			case let .offDeviceMnemonic(fs, mwp):
+				signOffDeviceMnemonic(purpose: purpose, mnemonicWithPassphrase: mwp)
+
 			default:
 				fatalError("Not implemented")
 			}
@@ -148,6 +151,19 @@ private extension Signing {
 			}.flatMap { $0 }
 
 			return .auth(result)
+		}
+	}
+
+	func signOffDeviceMnemonic(purpose: State.Purpose, mnemonicWithPassphrase: MnemonicWithPassphrase) -> Signatures {
+		switch purpose {
+		case let .transaction(input):
+			.transaction(mnemonicWithPassphrase.signTransaction(input: input))
+
+		case let .subintent(input):
+			.subintent(mnemonicWithPassphrase.signSubintent(input: input))
+
+		case let .auth(input):
+			.auth(mnemonicWithPassphrase.signAuth(input: input))
 		}
 	}
 

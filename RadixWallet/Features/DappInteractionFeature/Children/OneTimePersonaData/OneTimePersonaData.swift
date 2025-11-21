@@ -132,11 +132,9 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			return .none
 
 		case let .personasLoaded(personas):
-			state.personas = IdentifiedArrayOf(
-				uncheckedUniqueElements: personas.map {
-					.init(persona: $0, requested: state.requested)
-				}
-			)
+			state.personas = personas.map {
+				.init(persona: $0, requested: state.requested)
+			}.asIdentified()
 			if let selectedPersona = (state.selectedPersona?.id).flatMap({ personas[id: $0] }) {
 				state.selectedPersona = .init(persona: selectedPersona, requested: state.requested)
 			}

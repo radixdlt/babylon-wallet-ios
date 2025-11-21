@@ -13,6 +13,7 @@ extension AccountPortfoliosClient {
 
 		var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
+		var nonFungibleIds: Loadable<[OnLedgerEntitiesClient.OwnedNonFungibleId]> = .idle
 
 		var isCurrencyAmountVisible: Bool = true
 		var fiatCurrency: FiatCurrency = .usd
@@ -61,8 +62,10 @@ extension AccountPortfoliosClient {
 	/// Internal state that holds all loaded portfolios.
 	actor State {
 		typealias TokenPrices = [ResourceAddress: Decimal192]
+		typealias NFTPrices = [NonFungibleGlobalId: Decimal192]
 		let portfoliosSubject: AsyncCurrentValueSubject<Loadable<[AccountAddress: AccountPortfolio]>> = .init(.loading)
 		var tokenPrices: Result<TokenPrices, Error> = .success([:])
+		var nftPrices: Result<NFTPrices, Error> = .success([:])
 
 		var selectedCurrency: FiatCurrency = .usd
 		var isCurrencyAmountVisible: Bool = true
@@ -136,6 +139,14 @@ extension AccountPortfoliosClient.State {
 		}
 	}
 
+	func setNFTPrices(_ prices: Result<NFTPrices, Error>) {
+		self.nftPrices = prices
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
+			applyNonFungiblesWorth(to: &existingPortfolios)
+			setOrUpdateAccountPortfolios(existingPortfolios)
+		}
+	}
+
 	func setIsCurrencyAmountVisble(_ isVisible: Bool) {
 		self.isCurrencyAmountVisible = isVisible
 		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
@@ -156,8 +167,16 @@ extension AccountPortfoliosClient.State {
 		portfolios.mutateAll(applyTokenPrices)
 	}
 
+	func applyNonFungiblesWorth(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
+		portfolios.mutateAll(applyNonFungiblesWorth)
+	}
+
 	func applyTokenPrices(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
 		portfolio.updateFiatWorth(calculateWorth(gateway))
+	}
+
+	func applyNonFungiblesWorth(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
+		portfolio.updateNonFungiblesWorth(extractNonFungibleWorth())
 	}
 
 	func applyCurrencyVisibility(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
@@ -216,6 +235,27 @@ extension AccountPortfoliosClient.State {
 		}
 	}
 
+	func extractNonFungibleWorth() -> (NonFungibleGlobalID) -> FiatWorth? {
+		{ id in
+			let worth: FiatWorth.Worth? = {
+				guard case let .success(nftsWorth) = self.nftPrices else {
+					return .unknown
+				}
+
+				let worth = nftsWorth[id]
+				return worth.map(FiatWorth.Worth.known)
+			}()
+
+			return worth.map {
+				.init(
+					isVisible: self.isCurrencyAmountVisible,
+					worth: $0,
+					currency: self.selectedCurrency
+				)
+			}
+		}
+	}
+
 	func set(poolDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]>, forAccount address: AccountAddress) {
 		guard var portfolio = portfoliosSubject.value.wrappedValue?[address] else {
 			return
@@ -240,6 +280,14 @@ extension AccountPortfoliosClient.State {
 		}
 		setOrUpdateAccountPortfolio(portfolio)
 	}
+
+	func set(allNonFungibleIds: Loadable<[OnLedgerEntitiesClient.OwnedNonFungibleId]>, forAccount address: AccountAddress) {
+		guard var portfolio = portfoliosSubject.value.wrappedValue?[address] else {
+			return
+		}
+		portfolio.nonFungibleIds = allNonFungibleIds
+		setOrUpdateAccountPortfolio(portfolio)
+	}
 }
 
 // MARK: Fiat Worth changes
@@ -256,6 +304,14 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 		account.fungibleResources.updateFiatWorth(change)
 		stakeUnitDetails.mutateValue { $0.updateFiatWorth(change) }
 		poolUnitDetails.mutateValue { $0.updateFiatWorth(change) }
+	}
+
+	mutating func updateNonFungiblesWorth(_ extract: (NonFungibleGlobalID) -> FiatWorth?) {
+		nonFungibleIds.mutateValue { ownedNonFungibles in
+			ownedNonFungibles.mutateAll { ownedNonFungible in
+				ownedNonFungible.fiatWorth = extract(ownedNonFungible.id)
+			}
+		}
 	}
 }
 
@@ -341,8 +397,8 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 // MARK: - Account portfolio fiat worth
 extension AccountPortfoliosClient.AccountPortfolio {
 	var totalFiatWorth: Loadable<FiatWorth> {
-		poolUnitDetails.concat(stakeUnitDetails).map { poolUnitDetails, stakeUnitDetails in
-			let totalFiatWorth = account.fungibleResources.fiatWorth + stakeUnitDetails.fiatWorth + poolUnitDetails.fiatWorth
+		poolUnitDetails.concat3(stakeUnitDetails, nonFungibleIds).map { poolUnitDetails, stakeUnitDetails, nonFungibleValues in
+			let totalFiatWorth = account.fungibleResources.fiatWorth + stakeUnitDetails.fiatWorth + poolUnitDetails.fiatWorth + nonFungibleValues.fiatWorth
 			return .init(isVisible: isCurrencyAmountVisible, worth: totalFiatWorth, currency: fiatCurrency)
 		}
 		.errorFallback(.unknownWorth(isVisible: isCurrencyAmountVisible, currency: fiatCurrency))
@@ -377,6 +433,15 @@ private extension Collection<OnLedgerEntitiesClient.OwnedResourcePoolDetails> {
 			let xrdFiatWorth = poolUnitDetail.xrdResource?.redemptionValue?.exactAmount?.fiatWorth?.worth ?? .zero
 			let nonXrdFiatWorth = poolUnitDetail.nonXrdResources.compactMap(\.redemptionValue?.exactAmount?.fiatWorth?.worth).reduce(.zero, +)
 			return partialResult + xrdFiatWorth + nonXrdFiatWorth
+		}
+	}
+}
+
+private extension Collection<OnLedgerEntitiesClient.OwnedNonFungibleId> {
+	var fiatWorth: FiatWorth.Worth {
+		reduce(.zero) { partialResult, id in
+			let nonFungibleWorth = id.fiatWorth?.worth ?? .zero
+			return partialResult + nonFungibleWorth
 		}
 	}
 }

@@ -635,6 +635,24 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
+extension OnLedgerEntitiesClient {
+	func getAllOwnedNonFungibleIds(
+		account: OnLedgerEntity.OnLedgerAccount,
+		hiddenResources: [ResourceIdentifier]
+	) async throws -> [OwnedNonFungibleId] {
+		try await account
+			.nonFungibleResources
+			.filter {
+				!hiddenResources.contains(.nonFungible($0.resourceAddress))
+			}
+			.parallelMap { nonFungibleResource in
+				try await Self.getAllNonFungibleResourceIds(.init(account: account.address, resource: nonFungibleResource, pageCursor: nil))
+			}
+			.flatMap(\.self)
+			.map { OwnedNonFungibleId(id: $0) }
+	}
+}
+
 extension GatewayAPI.StateEntityDetailsOptIns {
 	static var dappDetails: Self {
 		.init(

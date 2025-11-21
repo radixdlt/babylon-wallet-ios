@@ -5,6 +5,7 @@ extension PreAuthorizationReview.State {
 		.init(
 			dAppMetadata: dAppMetadata,
 			displayMode: displayMode,
+			message: message.plaintext,
 			sliderResetDate: sliderResetDate,
 			expiration: expiration,
 			secondsToExpiration: secondsToExpiration,
@@ -20,6 +21,7 @@ extension PreAuthorizationReview {
 	struct ViewState: Equatable {
 		let dAppMetadata: DappMetadata
 		let displayMode: Common.DisplayMode
+		let message: String?
 		let sliderResetDate: Date
 		let expiration: Expiration
 		let secondsToExpiration: Int?
@@ -80,7 +82,7 @@ extension PreAuthorizationReview {
 						if let manifest = viewStore.displayMode.rawManifest {
 							rawManifest(manifest)
 						} else {
-							details(viewStore.showRawManifestButton)
+							details(viewStore.showRawManifestButton, message: viewStore.message)
 						}
 					}
 					.background(.secondaryBackground)
@@ -136,21 +138,34 @@ extension PreAuthorizationReview {
 			}
 		}
 
-		private func details(_ showRawManifestButton: Bool) -> some SwiftUI.View {
-			sections
-				.padding(.top, .large2 + .small3)
-				.padding(.horizontal, .small1)
-				.padding(.bottom, .medium1)
-				.overlay(alignment: .topTrailing) {
-					if showRawManifestButton {
-						Button(asset: AssetResource.code) {
-							store.send(.view(.toggleDisplayModeButtonTapped))
-						}
-						.buttonStyle(.secondaryRectangular)
-						.padding(.medium3)
+		private func details(_ showRawManifestButton: Bool, message: String?) -> some SwiftUI.View {
+			VStack(spacing: .medium1) {
+				messageSection(with: message)
+				sections
+			}
+			.padding(.top, .large2 + .small3)
+			.padding(.horizontal, .small1)
+			.padding(.bottom, .medium1)
+			.overlay(alignment: .topTrailing) {
+				if showRawManifestButton {
+					Button(asset: AssetResource.code) {
+						store.send(.view(.toggleDisplayModeButtonTapped))
 					}
+					.buttonStyle(.secondaryRectangular)
+					.padding(.medium3)
 				}
-				.frame(minHeight: .standardButtonHeight + 2 * .medium3, alignment: .top)
+			}
+			.frame(minHeight: .standardButtonHeight + 2 * .medium3, alignment: .top)
+		}
+
+		@ViewBuilder
+		private func messageSection(with message: String?) -> some SwiftUI.View {
+			if let message {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.message
+					Common.TransactionMessageView(message: message)
+				}
+			}
 		}
 
 		private var sections: some SwiftUI.View {

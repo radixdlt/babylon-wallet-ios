@@ -1058,7 +1058,9 @@ extension DappInteractionFlow.Path.State {
 				expiration: item.expiration,
 				nonce: .secureRandom(),
 				dAppMetadata: dappMetadata,
-				message: item.message
+				message: item.message.map {
+					Message.plaintext(string: $0)
+				} ?? Message.none
 			))
 		}
 	}

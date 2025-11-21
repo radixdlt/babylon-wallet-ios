@@ -191,7 +191,7 @@ extension TransactionReview {
 			if let message {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.message
-					TransactionMessageView(message: message)
+					Common.TransactionMessageView(message: message)
 				}
 			}
 		}
@@ -278,21 +278,6 @@ private extension View {
 	private func confirmUseOfTimedRecovery(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.confirmUseOfTimedRecovery, action: \.confirmUseOfTimedRecovery)) {
 			SigningConfirmShieldTimedRecovery.View(store: $0)
-		}
-	}
-}
-
-// MARK: - TransactionMessageView
-struct TransactionMessageView: View {
-	let message: String
-
-	var body: some View {
-		Speechbubble {
-			Text(message)
-				.message
-				.flushedLeft
-				.padding(.horizontal, .medium3)
-				.padding(.vertical, .small1)
 		}
 	}
 }
