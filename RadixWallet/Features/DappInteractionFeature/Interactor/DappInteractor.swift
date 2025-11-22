@@ -242,8 +242,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			let request = dappInteraction.request
 
 			switch delegateAction {
-			case let .submit(responseToDapp, dappMetadata):
-				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
+			case let .submit(responseToDapp, dappMetadata, notarizedTx):
+				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata, notarizedTransaction: notarizedTx)
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedShortEffect(for: .internal(.presentResponseSuccessView(dappMetadata, txID, request.route)))
@@ -276,7 +276,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .ok(response, route):
 				return .run { send in
 					do {
-						try await dappInteractionClient.completeInteraction(.response(response, origin: route))
+						try await dappInteractionClient.completeInteraction(.response(response, origin: route), nil)
 					} catch {
 						errorQueue.schedule(error)
 					}
@@ -324,7 +324,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func sendResponseToDappEffect(
 		_ responseToDapp: WalletToDappInteractionResponse,
 		for request: RequestEnvelope,
-		dappMetadata: DappMetadata
+		dappMetadata: DappMetadata,
+		notarizedTransaction: NotarizedTransaction? = nil
 	) -> Effect<Action> {
 		.run { send in
 			// In case of transaction response, sending it to the peer client is a silent operation.
@@ -342,7 +343,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 
 			do {
-				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
+				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route), notarizedTransaction)
 				if !isTransactionResponse {
 					await send(.internal(
 						.sentResponseToDapp(

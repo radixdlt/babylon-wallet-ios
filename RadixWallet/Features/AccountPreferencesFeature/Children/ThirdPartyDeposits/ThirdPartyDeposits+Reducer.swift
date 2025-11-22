@@ -135,7 +135,7 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 					.accountDepositSettings
 				)
 
-				switch result {
+				switch result.p2pResponse {
 				case let .dapp(.success(success)):
 					if case let .transaction(tx) = success.items {
 						/// Wait for the transaction to be committed
@@ -149,7 +149,7 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 					}
 
 					assertionFailure("Not a transaction Response?")
-				case .dapp(.failure), .none:
+				case .dapp(.failure):
 					/// Either user did dismiss the TransctionReview, or there was a failure.
 					/// Any failure message will be displayed in Transaction Review
 					break

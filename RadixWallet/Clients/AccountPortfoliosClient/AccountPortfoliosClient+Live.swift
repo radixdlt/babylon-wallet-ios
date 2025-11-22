@@ -107,11 +107,11 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Sendable
 		func applyNonFungiblePrices(_ ids: [NonFungibleGlobalID], forceRefresh: Bool) async {
 			if !ids.isEmpty {
-				let nftPrices = await Result {
-					try await SargonOS.shared.fetchNftFiatValues(nftIds: ids, currency: state.selectedCurrency, forceFetch: forceRefresh)
-				}
-
-				await state.setNFTPrices(nftPrices)
+//				let nftPrices = await Result {
+//					try await SargonOS.shared.fetchNftFiatValues(nftIds: ids, currency: state.selectedCurrency, forceFetch: forceRefresh)
+//				}
+//
+//				await state.setNFTPrices(nftPrices)
 			}
 		}
 

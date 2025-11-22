@@ -112,6 +112,7 @@ private extension View {
 			.p2pLinks(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.enterMnemonic(with: destinationStore)
+			.handleACTimedRecovery(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -164,6 +165,14 @@ private extension View {
 		sheet(store: destinationStore.scope(state: \.enterMnemonic, action: \.enterMnemonic)) { store in
 			NavigationStack {
 				ImportMnemonicForFactorSource.View(store: store)
+			}
+		}
+	}
+
+	private func handleACTimedRecovery(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.handleACTimedRecovery, action: \.handleACTimedRecovery)) { store in
+			NavigationStack {
+				HandleAccessControllerTimedRecovery.View(store: store)
 			}
 		}
 	}

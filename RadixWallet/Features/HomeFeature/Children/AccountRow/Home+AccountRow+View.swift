@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import SargonUniFFI
 import SwiftUI
 
 extension Home.AccountRow {
@@ -9,6 +10,7 @@ extension Home.AccountRow {
 		let isLoadingResources: Bool
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
 		let accountLockerClaims: [AccountLockerClaimDetails]
+		let accessControllerStateDetails: AccessControllerStateDetails?
 
 		let tags: [AccountCardTag]
 
@@ -51,6 +53,7 @@ extension Home.AccountRow {
 			}()
 			self.isLedgerAccount = state.isLedgerAccount
 			self.accountLockerClaims = state.accountLockerClaims
+			self.accessControllerStateDetails = state.accessControllerStateDetails
 
 			// Resources
 			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
@@ -114,6 +117,14 @@ extension Home.AccountRow {
 									viewStore.send(.accountLockerClaimTapped(claim))
 								} label: {
 									AccountBannerView(kind: .lockerClaim(dappName: claim.dappName))
+								}
+							}
+
+							if let acStateDetails = viewStore.accessControllerStateDetails, acStateDetails.timedRecoveryState != nil {
+								Button {
+									viewStore.send(.acTimedRecoveryTapped(acStateDetails))
+								} label: {
+									AccountBannerView(kind: .accessControllerTimedRecovery)
 								}
 							}
 						}

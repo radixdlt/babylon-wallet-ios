@@ -74,20 +74,21 @@ extension ApplyShield {
 							.shieldUpdate
 						)
 
-						switch result {
+						switch result.p2pResponse {
 						case let .dapp(.success(success)):
 							if case let .transaction(tx) = success.items {
 								/// Wait for the transaction to be committed
 								let txID = tx.send.transactionIntentHash
 								if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
-									// TODO: Use a client which wraps SargonOS so this features becomes testable
-									try await SargonOs.shared.commitProvisionalSecurityState(entityAddress: entityAddress)
+									if let signedIntent = result.notarizedTransaction, !isAccessControllerTimedRecoveryManifest(manifest: signedIntent.signedIntent.intent.manifest) {
+										try await SargonOs.shared.commitProvisionalSecurityState(entityAddress: entityAddress)
+									}
 								}
 								return
 							}
 
 							assertionFailure("Not a transaction Response?")
-						case .dapp(.failure), .none:
+						case .dapp(.failure):
 							break
 						}
 					}

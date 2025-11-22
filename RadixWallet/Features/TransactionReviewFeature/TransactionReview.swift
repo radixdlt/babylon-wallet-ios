@@ -19,6 +19,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var networkID: NetworkID? { reviewedTransaction?.networkID }
 
 		var reviewedTransaction: ReviewedTransaction? = nil
+		var notarizedTransaction: NotarizedTransaction? = nil
 
 		var sections: Common.Sections.State = .init(kind: .transaction)
 
@@ -115,7 +116,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(TransactionIntentHash)
+		case signedTXAndSubmittedToGateway(TransactionIntentHash, NotarizedTransaction?)
 		case transactionCompleted(TransactionIntentHash)
 		case dismiss
 	}
@@ -348,6 +349,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .notarizeResult(.success(notarizedTX)):
 			loggerGlobal.error("\(notarizedTX.notarized.signedIntent.intentSignatures.signatures)")
+			state.notarizedTransaction = notarizedTX.notarized
 			if isAccessControllerTimedRecoveryManifest(manifest: notarizedTX.intent.manifest) {
 				return handleTimedRecoveryTransaction(&state, notarizedTX: notarizedTX)
 			}
@@ -414,7 +416,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+			return .send(.delegate(.signedTXAndSubmittedToGateway(txID, state.notarizedTransaction)))
 
 		case .submitting(.delegate(.failedToSubmit)):
 			return .send(.delegate(.failed(.failedToSubmit)))

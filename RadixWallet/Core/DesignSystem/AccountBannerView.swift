@@ -25,7 +25,7 @@ struct AccountBannerView: View {
 
 	private var image: Image {
 		switch kind {
-		case .securityProblem:
+		case .securityProblem, .accessControllerTimedRecovery:
 			Image(.error)
 
 		case .lockerClaim:
@@ -39,6 +39,8 @@ struct AccountBannerView: View {
 			message
 		case let .lockerClaim(dappName):
 			L10n.HomePage.accountLockerClaim(dappName ?? L10n.DAppRequest.Metadata.unknownName)
+		case .accessControllerTimedRecovery:
+			"Timed Recovery"
 		}
 	}
 }
@@ -48,5 +50,6 @@ extension AccountBannerView {
 	enum Kind: Sendable, Hashable {
 		case securityProblem(message: String)
 		case lockerClaim(dappName: String?)
+		case accessControllerTimedRecovery
 	}
 }

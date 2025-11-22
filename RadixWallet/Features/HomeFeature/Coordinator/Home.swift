@@ -16,6 +16,7 @@ struct Home: Sendable, FeatureReducer {
 		fileprivate var problems: [SecurityProblem] = []
 		fileprivate var claims: ClaimsPerAccount = [:]
 		fileprivate var factorSources: FactorSources = []
+		fileprivate var accessControllersStateDetails: [AccessControllerStateDetails] = []
 
 		var showFiatWorth: Bool = true
 
@@ -67,6 +68,7 @@ struct Home: Sendable, FeatureReducer {
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims(ClaimsPerAccount)
 		case setFactorSources(FactorSources)
+		case setAccessControllersStateDetails([AccessControllerStateDetails])
 	}
 
 	@CasePathable
@@ -88,6 +90,7 @@ struct Home: Sendable, FeatureReducer {
 			case dAppsDirectory(DAppsDirectory.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicForFactorSource.State)
+			case handleACTimedRecovery(HandleAccessControllerTimedRecovery.State)
 		}
 
 		@CasePathable
@@ -102,6 +105,7 @@ struct Home: Sendable, FeatureReducer {
 			case dAppsDirectory(DAppsDirectory.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicForFactorSource.Action)
+			case handleACTimedRecovery(HandleAccessControllerTimedRecovery.Action)
 
 			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -133,6 +137,9 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.enterMnemonic, action: \.enterMnemonic) {
 				ImportMnemonicForFactorSource()
+			}
+			Scope(state: \.handleACTimedRecovery, action: \.handleACTimedRecovery) {
+				HandleAccessControllerTimedRecovery()
 			}
 		}
 	}
@@ -206,6 +213,7 @@ struct Home: Sendable, FeatureReducer {
 			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 			.merge(with: scheduleFetchAccountPortfoliosTimer(state))
 			.merge(with: factorSources())
+			.merge(with: accessControllersStateDetails())
 
 		case .onDisappear:
 			return .cancel(id: CancellableId.fetchAccountPortfolios)
@@ -324,6 +332,18 @@ struct Home: Sendable, FeatureReducer {
 				row.updateFactorSource(from: factorSources)
 			}
 			return .none
+
+		case let .setAccessControllersStateDetails(acDetails):
+			state.accessControllersStateDetails = acDetails
+			state.accountRows.mutateAll { row in
+				guard case let .securified(acAddress) = row.securityState else {
+					return
+				}
+				row.accessControllerStateDetails = acDetails.first {
+					$0.address == acAddress
+				}
+			}
+			return .none
 		}
 	}
 
@@ -343,6 +363,9 @@ struct Home: Sendable, FeatureReducer {
 				return .none
 			case let .presentSecurityProblemHandler(.enterMnemonic(enterMnemonicState)):
 				state.destination = .enterMnemonic(enterMnemonicState)
+				return .none
+			case let .presentHandleACTimedRecovery(acStateDetails):
+				state.destination = try! .handleACTimedRecovery(.init(acDetails: acStateDetails))
 				return .none
 			}
 
@@ -514,6 +537,21 @@ struct Home: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	private func accessControllersStateDetails() -> Effect<Action> {
+		.run { send in
+			if let accessControllersStateDetails = try? await SargonOS.shared.fetchAllAccessControllersDetails() {
+				await send(.internal(.setAccessControllersStateDetails(accessControllersStateDetails)))
+			}
+
+			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
+				guard !Task.isCancelled else { return }
+				if let accessControllersStateDetails = try? await SargonOS.shared.fetchAllAccessControllersDetails() {
+					await send(.internal(.setAccessControllersStateDetails(accessControllersStateDetails)))
+				}
+			}
+		}
+	}
 }
 
 extension Home.AccountRow.State {
@@ -523,8 +561,8 @@ extension Home.AccountRow.State {
 			if let fs = factorSources[id: control.transactionSigning.factorSourceId.asGeneral] {
 				securityState = .unsecurified(fs)
 			}
-		case .securified:
-			securityState = .securified
+		case let .securified(control):
+			securityState = .securified(control.accessControllerAddress)
 		}
 	}
 }

@@ -191,7 +191,7 @@ extension TransactionReview {
 			if let message {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.message
-					Common.TransactionMessageView(message: message)
+					// Common.TransactionMessageView(message: message)
 				}
 			}
 		}

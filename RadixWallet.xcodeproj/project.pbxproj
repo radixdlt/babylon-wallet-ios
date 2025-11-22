@@ -946,6 +946,8 @@
 		A0D79EAB2E1F9675006FE482 /* ImportMnemonicForFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D79EA92E1F9675006FE482 /* ImportMnemonicForFactorSource.swift */; };
 		A0D79EAC2E1F9675006FE482 /* ImportMnemonicForFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D79EAA2E1F9675006FE482 /* ImportMnemonicForFactorSource+View.swift */; };
 		A0DA89142E96A2CF005254CB /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0DA89132E96A2CF005254CB /* Sargon */; };
+		A0E77D7F2ED091A00092D8DA /* HandleAccessControllerTimedRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0E77D7D2ED091A00092D8DA /* HandleAccessControllerTimedRecovery.swift */; };
+		A0E77D802ED091A00092D8DA /* HandleAccessControllerTimedRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0E77D7E2ED091A00092D8DA /* HandleAccessControllerTimedRecovery+View.swift */; };
 		A0F223762DDC6C3600035389 /* DAppsDirectory+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F223752DDC6C3600035389 /* DAppsDirectory+View.swift */; };
 		A0F223772DDC6C3600035389 /* DAppsDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F223742DDC6C3600035389 /* DAppsDirectory.swift */; };
 		A0F2237C2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F2237A2DDC6D1C00035389 /* DAppsDirectoryClient+Live.swift */; };
@@ -2334,6 +2336,8 @@
 		A0D742AB2DD480890062DB01 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		A0D79EA92E1F9675006FE482 /* ImportMnemonicForFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicForFactorSource.swift; sourceTree = "<group>"; };
 		A0D79EAA2E1F9675006FE482 /* ImportMnemonicForFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportMnemonicForFactorSource+View.swift"; sourceTree = "<group>"; };
+		A0E77D7D2ED091A00092D8DA /* HandleAccessControllerTimedRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandleAccessControllerTimedRecovery.swift; sourceTree = "<group>"; };
+		A0E77D7E2ED091A00092D8DA /* HandleAccessControllerTimedRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HandleAccessControllerTimedRecovery+View.swift"; sourceTree = "<group>"; };
 		A0F223742DDC6C3600035389 /* DAppsDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DAppsDirectory.swift; sourceTree = "<group>"; };
 		A0F223752DDC6C3600035389 /* DAppsDirectory+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+View.swift"; sourceTree = "<group>"; };
 		A0F223792DDC6D1C00035389 /* DAppsDirectoryClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectoryClient+Interface.swift"; sourceTree = "<group>"; };
@@ -3030,6 +3034,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				A0E77D7C2ED091750092D8DA /* HandleAccessControllerTimedRecovery */,
 				A04AA7DF2E12E04900F38E67 /* SelectFactorSource */,
 				A09F8FD92DF6E49700DB5614 /* Discover */,
 				A08BF0502DDB67E40065766A /* DApps */,
@@ -6555,6 +6560,15 @@
 			path = ThemeSelection;
 			sourceTree = "<group>";
 		};
+		A0E77D7C2ED091750092D8DA /* HandleAccessControllerTimedRecovery */ = {
+			isa = PBXGroup;
+			children = (
+				A0E77D7D2ED091A00092D8DA /* HandleAccessControllerTimedRecovery.swift */,
+				A0E77D7E2ED091A00092D8DA /* HandleAccessControllerTimedRecovery+View.swift */,
+			);
+			path = HandleAccessControllerTimedRecovery;
+			sourceTree = "<group>";
+		};
 		A0F223782DDC6CF700035389 /* DAppsDirectoryClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -9296,6 +9310,8 @@
 				A40815DB2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueMap.swift in Sources */,
 				A408161B2C7E0D08005E65B9 /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
 				A43F1E262BC96F18001DD3FA /* SecurityCenter+Reducer.swift in Sources */,
+				A0E77D7F2ED091A00092D8DA /* HandleAccessControllerTimedRecovery.swift in Sources */,
+				A0E77D802ED091A00092D8DA /* HandleAccessControllerTimedRecovery+View.swift in Sources */,
 				48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */,
 				4884F3352BD83D9200A19B83 /* Stage1MigrateToSargon+ThirdPartyDeposits.swift in Sources */,
 				A408158D2C7E0D08005E65B9 /* MetadataGlobalAddressArrayValue.swift in Sources */,

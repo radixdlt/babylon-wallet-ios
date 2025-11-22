@@ -34,6 +34,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
+		var notarizedTransaction: NotarizedTransaction? = nil
 
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
@@ -125,7 +126,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
-		case submit(WalletToDappInteractionSuccessResponse, DappMetadata)
+		case submit(WalletToDappInteractionSuccessResponse, DappMetadata, NotarizedTransaction?)
 		case dismiss
 	}
 
@@ -235,7 +236,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case let .failedToUpdatePersonaAtEndOfFlow(_, response, dappMetadata):
 			// FIXME: Figure out if we wanna do something differently... we FAILED to save the persona
 			// into profile... yet still we are responding back to dapp with it.
-			return .send(.delegate(.submit(response, dappMetadata)))
+			return .send(.delegate(.submit(response, dappMetadata, nil)))
 
 		case let .usePersona(item, persona, authorizedDapp, authorizedPersona):
 			state.persona = persona
@@ -562,7 +563,8 @@ extension DappInteractionFlow {
 		case let .oneTimePersonaData(.delegate(.personaUpdated(persona))):
 			return handlePersonaUpdated(&state, persona)
 
-		case let .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))):
+		case let .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID, notarizedTx))):
+			state.notarizedTransaction = notarizedTx
 			return handleSignAndSubmitTX(item, txID)
 
 		case let .reviewTransaction(.delegate(.transactionCompleted(txID))):
@@ -798,7 +800,7 @@ extension DappInteractionFlow {
 				}
 			}
 
-			await send(.delegate(.submit(response, state.dappMetadata)))
+			await send(.delegate(.submit(response, state.dappMetadata, state.notarizedTransaction)))
 		}
 	}
 
