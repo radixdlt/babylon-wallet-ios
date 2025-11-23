@@ -11,6 +11,7 @@ extension Home.AccountRow {
 		let securityProblemsConfig: EntitySecurityProblemsView.Config
 		let accountLockerClaims: [AccountLockerClaimDetails]
 		let accessControllerStateDetails: AccessControllerStateDetails?
+		let timedRecoveryBannerState: AccountBannerView.TimedRecoveryBannerState?
 
 		let tags: [AccountCardTag]
 
@@ -54,6 +55,49 @@ extension Home.AccountRow {
 			self.isLedgerAccount = state.isLedgerAccount
 			self.accountLockerClaims = state.accountLockerClaims
 			self.accessControllerStateDetails = state.accessControllerStateDetails
+
+			// Timed Recovery Banner State
+			if let acDetails = state.accessControllerStateDetails,
+			   let timedRecoveryState = acDetails.timedRecoveryState
+			{
+				// Check if provisional state exists
+				let hasProvisionalState = (try? SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(
+					addressOfAccountOrPersona: .account(state.account.address)
+				)) != nil
+
+				if hasProvisionalState {
+					// Known recovery - compute countdown
+					if let timestamp = TimeInterval(timedRecoveryState.allowTimedRecoveryAfterUnixTimestampSeconds) {
+						let confirmationDate = Date(timeIntervalSince1970: timestamp)
+						let remaining = confirmationDate.timeIntervalSince(Date.now)
+
+						if remaining > 0 {
+							// Format countdown
+							let days = Int(remaining) / 86400
+							let hours = (Int(remaining) % 86400) / 3600
+
+							let countdown = if days > 0 {
+								"\(days)d"
+							} else if hours > 0 {
+								"\(hours)h"
+							} else {
+								"<1h"
+							}
+							self.timedRecoveryBannerState = .inProgress(countdown: countdown)
+						} else {
+							// Ready to confirm
+							self.timedRecoveryBannerState = .inProgress(countdown: nil)
+						}
+					} else {
+						self.timedRecoveryBannerState = .inProgress(countdown: nil)
+					}
+				} else {
+					// Unknown recovery
+					self.timedRecoveryBannerState = .unknown
+				}
+			} else {
+				self.timedRecoveryBannerState = nil
+			}
 
 			// Resources
 			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
@@ -120,11 +164,13 @@ extension Home.AccountRow {
 								}
 							}
 
-							if let acStateDetails = viewStore.accessControllerStateDetails, acStateDetails.timedRecoveryState != nil {
+							if let acStateDetails = viewStore.accessControllerStateDetails,
+							   let bannerState = viewStore.timedRecoveryBannerState
+							{
 								Button {
 									viewStore.send(.acTimedRecoveryTapped(acStateDetails))
 								} label: {
-									AccountBannerView(kind: .accessControllerTimedRecovery)
+									AccountBannerView(kind: .accessControllerTimedRecovery(state: bannerState))
 								}
 							}
 						}

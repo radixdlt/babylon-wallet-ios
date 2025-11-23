@@ -2392,6 +2392,76 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "gateways_removeGatewayAlert_title", fallback: "Remove Gateway")
     }
   }
+  internal enum HandleAccessControllerTimedRecovery {
+    /// Account Recovery
+    internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_title", fallback: "Account Recovery")
+    internal enum Banner {
+      /// Recovery ready to confirm
+      internal static let readyToConfirm = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_banner_readyToConfirm", fallback: "Recovery ready to confirm")
+      /// Recovery in %@
+      internal static func recoveryInProgress(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "handleAccessControllerTimedRecovery_banner_recoveryInProgress", String(describing: p1), fallback: "Recovery in %@")
+      }
+      /// ⚠️ Unrecognized recovery
+      internal static let unknownRecovery = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_banner_unknownRecovery", fallback: "⚠️ Unrecognized recovery")
+    }
+    internal enum Button {
+      /// Cancel Recovery
+      internal static let cancel = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_button_cancel", fallback: "Cancel Recovery")
+      /// Cancel Recovery
+      internal static let cancelUnknown = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_button_cancelUnknown", fallback: "Cancel Recovery")
+      /// Confirm Recovery
+      internal static let confirm = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_button_confirm", fallback: "Confirm Recovery")
+    }
+    internal enum Explanation {
+      /// Timed recovery allows you to regain access to your account if you've lost your security factors. The waiting period protects you by giving time to cancel unauthorized recovery attempts.
+      internal static let knownMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_explanation_knownMessage", fallback: "Timed recovery allows you to regain access to your account if you've lost your security factors. The waiting period protects you by giving time to cancel unauthorized recovery attempts.")
+      /// About Timed Recovery
+      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_explanation_title", fallback: "About Timed Recovery")
+      /// Timed recovery can be started by anyone with your recovery factors. The waiting period gives you time to cancel if someone is trying to take control of your account without authorization.
+      internal static let unknownMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_explanation_unknownMessage", fallback: "Timed recovery can be started by anyone with your recovery factors. The waiting period gives you time to cancel if someone is trying to take control of your account without authorization.")
+    }
+    internal enum Impact {
+      /// **Cancel** to stop the recovery and keep your current security setup.
+      internal static let cancelMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_impact_cancelMessage", fallback: "**Cancel** to stop the recovery and keep your current security setup.")
+      /// **Confirm** to complete the recovery and switch to the new security factors.
+      internal static let confirmMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_impact_confirmMessage", fallback: "**Confirm** to complete the recovery and switch to the new security factors.")
+      /// What Happens Next?
+      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_impact_title", fallback: "What Happens Next?")
+      /// **Confirm** is unavailable. You can only cancel recoveries you don't recognize to protect your account.
+      internal static let unknownConfirmDisabled = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_impact_unknownConfirmDisabled", fallback: "**Confirm** is unavailable. You can only cancel recoveries you don't recognize to protect your account.")
+    }
+    internal enum KnownRecovery {
+      /// Recovery in progress
+      internal static let hint = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_knownRecovery_hint", fallback: "Recovery in progress")
+    }
+    internal enum NewStructure {
+      /// After confirmation, your account will be secured with:
+      internal static let subtitle = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_newStructure_subtitle", fallback: "After confirmation, your account will be secured with:")
+      /// New Security Factors
+      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_newStructure_title", fallback: "New Security Factors")
+    }
+    internal enum Timeline {
+      /// Confirmable after
+      internal static let canConfirmAfter = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_canConfirmAfter", fallback: "Confirmable after")
+      /// ✓ Ready to confirm
+      internal static let confirmable = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_confirmable", fallback: "✓ Ready to confirm")
+      /// Time remaining
+      internal static let remainingTime = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_remainingTime", fallback: "Time remaining")
+      /// Recovery Timeline
+      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_title", fallback: "Recovery Timeline")
+    }
+    internal enum UnknownRecovery {
+      /// ⚠️ Unauthorized Recovery Detected. If you didn't start this recovery, cancel it now to protect your account.
+      internal static let alertMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownRecovery_alertMessage", fallback: "⚠️ Unauthorized Recovery Detected. If you didn't start this recovery, cancel it now to protect your account.")
+    }
+    internal enum UnknownStructure {
+      /// You cannot see what security factors will control this account after recovery completes. Only cancel this recovery if you still have access.
+      internal static let message = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownStructure_message", fallback: "You cannot see what security factors will control this account after recovery completes. Only cancel this recovery if you still have access.")
+      /// ⚠️ Unrecognized Recovery
+      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownStructure_title", fallback: "⚠️ Unrecognized Recovery")
+    }
+  }
   internal enum HiddenAssets {
     /// Tokens
     internal static let fungibles = L10n.tr("Localizable", "hiddenAssets_fungibles", fallback: "Tokens")
