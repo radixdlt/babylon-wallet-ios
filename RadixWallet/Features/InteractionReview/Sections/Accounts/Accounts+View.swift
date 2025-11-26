@@ -54,6 +54,19 @@ extension InteractionReview.Account {
 						.padding(.vertical, .medium2)
 						.foregroundColor(.error)
 						.background(.secondaryBackground)
+					} else if store.purpose == .stopTimedRecovery {
+						HStack(spacing: .medium3) {
+							Image(.close)
+							Text(L10n.TransactionReview.StopTimedRecovery.message)
+								.lineSpacing(-.small3)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.primaryText)
+								.multilineTextAlignment(.leading)
+						}
+						.flushedLeft
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .medium2)
+						.background(.secondaryBackground)
 					} else {
 						VStack(spacing: .zero) {
 							ForEach(store.transfers) { transfer in

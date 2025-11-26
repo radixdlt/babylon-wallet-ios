@@ -9,11 +9,21 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 		let provisionalSecurityState: SecurityStructureOfFactorSources?
 		let entity: AccountOrPersona
 		var isSecurityStructureExpanded: Bool = false
+		var secondsUntilRecoverable: Int
 
 		init(acDetails: AccessControllerStateDetails) throws {
 			self.acDetails = acDetails
 			entity = try SargonOs.shared.entityByAccessControllerAddress(address: acDetails.address)
 			provisionalSecurityState = try? SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entity.address)
+
+			// Calculate initial seconds until recoverable
+			if let timestamp = acDetails.timedRecoveryState.flatMap({ UInt64($0.allowTimedRecoveryAfterUnixTimestampSeconds) }) {
+				let confirmationDate = Date(timeIntervalSince1970: TimeInterval(timestamp))
+				let remaining = confirmationDate.timeIntervalSince(Date.now)
+				self.secondsUntilRecoverable = max(0, Int(remaining))
+			} else {
+				self.secondsUntilRecoverable = 0
+			}
 		}
 
 		/// Whether this recovery was initiated through this wallet (has provisional state)
@@ -39,15 +49,7 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 
 		/// Whether the waiting period has expired and recovery can be confirmed
 		var isRecoveryConfirmable: Bool {
-			guard let confirmationDate = recoveryConfirmationDate else { return false }
-			return Date.now >= confirmationDate
-		}
-
-		/// Time remaining until recovery can be confirmed (nil if already confirmable)
-		var timeUntilRecoverable: TimeInterval? {
-			guard let confirmationDate = recoveryConfirmationDate else { return nil }
-			let remaining = confirmationDate.timeIntervalSince(Date.now)
-			return remaining > 0 ? remaining : nil
+			secondsUntilRecoverable <= 0
 		}
 
 		/// Formatted date string for when recovery can be confirmed
@@ -56,26 +58,10 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 			return date.formatted(.dateTime.day().month(.wide).year().hour().minute())
 		}
 
-		/// Formatted countdown string (e.g., "2 days, 5 hours, 30 minutes")
+		/// Formatted countdown string using the same format as PreAuthorizationReview
 		var formattedCountdown: String? {
-			guard let timeRemaining = timeUntilRecoverable else { return nil }
-
-			let days = Int(timeRemaining) / 86400
-			let hours = (Int(timeRemaining) % 86400) / 3600
-			let minutes = (Int(timeRemaining) % 3600) / 60
-
-			var components: [String] = []
-			if days > 0 {
-				components.append("\(days) day\(days == 1 ? "" : "s")")
-			}
-			if hours > 0 {
-				components.append("\(hours) hour\(hours == 1 ? "" : "s")")
-			}
-			if minutes > 0 || components.isEmpty {
-				components.append("\(minutes) minute\(minutes == 1 ? "" : "s")")
-			}
-
-			return components.joined(separator: ", ")
+			guard secondsUntilRecoverable > 0 else { return nil }
+			return PreAuthorizationReview.TimeFormatter.format(seconds: secondsUntilRecoverable)
 		}
 	}
 
@@ -88,9 +74,19 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 		case securityStructureToggled
 	}
 
+	enum InternalAction: Sendable, Equatable {
+		case timerTicked
+	}
+
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
+	@Dependency(\.dismiss) var dismiss
+
+	enum CancelID: Hashable {
+		case timer
+	}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -99,7 +95,17 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
+			// Start a timer to update the countdown and button state
+			guard state.secondsUntilRecoverable > 0 else {
+				// Already confirmable, no need for timer
+				return .none
+			}
+			return .run { send in
+				for await _ in clock.timer(interval: .seconds(1)) {
+					await send(.internal(.timerTicked))
+				}
+			}
+			.cancellable(id: CancelID.timer)
 		case .securityStructureToggled:
 			state.isSecurityStructureExpanded.toggle()
 			return .none
@@ -129,6 +135,7 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 						break
 					}
 				}
+				await dismiss()
 			}
 		case .confirmButtonTapped:
 			return .run { [entityAddress = state.entity.address] _ in
@@ -156,7 +163,22 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 						break
 					}
 				}
+				await dismiss()
 			}
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .timerTicked:
+			// Decrement the countdown
+			state.secondsUntilRecoverable -= 1
+
+			// Cancel timer if recovery is now confirmable
+			if state.secondsUntilRecoverable <= 0 {
+				return .cancel(id: CancelID.timer)
+			}
+			return .none
 		}
 	}
 }

@@ -24,6 +24,9 @@ extension HandleAccessControllerTimedRecovery {
 					actionButtons
 				}
 				.animation(.easeInOut, value: store.isSecurityStructureExpanded)
+				.onAppear {
+					store.send(.view(.appeared))
+				}
 			}
 		}
 

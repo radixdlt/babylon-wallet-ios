@@ -2444,8 +2444,8 @@ internal enum L10n {
     internal enum Timeline {
       /// Confirmable after
       internal static let canConfirmAfter = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_canConfirmAfter", fallback: "Confirmable after")
-      /// ✓ Ready to confirm
-      internal static let confirmable = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_confirmable", fallback: "✓ Ready to confirm")
+      /// Ready to confirm
+      internal static let confirmable = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_confirmable", fallback: "Ready to confirm")
       /// Time remaining
       internal static let remainingTime = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_timeline_remainingTime", fallback: "Time remaining")
       /// Recovery Timeline
@@ -5165,6 +5165,10 @@ internal enum L10n {
     internal static func xrdAmount(_ p1: Any) -> String {
       return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
     }
+    internal enum ConfirmShieldUpdate {
+      /// Confirming shield update
+      internal static let sectionTitle = L10n.tr("Localizable", "transactionReview_confirmShieldUpdate_sectionTitle", fallback: "Confirming shield update")
+    }
     internal enum DeletingAccount {
       /// Deleting Account. Permanently removing access and preventing future deposits.
       internal static let message = L10n.tr("Localizable", "transactionReview_deletingAccount_message", fallback: "Deleting Account. Permanently removing access and preventing future deposits.")
@@ -5202,6 +5206,12 @@ internal enum L10n {
       internal static let message = L10n.tr("Localizable", "transactionReview_nonConformingManifestWarning_message", fallback: "This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.")
       /// Warning
       internal static let title = L10n.tr("Localizable", "transactionReview_nonConformingManifestWarning_title", fallback: "Warning")
+    }
+    internal enum StopTimedRecovery {
+      /// Stopping timed recovery. Your current security setup will remain unchanged.
+      internal static let message = L10n.tr("Localizable", "transactionReview_stopTimedRecovery_message", fallback: "Stopping timed recovery. Your current security setup will remain unchanged.")
+      /// Stop Timed Recovery
+      internal static let title = L10n.tr("Localizable", "transactionReview_stopTimedRecovery_title", fallback: "Stop Timed Recovery")
     }
     internal enum SubmitTransaction {
       /// Transaction ID

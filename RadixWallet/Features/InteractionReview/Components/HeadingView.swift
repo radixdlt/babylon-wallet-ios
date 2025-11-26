@@ -44,6 +44,11 @@ extension InteractionReview {
 			icon: AssetResource.transactionReviewDeletingAccount
 		)
 
+		static let stopTimedRecovery = HeadingView(
+			L10n.TransactionReview.StopTimedRecovery.title,
+			icon: AssetResource.transactionReviewUpdateShield
+		)
+
 		static let depositing = HeadingView(
 			L10n.InteractionReview.depositsHeading,
 			icon: AssetResource.transactionReviewDepositing
@@ -91,6 +96,11 @@ extension InteractionReview {
 
 		static let shieldUpdate = HeadingView(
 			L10n.TransactionReview.UpdateShield.sectionTitle,
+			icon: AssetResource.transactionReviewUpdateShield
+		)
+
+		static let confirmShieldUpdate = HeadingView(
+			L10n.TransactionReview.ConfirmShieldUpdate.sectionTitle,
 			icon: AssetResource.transactionReviewUpdateShield
 		)
 	}

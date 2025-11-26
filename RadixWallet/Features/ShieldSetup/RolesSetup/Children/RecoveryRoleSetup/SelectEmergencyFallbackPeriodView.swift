@@ -92,5 +92,5 @@ private extension TimePeriodUnit {
 
 // MARK: - TimePeriodUnit + CaseIterable
 extension TimePeriodUnit: CaseIterable {
-	public static let allCases: [Self] = [.days, .weeks]
+	public static let allCases: [Self] = [.days, .weeks, .minutes]
 }

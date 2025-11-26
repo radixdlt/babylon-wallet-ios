@@ -247,7 +247,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .viewShieldDetailsRowTapped:
-			state.destination = .shieldDetails(.init(entityAddress: .identity(state.persona.address)))
+			state.destination = .shieldDetails(.init(entityAddress: .identity(state.persona.address), accessControllerStateDetails: nil))
 			return .none
 		}
 	}

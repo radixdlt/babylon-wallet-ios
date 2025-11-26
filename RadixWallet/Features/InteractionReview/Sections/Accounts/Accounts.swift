@@ -103,6 +103,7 @@ extension InteractionReview.Account {
 		case withdrawal
 		case deposit
 		case accountDeletion
+		case stopTimedRecovery
 	}
 }
 

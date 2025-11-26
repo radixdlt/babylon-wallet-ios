@@ -10,6 +10,7 @@ extension InteractionReview {
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 			var deposits: Accounts.State? = nil
 			var accountDeletion: Accounts.State? = nil
+			var stopTimedRecovery: Accounts.State? = nil
 
 			var contributingToPools: InteractionReviewPools.State? = nil
 			var redeemingFromPools: InteractionReviewPools.State? = nil
@@ -21,6 +22,7 @@ extension InteractionReview {
 			var accountDepositSetting: InteractionReview.DepositSettingState? = nil
 			var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 			var shieldUpdate: InteractionReview.ShieldState? = nil
+			var confirmShieldUpdate: InteractionReview.ShieldState? = nil
 
 			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
@@ -56,6 +58,7 @@ extension InteractionReview {
 			case withdrawals(Common.Accounts.Action)
 			case deposits(Common.Accounts.Action)
 			case accountDeletion(Common.Accounts.Action)
+			case stopTimedRecovery(Common.Accounts.Action)
 			case dAppsUsed(InteractionReviewDappsUsed.Action)
 			case contributingToPools(InteractionReviewPools.Action)
 			case redeemingFromPools(InteractionReviewPools.Action)
@@ -189,7 +192,9 @@ extension InteractionReview {
 				state.accountDepositExceptions = sections.accountDepositExceptions
 				state.proofs = sections.proofs
 				state.accountDeletion = sections.accountDeletion
+				state.stopTimedRecovery = sections.stopTimedRecovery
 				state.shieldUpdate = sections.shieldUpdate
+				state.confirmShieldUpdate = sections.confirmShieldUpdate
 				return .none
 			}
 		}

@@ -4,12 +4,61 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let entityAddress: AddressOfAccountOrPersona
+		let accessControllerStateDetails: AccessControllerStateDetails?
 
 		@Shared(.shieldBuilder) var shieldBuilder
 		var structure: SecurityStructureOfFactorSources?
 
 		@Presents
 		var destination: Destination.State? = nil
+
+		var hasTimedRecovery: Bool {
+			accessControllerStateDetails?.timedRecoveryState != nil
+		}
+
+		var timedRecoveryBannerState: AccountBannerView.TimedRecoveryBannerState? {
+			guard let acDetails = accessControllerStateDetails,
+			      let timedRecoveryState = acDetails.timedRecoveryState
+			else {
+				return nil
+			}
+
+			// Check if provisional state exists
+			let hasProvisionalState = (try? SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(
+				addressOfAccountOrPersona: entityAddress
+			)) != nil
+
+			if hasProvisionalState {
+				// Known recovery - compute countdown
+				if let timestamp = TimeInterval(timedRecoveryState.allowTimedRecoveryAfterUnixTimestampSeconds) {
+					let confirmationDate = Date(timeIntervalSince1970: timestamp)
+					let remaining = confirmationDate.timeIntervalSince(Date.now)
+
+					if remaining > 0 {
+						// Format countdown
+						let days = Int(remaining) / 86400
+						let hours = (Int(remaining) % 86400) / 3600
+
+						let countdown = if days > 0 {
+							"\(days)d"
+						} else if hours > 0 {
+							"\(hours)h"
+						} else {
+							"<1h"
+						}
+						return .inProgress(countdown: countdown)
+					} else {
+						// Ready to confirm
+						return .inProgress(countdown: nil)
+					}
+				} else {
+					return .inProgress(countdown: nil)
+				}
+			} else {
+				// Unknown recovery
+				return .unknown
+			}
+		}
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -18,6 +67,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		case task
 		case editFactorsTapped
 		case onFactorSourceTapped(FactorSource)
+		case timedRecoveryBannerTapped
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -31,6 +81,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			case editShieldFactors(EditSecurityShieldCoordinator.State)
 			case factorSourceDetails(FactorSourceDetail.State)
 			case applyShield(ApplyShield.Coordinator.State)
+			case handleTimedRecovery(HandleAccessControllerTimedRecovery.State)
 		}
 
 		@CasePathable
@@ -38,6 +89,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			case editShieldFactors(EditSecurityShieldCoordinator.Action)
 			case factorSourceDetails(FactorSourceDetail.Action)
 			case applyShield(ApplyShield.Coordinator.Action)
+			case handleTimedRecovery(HandleAccessControllerTimedRecovery.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -49,6 +101,9 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			}
 			Scope(state: \.applyShield, action: \.applyShield) {
 				ApplyShield.Coordinator()
+			}
+			Scope(state: \.handleTimedRecovery, action: \.handleTimedRecovery) {
+				HandleAccessControllerTimedRecovery()
 			}
 		}
 	}
@@ -88,6 +143,18 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			} catch: { err, _ in
 				errorQueue.schedule(err)
 			}
+		case .timedRecoveryBannerTapped:
+			guard let acDetails = state.accessControllerStateDetails else {
+				return .none
+			}
+			do {
+				state.destination = try .handleTimedRecovery(
+					.init(acDetails: acDetails)
+				)
+			} catch {
+				errorQueue.schedule(error)
+			}
+			return .none
 		}
 	}
 
@@ -123,6 +190,10 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		case .applyShield(.delegate(.finished)):
 			state.destination = nil
 			return .none
+		case .handleTimedRecovery:
+			// Dismiss sheet and reload structure in case recovery was completed/cancelled
+			state.destination = nil
+			return .send(.view(.task))
 		default:
 			return .none
 		}
