@@ -10,7 +10,7 @@ extension InteractionReview {
 			var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 			var deposits: Accounts.State? = nil
 			var accountDeletion: Accounts.State? = nil
-			var stopTimedRecovery: Accounts.State? = nil
+			var stopTimedRecovery: StopTimedRecoveryState? = nil
 
 			var contributingToPools: InteractionReviewPools.State? = nil
 			var redeemingFromPools: InteractionReviewPools.State? = nil
@@ -58,7 +58,6 @@ extension InteractionReview {
 			case withdrawals(Common.Accounts.Action)
 			case deposits(Common.Accounts.Action)
 			case accountDeletion(Common.Accounts.Action)
-			case stopTimedRecovery(Common.Accounts.Action)
 			case dAppsUsed(InteractionReviewDappsUsed.Action)
 			case contributingToPools(InteractionReviewPools.Action)
 			case redeemingFromPools(InteractionReviewPools.Action)

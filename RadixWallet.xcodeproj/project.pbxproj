@@ -897,6 +897,7 @@
 		A06323EA2DFC308200963A1F /* LearnAbout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A06323E72DFC308200963A1F /* LearnAbout.swift */; };
 		A070FA332E58482400CB9566 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A070FA322E58482400CB9566 /* Sargon */; };
 		A0777B482E253E1E00E82892 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0777B472E253E1E00E82892 /* Sargon */; };
+		A07B8C462ED8A9A7001D084A /* InteractionReview-StopTimedRecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07B8C442ED8A9A7001D084A /* InteractionReview-StopTimedRecoveryView.swift */; };
 		A0830CCE2E428E8700DF1F08 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0830CCD2E428E8700DF1F08 /* Sargon */; };
 		A089D42F2E34F80600866A47 /* ArculusFactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D42D2E34F80600866A47 /* ArculusFactorSourceAccess.swift */; };
 		A089D4302E34F80600866A47 /* ArculusFactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089D42E2E34F80600866A47 /* ArculusFactorSourceAccess+View.swift */; };
@@ -2298,6 +2299,7 @@
 		A0600D382DD35B2200A2ADD3 /* DarkModeTintedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarkModeTintedImage.swift; sourceTree = "<group>"; };
 		A06323E72DFC308200963A1F /* LearnAbout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnAbout.swift; sourceTree = "<group>"; };
 		A06323E82DFC308200963A1F /* LearnAbout+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LearnAbout+View.swift"; sourceTree = "<group>"; };
+		A07B8C442ED8A9A7001D084A /* InteractionReview-StopTimedRecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-StopTimedRecoveryView.swift"; sourceTree = "<group>"; };
 		A089D42D2E34F80600866A47 /* ArculusFactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArculusFactorSourceAccess.swift; sourceTree = "<group>"; };
 		A089D42E2E34F80600866A47 /* ArculusFactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusFactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		A089D4312E35342F00866A47 /* ArculusCardClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCardClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5793,6 +5795,7 @@
 		5B27FBDE2CC6CCA6002975BE /* Sections */ = {
 			isa = PBXGroup;
 			children = (
+				A07B8C452ED8A9A7001D084A /* StopTimedRecovery */,
 				A08BBA5F2DAD49D500534B67 /* Shield */,
 				5B27FBFB2CC7E6C1002975BE /* Sections.swift */,
 				5B27FBFC2CC7E6C1002975BE /* Sections+View.swift */,
@@ -6477,6 +6480,14 @@
 				A0D201702E057258009DA055 /* LearnItemsList+View.swift */,
 			);
 			path = LearnAbout;
+			sourceTree = "<group>";
+		};
+		A07B8C452ED8A9A7001D084A /* StopTimedRecovery */ = {
+			isa = PBXGroup;
+			children = (
+				A07B8C442ED8A9A7001D084A /* InteractionReview-StopTimedRecoveryView.swift */,
+			);
+			path = StopTimedRecovery;
 			sourceTree = "<group>";
 		};
 		A089D42C2E34F7E500866A47 /* Arculus */ = {
@@ -9319,6 +9330,7 @@
 				A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */,
 				E7607DD42D4BB5BB0083B3A5 /* ChooseAccountsForShield.swift in Sources */,
 				5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */,
+				A07B8C462ED8A9A7001D084A /* InteractionReview-StopTimedRecoveryView.swift in Sources */,
 				48CFC4552ADC10DA00E77A5C /* CacheClient+Live.swift in Sources */,
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
 				48CFC33E2ADC10D900E77A5C /* DappInteractionFlow+View.swift in Sources */,

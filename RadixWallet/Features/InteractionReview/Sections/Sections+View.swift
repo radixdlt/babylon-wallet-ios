@@ -15,7 +15,8 @@ extension InteractionReview.Sections.State {
 			accountDepositSetting: accountDepositSetting,
 			accountDepositExceptions: accountDepositExceptions,
 			shieldUpdate: shieldUpdate,
-			confirmShieldUpdate: confirmShieldUpdate
+			confirmShieldUpdate: confirmShieldUpdate,
+			stopTimedRecovery: stopTimedRecovery
 		)
 	}
 }
@@ -37,6 +38,7 @@ extension InteractionReview.Sections {
 		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
 		let shieldUpdate: InteractionReview.ShieldState?
 		let confirmShieldUpdate: InteractionReview.ShieldState?
+		let stopTimedRecovery: InteractionReview.StopTimedRecoveryState?
 
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
@@ -51,7 +53,7 @@ extension InteractionReview.Sections {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					accountDeletion
-					stopTimedRecovery
+					stopTimedRecovery(viewStore.stopTimedRecovery)
 					withdrawals
 
 					VStack(alignment: .leading, spacing: .medium1) {
@@ -275,11 +277,11 @@ extension InteractionReview.Sections {
 		}
 
 		@ViewBuilder
-		private var stopTimedRecovery: some SwiftUI.View {
-			IfLetStore(store.scope(state: \.stopTimedRecovery, action: \.child.stopTimedRecovery)) { childStore in
+		private func stopTimedRecovery(_ viewState: InteractionReview.StopTimedRecoveryState?) -> some SwiftUI.View {
+			if let viewState {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.stopTimedRecovery
-					Common.Accounts.View(store: childStore)
+					Common.StopTimedRecoveryView(viewState: viewState)
 				}
 			}
 		}

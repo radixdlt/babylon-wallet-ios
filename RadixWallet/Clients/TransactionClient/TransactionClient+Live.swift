@@ -80,18 +80,30 @@ extension MyEntitiesInvolvedInTransaction {
 		allPersonas: [Persona],
 		executionSummary: ExecutionSummary
 	) throws -> Self {
-		let addressOfSecurifiedAccount: AccountAddress? = switch executionSummary.detailedClassification {
+		let addressOfSecurifiedEntity: AddressOfAccountOrPersona? = switch executionSummary.detailedClassification {
 		case let .accessControllerRecovery(acAddresses), let .accessControllerConfirmTimedRecovery(acAddresses), let .accessControllerStopTimedRecovery(acAddresses):
-			try? SargonOs.shared.entityByAccessControllerAddress(address: acAddresses.first!).asAccount().accountAddress
+			try? SargonOs.shared.entityByAccessControllerAddress(address: acAddresses.first!).address
 		default:
 			nil
+		}
+
+		let additionalAccountsRequiringAuth: [AccountAddress] = if let addressOfSecurifiedEntity, case let .account(accountAddress) = addressOfSecurifiedEntity {
+			[accountAddress]
+		} else {
+			[]
+		}
+
+		let additionalPersonasRequiringAuth: [IdentityAddress] = if let addressOfSecurifiedEntity, case let .identity(identityAddress) = addressOfSecurifiedEntity {
+			[identityAddress]
+		} else {
+			[]
 		}
 
 		return try fromInput(
 			allAccounts: allAccounts,
 			allPersonas: allPersonas,
-			addressesOfPersonasRequiringAuth: executionSummary.addressesOfIdentitiesRequiringAuth,
-			addressesOfAccountsRequiringAuth: executionSummary.addressesOfAccountsRequiringAuth + (addressOfSecurifiedAccount.map { [$0] } ?? []),
+			addressesOfPersonasRequiringAuth: executionSummary.addressesOfIdentitiesRequiringAuth + additionalPersonasRequiringAuth,
+			addressesOfAccountsRequiringAuth: executionSummary.addressesOfAccountsRequiringAuth + additionalAccountsRequiringAuth,
 			addressesOfAccountsWithdrawnFrom: executionSummary.withdrawals.keys,
 			addressesOfAccountsDepositedInto: executionSummary.deposits.keys
 		)
@@ -345,9 +357,9 @@ extension TransactionClient {
 		if case let .accessControllerRecovery(acAddresses) = request.executionSummary.detailedClassification, let acAddress = acAddresses.first {
 			@Dependency(\.accessControllerClient) var accessControllerClient
 			let details = try await accessControllerClient.getAccessControllerStateDetails(acAddress)
-			if details.xrdBalance >= totalCost {
+			if let feePayerCandidate = feePayerCandidates.first, details.xrdBalance >= totalCost {
 				return .init(
-					payer: feePayerCandidates.first!,
+					payer: feePayerCandidate,
 					updatedFee: request.transactionFee,
 					transactionSigners: request.transactionSigners,
 					signingFactors: request.signingFactors

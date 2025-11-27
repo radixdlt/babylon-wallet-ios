@@ -6,7 +6,7 @@ extension InteractionReview {
 		var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 		var deposits: Accounts.State? = nil
 		var accountDeletion: Accounts.State? = nil
-		var stopTimedRecovery: Accounts.State? = nil
+		var stopTimedRecovery: StopTimedRecoveryState? = nil
 
 		var contributingToPools: InteractionReviewPools.State? = nil
 		var redeemingFromPools: InteractionReviewPools.State? = nil

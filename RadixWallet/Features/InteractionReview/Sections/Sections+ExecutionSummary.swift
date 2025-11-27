@@ -85,7 +85,7 @@ extension InteractionReview.Sections {
 			)
 
 		case let .accessControllerStopTimedRecovery(acAddresses):
-			let stopRecovery: Common.Accounts.State? = try await extractStopTimedRecovery(acAddresses: acAddresses)
+			let stopRecovery: Common.StopTimedRecoveryState? = try await extractStopTimedRecovery(acAddresses: acAddresses)
 
 			return Common.SectionsData(
 				stopTimedRecovery: stopRecovery
@@ -572,25 +572,13 @@ extension InteractionReview.Sections {
 		return .init(accounts: accounts, enableCustomizeGuarantees: false)
 	}
 
-	private func extractStopTimedRecovery(acAddresses: [AccessControllerAddress]) async throws -> Common.Accounts.State? {
+	private func extractStopTimedRecovery(acAddresses: [AccessControllerAddress]) async throws -> Common.StopTimedRecoveryState? {
 		guard let acAddress = acAddresses.first else { return nil }
 
 		// Get the entity (account or persona) from access controller address
 		let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
 
-		// Extract account address - currently only accounts are supported for timed recovery
-		let accountAddress = try entity.asAccount().accountAddress
-
-		let userAccounts: [Common.ReviewAccount] = try await extractUserAccounts([accountAddress])
-		let account = try userAccounts.account(for: accountAddress)
-
-		let accountState = Common.Account.State(
-			account: account,
-			transfers: [],
-			purpose: .stopTimedRecovery
-		)
-
-		return .init(accounts: [accountState].asIdentified(), enableCustomizeGuarantees: false)
+		return .init(entity: entity)
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> Common.ValidatorsState? {
