@@ -4,7 +4,9 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		let entityAddress: AddressOfAccountOrPersona
-		let accessControllerStateDetails: AccessControllerStateDetails?
+		let accessControllerAddress: AccessControllerAddress
+
+		var accessControllerStateDetails: AccessControllerStateDetails?
 
 		@Shared(.shieldBuilder) var shieldBuilder
 		var structure: SecurityStructureOfFactorSources?
@@ -17,8 +19,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		}
 
 		var timedRecoveryBannerState: AccountBannerView.TimedRecoveryBannerState? {
-			guard let acDetails = accessControllerStateDetails,
-			      let timedRecoveryState = acDetails.timedRecoveryState
+			guard let timedRecoveryState = accessControllerStateDetails?.timedRecoveryState
 			else {
 				return nil
 			}
@@ -73,6 +74,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case secStructureUpdated(SecurityStructureOfFactorSources)
 		case factorSourceIntegrityLoaded(FactorSourceIntegrity)
+		case accessControllerStateDetailsUpdated(AccessControllerStateDetails?)
 	}
 
 	struct Destination: DestinationReducer {
@@ -110,6 +112,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.accessControllerClient) var accessControllerClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -128,7 +131,13 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			} catch {
 				errorQueue.schedule(error)
 			}
-			return .none
+
+			// Subscribe to access controller state updates if entity is securified
+			return .run { [acAddress = state.accessControllerAddress] send in
+				for try await acDetails in await accessControllerClient.accessControllerUpdates(acAddress) {
+					await send(.internal(.accessControllerStateDetailsUpdated(acDetails)))
+				}
+			}
 		case .editFactorsTapped:
 			guard let structure = state.structure else { return .none }
 			state.$shieldBuilder.withLock { [structure] sharedValue in
@@ -170,6 +179,9 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		case let .factorSourceIntegrityLoaded(integrity):
 			state.destination = .factorSourceDetails(.init(integrity: integrity))
 			return .none
+		case let .accessControllerStateDetailsUpdated(acDetails):
+			state.accessControllerStateDetails = acDetails
+			return .none
 		}
 	}
 
@@ -190,10 +202,6 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		case .applyShield(.delegate(.finished)):
 			state.destination = nil
 			return .none
-		case .handleTimedRecovery:
-			// Dismiss sheet and reload structure in case recovery was completed/cancelled
-			state.destination = nil
-			return .send(.view(.task))
 		default:
 			return .none
 		}

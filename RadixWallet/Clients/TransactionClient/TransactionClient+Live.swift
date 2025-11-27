@@ -342,6 +342,21 @@ extension TransactionClient {
 		let totalCost = request.transactionFee.totalFee.max
 		let allSignerEntities = request.transactionSigners.intentSignerEntitiesOrEmpty()
 
+		if case let .accessControllerRecovery(acAddresses) = request.executionSummary.detailedClassification, let acAddress = acAddresses.first {
+			@Dependency(\.accessControllerClient) var accessControllerClient
+			let details = try await accessControllerClient.getAccessControllerStateDetails(acAddress)
+			if details.xrdBalance >= totalCost {
+				return .init(
+					payer: feePayerCandidates.first!,
+					updatedFee: request.transactionFee,
+					transactionSigners: request.transactionSigners,
+					signingFactors: request.signingFactors
+				)
+			} else {
+				return nil
+			}
+		}
+
 		func findFeePayer(
 			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Account>>,
 			includeSignaturesCost: Bool

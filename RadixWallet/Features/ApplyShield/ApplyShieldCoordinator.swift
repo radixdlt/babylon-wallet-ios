@@ -50,6 +50,7 @@ extension ApplyShield {
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
 		@Dependency(\.submitTXClient) var submitTXClient
 		@Dependency(\.errorQueue) var errorQueue
+		@Dependency(\.accessControllerClient) var accessControllerClient
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.root, action: \.child.root) {
@@ -83,6 +84,8 @@ extension ApplyShield {
 									if let signedIntent = result.notarizedTransaction, !isAccessControllerTimedRecoveryManifest(manifest: signedIntent.signedIntent.intent.manifest) {
 										try await SargonOs.shared.commitProvisionalSecurityState(entityAddress: entityAddress)
 									}
+									// Force refresh access controller state after successful shield update
+									await accessControllerClient.forceRefresh()
 								}
 								return
 							}

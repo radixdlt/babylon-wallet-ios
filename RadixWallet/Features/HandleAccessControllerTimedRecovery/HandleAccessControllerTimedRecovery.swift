@@ -83,6 +83,7 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.accessControllerClient) var accessControllerClient
 
 	enum CancelID: Hashable {
 		case timer
@@ -126,6 +127,8 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 							if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 								// TODO: Use a client which wraps SargonOS so this features becomes testable
 								try await SargonOs.shared.removeProvisionalSecurityState(entityAddress: entityAddress)
+								// Force refresh access controller state after successful stop transaction
+								await accessControllerClient.forceRefresh()
 							}
 							return
 						}
@@ -154,6 +157,8 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 							if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 								// TODO: Use a client which wraps SargonOS so this features becomes testable
 								try await SargonOs.shared.commitProvisionalSecurityState(entityAddress: entityAddress)
+								// Force refresh access controller state after successful confirm transaction
+								await accessControllerClient.forceRefresh()
 							}
 							return
 						}

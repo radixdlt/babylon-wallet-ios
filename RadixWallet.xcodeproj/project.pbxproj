@@ -923,6 +923,9 @@
 		A0A53EBA2E54DAA500BE36FE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0A53EB92E54DAA500BE36FE /* Sargon */; };
 		A0A556152ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A556132ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift */; };
 		A0A556162ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A556142ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift */; };
+		A0B566E92ED75F96002655C0 /* AccessControllerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B566E52ED75F96002655C0 /* AccessControllerClient+Interface.swift */; };
+		A0B566EA2ED75F96002655C0 /* AccessControllerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B566E62ED75F96002655C0 /* AccessControllerClient+Live.swift */; };
+		A0B566EB2ED75F96002655C0 /* AccessControllerClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B566E72ED75F96002655C0 /* AccessControllerClient+Test.swift */; };
 		A0BA444C2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */; };
 		A0BA444D2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */; };
 		A0BA44512E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */; };
@@ -2318,6 +2321,9 @@
 		A09F8FDD2DF6E4C300DB5614 /* Discover+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Discover+View.swift"; sourceTree = "<group>"; };
 		A0A556132ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningConfirmShieldTimedRecovery.swift; sourceTree = "<group>"; };
 		A0A556142ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SigningConfirmShieldTimedRecovery+View.swift"; sourceTree = "<group>"; };
+		A0B566E52ED75F96002655C0 /* AccessControllerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccessControllerClient+Interface.swift"; sourceTree = "<group>"; };
+		A0B566E62ED75F96002655C0 /* AccessControllerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccessControllerClient+Live.swift"; sourceTree = "<group>"; };
+		A0B566E72ED75F96002655C0 /* AccessControllerClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccessControllerClient+Test.swift"; sourceTree = "<group>"; };
 		A0BA444A2E7F05AF00ED76E8 /* ShieldTemplateDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShieldTemplateDetails.swift; sourceTree = "<group>"; };
 		A0BA444B2E7F05AF00ED76E8 /* ShieldTemplateDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShieldTemplateDetails+View.swift"; sourceTree = "<group>"; };
 		A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityStructureOfFactorSourcesView+View.swift"; sourceTree = "<group>"; };
@@ -4689,6 +4695,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A0B566E82ED75F96002655C0 /* AccessControllerClient */,
 				A089D4342E35342F00866A47 /* ArculusCardClient */,
 				A09F8FD22DEF4D8500DB5614 /* RadixNameServiceClient */,
 				A0F223782DDC6CF700035389 /* DAppsDirectoryClient */,
@@ -6549,6 +6556,16 @@
 				A06323E62DFC306600963A1F /* LearnAbout */,
 			);
 			path = Discover;
+			sourceTree = "<group>";
+		};
+		A0B566E82ED75F96002655C0 /* AccessControllerClient */ = {
+			isa = PBXGroup;
+			children = (
+				A0B566E52ED75F96002655C0 /* AccessControllerClient+Interface.swift */,
+				A0B566E62ED75F96002655C0 /* AccessControllerClient+Live.swift */,
+				A0B566E72ED75F96002655C0 /* AccessControllerClient+Test.swift */,
+			);
+			path = AccessControllerClient;
 			sourceTree = "<group>";
 		};
 		A0D742A62DD478BD0062DB01 /* ThemeSelection */ = {
@@ -8861,6 +8878,9 @@
 				A00CC6DA2E157978005278AE /* AddFactorSoruce-SelectKind+View.swift in Sources */,
 				E703C0272D3F8D81006DF199 /* MultiPickerView.swift in Sources */,
 				A40815692C7E0D08005E65B9 /* BlueprintRoyaltyConfig.swift in Sources */,
+				A0B566E92ED75F96002655C0 /* AccessControllerClient+Interface.swift in Sources */,
+				A0B566EA2ED75F96002655C0 /* AccessControllerClient+Live.swift in Sources */,
+				A0B566EB2ED75F96002655C0 /* AccessControllerClient+Test.swift in Sources */,
 				A40815D42C7E0D08005E65B9 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
 				A40815CE2C7E0D08005E65B9 /* PackageCodeCollectionItem.swift in Sources */,
 				48CFC3772ADC10D900E77A5C /* LSUDetails.swift in Sources */,

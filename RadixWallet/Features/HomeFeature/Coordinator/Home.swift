@@ -158,6 +158,7 @@ struct Home: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.accountLockersClient) var accountLockersClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.accessControllerClient) var accessControllerClient
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
 
@@ -540,15 +541,8 @@ struct Home: Sendable, FeatureReducer {
 
 	private func accessControllersStateDetails() -> Effect<Action> {
 		.run { send in
-			if let accessControllersStateDetails = try? await SargonOS.shared.fetchAllAccessControllersDetails() {
+			for try await accessControllersStateDetails in await accessControllerClient.accessControllerStateDetailsUpdates() {
 				await send(.internal(.setAccessControllersStateDetails(accessControllersStateDetails)))
-			}
-
-			for await _ in clock.timer(interval: .seconds(accountPortfoliosRefreshIntervalInSeconds)) {
-				guard !Task.isCancelled else { return }
-				if let accessControllersStateDetails = try? await SargonOS.shared.fetchAllAccessControllersDetails() {
-					await send(.internal(.setAccessControllersStateDetails(accessControllersStateDetails)))
-				}
 			}
 		}
 	}

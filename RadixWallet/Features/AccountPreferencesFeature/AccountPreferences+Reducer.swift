@@ -47,7 +47,6 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case refreshAccountCompleted(TaskResult<OnLedgerEntity.OnLedgerAccount>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		case securityStateDetermined(State.SecurityState)
-		case showShieldDetails(entityAddress: AddressOfAccountOrPersona, accessControllerStateDetails: AccessControllerStateDetails?)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -234,13 +233,6 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case let .securityStateDetermined(securityState):
 			state.securityState = securityState
 			return .none
-
-		case let .showShieldDetails(entityAddress, accessControllerStateDetails):
-			state.destination = .shieldDetails(.init(
-				entityAddress: entityAddress,
-				accessControllerStateDetails: accessControllerStateDetails
-			))
-			return .none
 		}
 	}
 
@@ -377,7 +369,6 @@ extension AccountPreferences {
 			return .none
 
 		case .securifiedWith(.shield):
-			// Fetch access controller details for the account
 			let acAddress: AccessControllerAddress? = switch state.account.securityState {
 			case let .securified(control):
 				control.accessControllerAddress
@@ -385,21 +376,12 @@ extension AccountPreferences {
 				nil
 			}
 
-			let entityAddress = state.account.address
-			return .run { send in
-				let acDetails: AccessControllerStateDetails?
-				if let acAddress {
-					let allDetails = try? await SargonOS.shared.fetchAllAccessControllersDetails()
-					acDetails = allDetails?.first { $0.address == acAddress }
-				} else {
-					acDetails = nil
-				}
-
-				await send(.internal(.showShieldDetails(
-					entityAddress: .account(entityAddress),
-					accessControllerStateDetails: acDetails
-				)))
+			guard let acAddress else {
+				return .none
 			}
+
+			state.destination = .shieldDetails(.init(entityAddress: .account(state.account.address), accessControllerAddress: acAddress))
+			return .none
 		}
 	}
 }
