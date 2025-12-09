@@ -472,6 +472,8 @@
 "transactionReview_updateShield_proveOwnerhipTitle" = "Log In and Prove Ownership";
 "transactionReview_updateShield_proveOwnerhipMessage" = "Factors required to log into dApps with Personas and prove ownership of Accounts.";
 "transactionReview_updateShield_proveOwnerhipThreshold" = "Must present this factor";
+"transactionReview_updateShield_stopTimedRecoveryTitle" = "Stop Timed Recovery";
+"transactionReview_updateShield_stopTimedRecoveryDescription" = "Stopping timed recovery. Your current security setup will remain unchanged.";
 "transactionStatus_completing_text" = "Completing Transaction…";
 "transactionStatus_transactionID_text" = "Transaction ID: ";
 "transactionStatus_success_title" = "Transaction Success";
@@ -1825,3 +1827,29 @@ Please retry.";
 "commonSecurityShields_applyShield" = "Apply Shield";
 "commonSecurityShields_shielded" = "Shielded";
 "commonSecurityShields_select_title" = "Select Security Shield";
+"commonSecurityShields_recoveryIn" = "Recovery in %@";
+"commonSecurityShields_recoveryReadyToConfirm" = "Recovery ready to confirm";
+"accountRecovery_title" = "Account Recovery";
+"accountRecovery_cancel_button" = "Cancel Recovery";
+"accountRecovery_confirm_button" = "Confirm Recovery";
+"accountRecovery_unauthorizedRecovery_warning" = "Unauthorized Recovery Detected. If you didn\'t start this recovery, cancel it now to protect your account.";
+"accountRecovery_unauthorizedRecoverySection_title" = "Unrecognized Recovery";
+"accountRecovery_unauthorizedRecoverySection_description" = "You cannot see what security factors will control this account after recovery completes.";
+"accountRecovery_timeline_title" = "Recovery Timeline";
+"accountRecovery_about_title" = "About Timed Recovery";
+"accountRecovery_about_description" = "Timed recovery allows you to regain access to your account if you\'ve lost your security factors. The waiting period protects you by giving time to cancel unauthorized recovery attempts.";
+"accountRecovery_newFactors_title" = "New Security Factors";
+"accountRecovery_newFactors_subtitle" = "After confirmation, your account will be secured with:";
+"accountRecovery_whatHappensSection_title" = "What Happens Next?";
+"accountRecovery_whatHappensSectionUnauthorized_description" = "Confirm is **unavailable. You can only cancel recoveries you don\'t recognize to protect your account.**
+Cancel to stop the recovery and keep your current security setup.";
+"accountRecovery_whatHappensSection_description" = "Confirm to complete the recovery and switch to the new security factors.
+Cancel to stop the recovery and keep your current security setup.";
+"accountRecovery_confirmableAfter_title" = "Confirmable after";
+"accountRecovery_readyToConfirm" = "Ready to confirm";
+"accountRecovery_remainingTime" = "Time remaining";
+"confirmAccountRecovery_title" = "Cannot Update Shield Yet";
+"confirmAccountRecovery_subtitle" = "You can use your timed emergency fallback to confirm Shield update or you can restart the signing process.";
+"confirmAccountRecovery_description" = "Starts the Shield update process. Requires a confirmation transaction when wait period is over.";
+"confirmAccountRecovery_confirmInLabel" = "You can confirm in";
+"confirmAccountRecovery_useButton" = "Use Emergency Fallback";
