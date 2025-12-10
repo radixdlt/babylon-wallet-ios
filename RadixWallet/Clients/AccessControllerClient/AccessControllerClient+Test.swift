@@ -11,7 +11,7 @@ extension AccessControllerClient: TestDependencyKey {
 
 	static let noop = Self(
 		getAllAccessControllerStateDetails: { [] },
-		getAccessControllerStateDetails: { _ in AccessControllerStateDetails(address: AccessControllerAddress.sampleStokenet, timedRecoveryState: nil, xrdBalance: .zero) },
+		getAccessControllerStateDetails: { _ in AccessControllerStateDetails(address: newAccessControllerAddressSampleStokenet(), timedRecoveryState: nil, xrdBalance: .zero) },
 		accessControllerStateDetailsUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		accessControllerUpdates: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		forceRefresh: {}
