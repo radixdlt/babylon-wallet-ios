@@ -212,18 +212,36 @@ extension HandleAccessControllerTimedRecovery {
 		@ViewBuilder
 		private var actionButtons: some SwiftUI.View {
 			if store.isKnownRecovery {
-				HStack(spacing: .medium3) {
-					Button(L10n.HandleAccessControllerTimedRecovery.Button.cancel) {
-						store.send(.view(.stopButtonTapped))
-					}
-					.buttonStyle(.secondaryRectangular)
+				ViewThatFits(in: .horizontal) {
+					HStack(spacing: .medium3) {
+						Button(L10n.HandleAccessControllerTimedRecovery.Button.cancel) {
+							store.send(.view(.stopButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular)
 
-					Button(L10n.HandleAccessControllerTimedRecovery.Button.confirm) {
-						store.send(.view(.confirmButtonTapped))
+						Button(L10n.HandleAccessControllerTimedRecovery.Button.confirm) {
+							store.send(.view(.confirmButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular)
+						.disabled(!store.isRecoveryConfirmable)
+						.opacity(store.isRecoveryConfirmable ? 1 : 0.3)
 					}
-					.buttonStyle(.secondaryRectangular)
-					.disabled(!store.isRecoveryConfirmable)
+
+					VStack(spacing: .medium3) {
+						Button(L10n.HandleAccessControllerTimedRecovery.Button.cancel) {
+							store.send(.view(.stopButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+
+						Button(L10n.HandleAccessControllerTimedRecovery.Button.confirm) {
+							store.send(.view(.confirmButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+						.disabled(!store.isRecoveryConfirmable)
+						.opacity(store.isRecoveryConfirmable ? 1 : 0.3)
+					}
 				}
+
 			} else {
 				Button(L10n.HandleAccessControllerTimedRecovery.Button.cancelUnknown) {
 					store.send(.view(.stopButtonTapped))
