@@ -19,7 +19,12 @@ extension HandleAccessControllerTimedRecovery {
 					.padding(.bottom, .medium1)
 				}
 				.background(.secondaryBackground)
-				.radixToolbar(title: L10n.HandleAccessControllerTimedRecovery.title, closeAction: {})
+				.radixToolbar(
+					title: L10n.HandleAccessControllerTimedRecovery.title,
+					closeAction: {
+						dismiss()
+					}
+				)
 				.footer {
 					actionButtons
 				}
@@ -150,7 +155,7 @@ extension HandleAccessControllerTimedRecovery {
 				.cornerRadius(.medium1)
 			} else {
 				VStack(alignment: .leading, spacing: .medium2) {
-					HStack(alignment: .top, spacing: .medium2) {
+					HStack(alignment: .center, spacing: .medium2) {
 						Image(.error)
 							.resizable()
 							.frame(width: .large2, height: .large2)
@@ -211,19 +216,19 @@ extension HandleAccessControllerTimedRecovery {
 					Button(L10n.HandleAccessControllerTimedRecovery.Button.cancel) {
 						store.send(.view(.stopButtonTapped))
 					}
-					.buttonStyle(.secondaryRectangular(isDestructive: true))
+					.buttonStyle(.secondaryRectangular)
 
 					Button(L10n.HandleAccessControllerTimedRecovery.Button.confirm) {
 						store.send(.view(.confirmButtonTapped))
 					}
-					.buttonStyle(.primaryRectangular)
+					.buttonStyle(.secondaryRectangular)
 					.disabled(!store.isRecoveryConfirmable)
 				}
 			} else {
 				Button(L10n.HandleAccessControllerTimedRecovery.Button.cancelUnknown) {
 					store.send(.view(.stopButtonTapped))
 				}
-				.buttonStyle(.primaryRectangular(isDestructive: true))
+				.buttonStyle(.secondaryRectangular(shouldExpand: true))
 			}
 		}
 	}

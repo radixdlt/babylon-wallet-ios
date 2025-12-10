@@ -2403,7 +2403,7 @@ internal enum L10n {
         return L10n.tr("Localizable", "handleAccessControllerTimedRecovery_banner_recoveryInProgress", String(describing: p1), fallback: "Recovery in %@")
       }
       /// ⚠️ Unrecognized recovery
-      internal static let unknownRecovery = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_banner_unknownRecovery", fallback: "⚠️ Unrecognized recovery")
+      internal static let unknownRecovery = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_banner_unknownRecovery", fallback: "Unrecognized recovery")
     }
     internal enum Button {
       /// Cancel Recovery
@@ -2453,13 +2453,13 @@ internal enum L10n {
     }
     internal enum UnknownRecovery {
       /// ⚠️ Unauthorized Recovery Detected. If you didn't start this recovery, cancel it now to protect your account.
-      internal static let alertMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownRecovery_alertMessage", fallback: "⚠️ Unauthorized Recovery Detected. If you didn't start this recovery, cancel it now to protect your account.")
+      internal static let alertMessage = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownRecovery_alertMessage", fallback: "Unauthorized Recovery Detected. If you didn't start this recovery, cancel it now to protect your account.")
     }
     internal enum UnknownStructure {
       /// You cannot see what security factors will control this account after recovery completes. Only cancel this recovery if you still have access.
-      internal static let message = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownStructure_message", fallback: "You cannot see what security factors will control this account after recovery completes. Only cancel this recovery if you still have access.")
+      internal static let message = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownStructure_message", fallback: "You cannot see what security factors will control this account after recovery completes.")
       /// ⚠️ Unrecognized Recovery
-      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownStructure_title", fallback: "⚠️ Unrecognized Recovery")
+      internal static let title = L10n.tr("Localizable", "handleAccessControllerTimedRecovery_unknownStructure_title", fallback: "Unrecognized Recovery")
     }
   }
   internal enum HiddenAssets {

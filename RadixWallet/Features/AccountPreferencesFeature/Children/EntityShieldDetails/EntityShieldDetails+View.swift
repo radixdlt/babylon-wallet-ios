@@ -76,7 +76,7 @@ extension EntityShieldDetails {
 					}
 				}
 			}
-			.foregroundColor(.button)
+			.foregroundColor(.primaryText)
 		}
 	}
 }
@@ -117,7 +117,9 @@ private extension View {
 
 	private func handleTimedRecovery(with destinationStore: PresentationStoreOf<EntityShieldDetails.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.handleTimedRecovery, action: \.handleTimedRecovery)) { store in
-			HandleAccessControllerTimedRecovery.View(store: store)
+			NavigationStack {
+				HandleAccessControllerTimedRecovery.View(store: store)
+			}
 		}
 	}
 }

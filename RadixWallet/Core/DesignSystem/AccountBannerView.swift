@@ -8,6 +8,7 @@ struct AccountBannerView: View {
 		HStack(spacing: .zero) {
 			image
 				.resizable()
+				.scaledToFit()
 				.frame(width: .medium3, height: .medium3)
 
 			Text(text)

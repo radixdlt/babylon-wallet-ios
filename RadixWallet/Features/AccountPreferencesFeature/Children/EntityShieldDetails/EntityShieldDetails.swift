@@ -181,6 +181,15 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 			return .none
 		case let .accessControllerStateDetailsUpdated(acDetails):
 			state.accessControllerStateDetails = acDetails
+			// Reload structure when access controller updates
+			do {
+				let updatedStructure = try SargonOS.shared.securityStructureOfFactorSourcesFromAddressOfAccountOrPersona(
+					addressOfAccountOrPersona: state.entityAddress
+				)
+				state.structure = updatedStructure
+			} catch {
+				errorQueue.schedule(error)
+			}
 			return .none
 		}
 	}
