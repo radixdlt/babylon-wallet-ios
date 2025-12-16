@@ -313,6 +313,8 @@ extension TimePeriod {
 			L10n.ShieldWizardRecovery.Fallback.Week.period
 		case (_, .weeks):
 			L10n.ShieldWizardRecovery.Fallback.Weeks.period(Int(value))
+		case (_, .minutes):
+			"Minutes"
 		}
 	}
 }

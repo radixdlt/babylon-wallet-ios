@@ -14,7 +14,9 @@ extension InteractionReview.Sections.State {
 			claimingFromValidators: claimingFromValidators,
 			accountDepositSetting: accountDepositSetting,
 			accountDepositExceptions: accountDepositExceptions,
-			shieldUpdate: shieldUpdate
+			shieldUpdate: shieldUpdate,
+			confirmShieldUpdate: confirmShieldUpdate,
+			stopTimedRecovery: stopTimedRecovery
 		)
 	}
 }
@@ -35,6 +37,8 @@ extension InteractionReview.Sections {
 		let accountDepositSetting: InteractionReview.DepositSettingState?
 		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
 		let shieldUpdate: InteractionReview.ShieldState?
+		let confirmShieldUpdate: InteractionReview.ShieldState?
+		let stopTimedRecovery: InteractionReview.StopTimedRecoveryState?
 
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
@@ -49,6 +53,7 @@ extension InteractionReview.Sections {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					accountDeletion
+					stopTimedRecovery(viewStore.stopTimedRecovery)
 					withdrawals
 
 					VStack(alignment: .leading, spacing: .medium1) {
@@ -77,6 +82,7 @@ extension InteractionReview.Sections {
 					accountDepositSetting(viewStore.accountDepositSetting)
 					accountDepositExceptions(viewStore.accountDepositExceptions)
 					shieldUpdate(viewStore.shieldUpdate)
+					confirmShieldUpdate(viewStore.confirmShieldUpdate)
 				}
 				.animation(.easeInOut, value: viewStore.isExpandedDappsUsed)
 				.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
@@ -256,6 +262,26 @@ extension InteractionReview.Sections {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.shieldUpdate
 					Common.ShieldView(viewState: viewState)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private func confirmShieldUpdate(_ viewState: InteractionReview.ShieldState?) -> some SwiftUI.View {
+			if let viewState {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.confirmShieldUpdate
+					Common.ShieldView(viewState: viewState)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private func stopTimedRecovery(_ viewState: InteractionReview.StopTimedRecoveryState?) -> some SwiftUI.View {
+			if let viewState {
+				VStack(alignment: .leading, spacing: .small2) {
+					Common.HeadingView.stopTimedRecovery
+					Common.StopTimedRecoveryView(viewState: viewState)
 				}
 			}
 		}

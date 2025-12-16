@@ -25,6 +25,14 @@ struct TransactionFee: Hashable, Sendable {
 		notaryIsSignatory: Bool,
 		includeLockFee: Bool
 	) throws {
+		// Check if this is an access controller recovery transaction
+		let isAccessControllerRecovery = switch executionSummary.detailedClassification {
+		case .accessControllerRecovery, .accessControllerConfirmTimedRecovery, .accessControllerStopTimedRecovery:
+			true
+		default:
+			false
+		}
+
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionSummary.feeSummary.executionCost,
 			finalizationCost: executionSummary.feeSummary.finalizationCost,
@@ -33,7 +41,8 @@ struct TransactionFee: Hashable, Sendable {
 			guaranteesCost: executionSummary.guranteesCost(),
 			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
 			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
-			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
+			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory),
+			accessControllerRecoveryCost: isAccessControllerRecovery ? PredefinedFeeConstants.accessControllerRecoveryCost : .zero
 		)
 
 		let feeLocks: FeeLocks = .init(
@@ -115,6 +124,7 @@ extension TransactionFee {
         static let signatureCost =                       try! Decimal192("0.01109974758")
         static let notarizingCost =                      try! Decimal192("0.0081393944")
         static let notarizingCostWhenNotaryIsSignatory = try! Decimal192("0.0084273944")
+        static let accessControllerRecoveryCost =        try! Decimal192("0.5")
 		//    swiftformat:enable all
 
 		static func notarizingCost(_ notaryIsSignatory: Bool) -> Decimal192 {
@@ -142,6 +152,7 @@ extension TransactionFee {
 		var lockFeeCost: Decimal192
 		var signaturesCost: Decimal192
 		var notarizingCost: Decimal192
+		var accessControllerRecoveryCost: Decimal192
 
 		var totalExecutionCost: Decimal192 {
 			executionCost
@@ -149,6 +160,7 @@ extension TransactionFee {
 				+ signaturesCost
 				+ lockFeeCost
 				+ notarizingCost
+				+ accessControllerRecoveryCost
 		}
 
 		var total: Decimal192 {
@@ -166,7 +178,8 @@ extension TransactionFee {
 			guaranteesCost: Decimal192,
 			signaturesCost: Decimal192,
 			lockFeeCost: Decimal192,
-			notarizingCost: Decimal192
+			notarizingCost: Decimal192,
+			accessControllerRecoveryCost: Decimal192
 		) {
 			self.executionCost = executionCost
 			self.finalizationCost = finalizationCost
@@ -176,6 +189,7 @@ extension TransactionFee {
 			self.signaturesCost = signaturesCost
 			self.lockFeeCost = lockFeeCost
 			self.notarizingCost = notarizingCost
+			self.accessControllerRecoveryCost = accessControllerRecoveryCost
 		}
 	}
 
@@ -278,7 +292,8 @@ extension TransactionFee {
 			guaranteesCost: 5,
 			signaturesCost: 5,
 			lockFeeCost: 5,
-			notarizingCost: 5
+			notarizingCost: 5,
+			accessControllerRecoveryCost: 0
 		)
 		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 0, contingentLock: 0))
 	}
@@ -292,7 +307,8 @@ extension TransactionFee {
 			guaranteesCost: 5,
 			signaturesCost: 5,
 			lockFeeCost: 5,
-			notarizingCost: 5
+			notarizingCost: 5,
+			accessControllerRecoveryCost: 0
 		)
 		return .init(feeSummary: feeSummary, feeLocks: .init(nonContingentLock: 100, contingentLock: 0))
 	}

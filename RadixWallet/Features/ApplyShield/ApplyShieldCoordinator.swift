@@ -6,22 +6,19 @@ extension ApplyShield {
 		@ObservableState
 		struct State: Sendable, Hashable {
 			let securityStructure: SecurityStructureOfFactorSources
-			var selectedAccounts: [AccountAddress] = []
-			var selectedPersonas: [IdentityAddress] = []
+			var entityAddress: AddressOfAccountOrPersona?
 
 			var root: Path.State
 			var path: StackState<Path.State> = .init()
 
 			init(
 				securityStructure: SecurityStructureOfFactorSources,
-				selectedAccounts: [AccountAddress] = [],
-				selectedPersonas: [IdentityAddress] = [],
+				entityAddress: AddressOfAccountOrPersona? = nil,
 				root: Path.State? = nil
 			) {
 				self.securityStructure = securityStructure
 				self.root = root ?? .intro(.init(shieldID: securityStructure.metadata.id))
-				self.selectedAccounts = selectedAccounts
-				self.selectedPersonas = selectedPersonas
+				self.entityAddress = entityAddress
 			}
 		}
 
@@ -53,6 +50,7 @@ extension ApplyShield {
 		@Dependency(\.dappInteractionClient) var dappInteractionClient
 		@Dependency(\.submitTXClient) var submitTXClient
 		@Dependency(\.errorQueue) var errorQueue
+		@Dependency(\.accessControllerClient) var accessControllerClient
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.root, action: \.child.root) {
@@ -65,9 +63,11 @@ extension ApplyShield {
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .applyButtonTapped:
-				let addresses: [AddressOfAccountOrPersona] = state.selectedAccounts.map { .account($0) } + state.selectedPersonas.map { .identity($0) }
+				guard let entityAddress = state.entityAddress else {
+					return .none
+				}
 				return .run { [securityStructure = state.securityStructure] send in
-					let manifest = try await SargonOs.shared.makeSetupSecurityShieldManifest(securityStructure: securityStructure, address: addresses.first!)
+					let manifest = try await SargonOs.shared.makeUpdateSecurityShieldManifest(securityStructure: securityStructure, address: entityAddress)
 
 					Task {
 						let result = await dappInteractionClient.addWalletInteraction(
@@ -75,21 +75,23 @@ extension ApplyShield {
 							.shieldUpdate
 						)
 
-						// TODO: Remove this temporary - will be handled by Sargon once batch transactions are implemented
-						switch result {
+						switch result.p2pResponse {
 						case let .dapp(.success(success)):
 							if case let .transaction(tx) = success.items {
 								/// Wait for the transaction to be committed
 								let txID = tx.send.transactionIntentHash
 								if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
-									// TODO: Use a client which wraps SargonOS so this features becomes testable
-									try await SargonOs.shared.markEntitiesAsSecurified(entityAddresses: addresses)
+									if let signedIntent = result.notarizedTransaction, !isAccessControllerTimedRecoveryManifest(manifest: signedIntent.signedIntent.intent.manifest) {
+										try await SargonOs.shared.commitProvisionalSecurityState(entityAddress: entityAddress)
+									}
+									// Force refresh access controller state after successful shield update
+									await accessControllerClient.forceRefresh()
 								}
 								return
 							}
 
 							assertionFailure("Not a transaction Response?")
-						case .dapp(.failure), .none:
+						case .dapp(.failure):
 							break
 						}
 					}
@@ -113,7 +115,7 @@ extension ApplyShield {
 			case .root(.intro(.delegate(.skipped))):
 				return .send(.delegate(.skipped))
 			case let .path(.element(id: _, action: .chooseAccounts(.delegate(.finished(accounts))))):
-				if accounts.isEmpty {
+				guard let account = accounts.first else {
 					state.path.append(.choosePersonas(.init(
 						choosePersonas: .init(
 							selectionRequirement: .exactly(1)
@@ -122,11 +124,14 @@ extension ApplyShield {
 					)))
 					return .none
 				}
-				state.selectedAccounts = accounts
+				state.entityAddress = .account(account)
 				state.path.append(.completion)
 				return .none
 			case let .path(.element(id: _, action: .choosePersonas(.delegate(.finished(personas))))):
-				state.selectedPersonas = personas
+				guard let persona = personas.first else {
+					return .none
+				}
+				state.entityAddress = .identity(persona)
 				state.path.append(.completion)
 				return .none
 			default:

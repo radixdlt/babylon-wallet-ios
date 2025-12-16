@@ -247,7 +247,18 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .viewShieldDetailsRowTapped:
-			state.destination = .shieldDetails(.init(entityAddress: .identity(state.persona.address)))
+			let acAddress: AccessControllerAddress? = switch state.persona.securityState {
+			case let .securified(control):
+				control.accessControllerAddress
+			case .unsecured:
+				nil
+			}
+
+			guard let acAddress else {
+				return .none
+			}
+
+			state.destination = .shieldDetails(.init(entityAddress: .identity(state.persona.address), accessControllerAddress: acAddress))
 			return .none
 		}
 	}
@@ -335,7 +346,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			return loadSecState(state: state)
 
 		case let .selectShield(.delegate(.confirmed(shield))):
-			state.destination = .applyShield(.init(securityStructure: shield, selectedPersonas: [state.persona.address], root: .completion))
+			state.destination = .applyShield(.init(securityStructure: shield, entityAddress: .identity(state.persona.address), root: .completion))
 			return .none
 
 		case .applyShield(.delegate(.finished)):

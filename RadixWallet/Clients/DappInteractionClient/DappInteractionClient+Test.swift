@@ -18,7 +18,16 @@ extension DappInteractionClient: TestDependencyKey {
 
 	static let noop = Self(
 		interactions: AsyncLazySequence([]).eraseToAnyAsyncSequence(),
-		addWalletInteraction: { _, _ in .none },
-		completeInteraction: { _ in }
+		addWalletInteraction: { _, _ in
+			.init(
+				p2pResponse: .dapp(.failure(.init(
+					interactionId: "noop",
+					error: .rejectedByUser,
+					message: nil
+				))),
+				notarizedTransaction: nil
+			)
+		},
+		completeInteraction: { _, _ in }
 	)
 }

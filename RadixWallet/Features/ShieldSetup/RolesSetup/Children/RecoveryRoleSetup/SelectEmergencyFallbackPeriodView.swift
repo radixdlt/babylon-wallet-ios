@@ -37,7 +37,7 @@ struct SelectEmergencyFallbackPeriodView: View {
 			MultiPickerView(
 				data: [
 					selectedPeriod.unit.values.map { "\($0)" },
-					TimePeriodUnit.allCases.map(\.title),
+					TimePeriodUnit.units.map(\.title),
 				],
 				selections: Binding(
 					get: {
@@ -76,11 +76,21 @@ private extension TimePeriodUnit {
 			L10n.ShieldWizardRecovery.Fallback.Days.label
 		case .weeks:
 			L10n.ShieldWizardRecovery.Fallback.Weeks.label
+		case .minutes:
+			"Minutes"
 		}
+	}
+
+	static var units: [Self] {
+		#if DEBUG
+		allCases
+		#else
+		[.days, .weeks]
+		#endif
 	}
 }
 
 // MARK: - TimePeriodUnit + CaseIterable
 extension TimePeriodUnit: CaseIterable {
-	public static let allCases: [Self] = [.days, .weeks]
+	public static let allCases: [Self] = [.days, .weeks, .minutes]
 }

@@ -8,7 +8,7 @@ extension Home {
 		struct State: Sendable, Hashable, Identifiable, AccountWithInfoHolder {
 			enum SecurityState: Sendable, Hashable {
 				case unsecurified(FactorSource)
-				case securified
+				case securified(AccessControllerAddress)
 			}
 
 			var id: AccountAddress { account.address }
@@ -20,6 +20,7 @@ extension Home {
 			var totalFiatWorth: Loadable<FiatWorth>
 			var securityProblemsConfig: EntitySecurityProblemsView.Config
 			var accountLockerClaims: [AccountLockerClaimDetails] = []
+			var accessControllerStateDetails: AccessControllerStateDetails? = nil
 
 			init(
 				account: Account,
@@ -36,6 +37,7 @@ extension Home {
 			case tapped
 			case securityProblemTapped(SecurityProblem)
 			case accountLockerClaimTapped(AccountLockerClaimDetails)
+			case acTimedRecoveryTapped(AccessControllerStateDetails)
 		}
 
 		enum InternalAction: Sendable, Equatable {
@@ -46,10 +48,13 @@ extension Home {
 		enum DelegateAction: Sendable, Equatable {
 			case openDetails
 			case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
+			case presentHandleACTimedRecovery(AccessControllerStateDetails)
 		}
 
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.accountLockersClient) var accountLockersClient
+		@Dependency(\.dappInteractionClient) var dappInteractionClient
+		@Dependency(\.submitTXClient) var submitTXClient
 		@Dependency(\.errorQueue) var errorQueue
 
 		func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -64,6 +69,34 @@ extension Home {
 				} catch: { error, _ in
 					loggerGlobal.error("Account locker claim failed, error: \(error)")
 				}
+			case let .acTimedRecoveryTapped(acStateDetails):
+				.send(.delegate(.presentHandleACTimedRecovery(acStateDetails)))
+				//                    .run { [accountAddress = state.account.accountAddress] _ in
+				//                        let manifest = try await SargonOS.shared.makeStopTimedRecoveryManifest(address: .account(accountAddress))
+				//                        Task {
+				//                            let result = await dappInteractionClient.addWalletInteraction(
+				//                                .transaction(.init(send: .init(transactionManifest: manifest))),
+				//                                .shieldUpdate
+				//                            )
+//
+				//                            switch result {
+				//                            case let .dapp(.success(success)):
+				//                                if case let .transaction(tx) = success.items {
+				//                                    /// Wait for the transaction to be committed
+				//                                    let txID = tx.send.transactionIntentHash
+				//                                    if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
+				//                                        // TODO: Use a client which wraps SargonOS so this features becomes testable
+				//                                        try await SargonOs.shared.removeProvisionalSecurityState(entityAddress: .account(accountAddress))
+				//                                    }
+				//                                    return
+				//                                }
+//
+				//                                assertionFailure("Not a transaction Response?")
+				//                            case .dapp(.failure), .none:
+				//                                break
+				//                            }
+				//                        }
+				//                    }
 			}
 		}
 

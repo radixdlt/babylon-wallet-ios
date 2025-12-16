@@ -223,7 +223,7 @@ extension AccountLockersClient {
 				.accountLockerClaim
 			)
 
-			switch result {
+			switch result.p2pResponse {
 			case let .dapp(.success(success)):
 				if case let .transaction(tx) = success.items {
 					// Poll transaction status until available

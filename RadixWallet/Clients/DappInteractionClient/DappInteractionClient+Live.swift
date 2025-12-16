@@ -4,7 +4,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 extension DappInteractionClient: DependencyKey {
 	static var liveValue: DappInteractionClient = {
 		let interactionsSubject: AsyncPassthroughSubject<Result<ValidatedDappRequest, Error>> = .init()
-		let interactionResponsesSubject: AsyncPassthroughSubject<P2P.RTCOutgoingMessage.Response> = .init()
+		let interactionResponsesSubject: AsyncPassthroughSubject<WalletInteractionResult> = .init()
 
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
@@ -45,17 +45,17 @@ extension DappInteractionClient: DependencyKey {
 
 				interactionsSubject.send(.success(request))
 
-				return await interactionResponsesSubject.first(where: {
-					switch $0 {
-					case let .dapp(response):
-						response.interactionId == interactionId
+				return await interactionResponsesSubject.first(where: { result in
+					switch result.p2pResponse {
+					case let .dapp(dappResponse):
+						dappResponse.interactionId == interactionId
 					}
-				})
+				})!
 			},
-			completeInteraction: { message in
+			completeInteraction: { message, notarizedTransaction in
 				switch message {
 				case let .response(response, route):
-					interactionResponsesSubject.send(response)
+					interactionResponsesSubject.send(.init(p2pResponse: response, notarizedTransaction: notarizedTransaction))
 					try await radixConnectClient.sendResponse(response, route)
 				default:
 					break

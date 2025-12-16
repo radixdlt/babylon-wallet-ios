@@ -8,6 +8,7 @@ struct AccountBannerView: View {
 		HStack(spacing: .zero) {
 			image
 				.resizable()
+				.scaledToFit()
 				.frame(width: .medium3, height: .medium3)
 
 			Text(text)
@@ -30,6 +31,14 @@ struct AccountBannerView: View {
 
 		case .lockerClaim:
 			Image(systemName: "bell")
+
+		case let .accessControllerTimedRecovery(state):
+			switch state {
+			case .inProgress:
+				Image(systemName: "hourglass")
+			case .unknown:
+				Image(.error)
+			}
 		}
 	}
 
@@ -39,6 +48,17 @@ struct AccountBannerView: View {
 			message
 		case let .lockerClaim(dappName):
 			L10n.HomePage.accountLockerClaim(dappName ?? L10n.DAppRequest.Metadata.unknownName)
+		case let .accessControllerTimedRecovery(state):
+			switch state {
+			case let .inProgress(countdown):
+				if let countdown {
+					L10n.HandleAccessControllerTimedRecovery.Banner.recoveryInProgress(countdown)
+				} else {
+					L10n.HandleAccessControllerTimedRecovery.Banner.readyToConfirm
+				}
+			case .unknown:
+				L10n.HandleAccessControllerTimedRecovery.Banner.unknownRecovery
+			}
 		}
 	}
 }
@@ -48,5 +68,13 @@ extension AccountBannerView {
 	enum Kind: Sendable, Hashable {
 		case securityProblem(message: String)
 		case lockerClaim(dappName: String?)
+		case accessControllerTimedRecovery(state: TimedRecoveryBannerState)
+	}
+
+	enum TimedRecoveryBannerState: Sendable, Hashable {
+		/// Recovery is in progress and the countdown (if any) is provided
+		case inProgress(countdown: String?)
+		/// Recovery is unknown to the wallet
+		case unknown
 	}
 }

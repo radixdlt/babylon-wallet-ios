@@ -2,9 +2,9 @@ import Sargon
 import SwiftUI
 
 extension InteractionReview {
-	typealias ShieldState = ShieldView.ViewState
+	typealias StopTimedRecoveryState = StopTimedRecoveryView.ViewState
 
-	struct ShieldView: View {
+	struct StopTimedRecoveryView: View {
 		let viewState: ViewState
 
 		var body: some View {
@@ -16,22 +16,26 @@ extension InteractionReview {
 			}
 		}
 
-		@MainActor
 		@ViewBuilder
 		private var coreView: some SwiftUI.View {
-			entity
-			SecurityStructureOfFactorSourcesView(structure: viewState.shield, onFactorSourceTapped: { _ in })
-			//			VStack(spacing: .medium3) {
-			//				// factorsHeader
-			//				primaryRoleFactors
-			//				performShieldRecoveryFactors
-			//			}
-			//			.padding(.vertical, .medium3)
-			//			.background(.secondaryBackground)
+			entityCard
+
+			HStack(spacing: .medium3) {
+				Image(.close)
+				Text(L10n.TransactionReview.StopTimedRecovery.message)
+					.lineSpacing(-.small3)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.primaryText)
+					.multilineTextAlignment(.leading)
+			}
+			.flushedLeft
+			.padding(.horizontal, .medium3)
+			.padding(.vertical, .medium2)
+			.background(.secondaryBackground)
 		}
 
 		@ViewBuilder
-		private var entity: some SwiftUI.View {
+		private var entityCard: some SwiftUI.View {
 			switch viewState.entity {
 			case let .accountEntity(account):
 				AccountCard(kind: .innerCompact, account: account)
@@ -54,10 +58,9 @@ extension InteractionReview {
 	}
 }
 
-// MARK: - InteractionReview.ShieldView.ViewState
-extension InteractionReview.ShieldView {
+// MARK: - InteractionReview.StopTimedRecoveryView.ViewState
+extension InteractionReview.StopTimedRecoveryView {
 	struct ViewState: Sendable, Hashable {
 		let entity: AccountOrPersona
-		let shield: SecurityStructureOfFactorSources
 	}
 }

@@ -19,7 +19,8 @@ final class TransactionClientTests: TestCase {
 		guaranteesCost: 5,
 		signaturesCost: 5,
 		lockFeeCost: 5,
-		notarizingCost: 5
+		notarizingCost: 5,
+		accessControllerRecoveryCost: 0
 	)
 
 	// MARK: - TransactionFee tests

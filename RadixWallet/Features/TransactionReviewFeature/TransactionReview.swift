@@ -19,6 +19,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var networkID: NetworkID? { reviewedTransaction?.networkID }
 
 		var reviewedTransaction: ReviewedTransaction? = nil
+		var notarizedTransaction: NotarizedTransaction? = nil
 
 		var sections: Common.Sections.State = .init(kind: .transaction)
 
@@ -29,7 +30,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 
 		var waitsForTransactionToBeComitted: Bool {
-			interactionId.isWalletAccountDepositSettingsInteraction || interactionId.isWalletAccountDeleteInteraction
+			interactionId.isWalletAccountDepositSettingsInteraction || interactionId.isWalletAccountDeleteInteraction || interactionId.isWalletShieldUpdateInteraction
 		}
 
 		var isWalletTransaction: Bool {
@@ -115,7 +116,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(TransactionIntentHash)
+		case signedTXAndSubmittedToGateway(TransactionIntentHash, NotarizedTransaction?)
 		case transactionCompleted(TransactionIntentHash)
 		case dismiss
 	}
@@ -128,6 +129,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.State)
 			case rawTransactionAlert(AlertState<Never>)
 			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.State)
+			case confirmUseOfTimedRecovery(SigningConfirmShieldTimedRecovery.State)
 		}
 
 		@CasePathable
@@ -137,6 +139,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.Action)
 			case rawTransactionAlert(Never)
 			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.Action)
+			case confirmUseOfTimedRecovery(SigningConfirmShieldTimedRecovery.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -151,6 +154,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: \.tooManyFactorSkipped, action: \.tooManyFactorSkipped) {
 				SigningTooManyFactorsSkipped()
+			}
+			Scope(state: \.confirmUseOfTimedRecovery, action: \.confirmUseOfTimedRecovery) {
+				SigningConfirmShieldTimedRecovery()
 			}
 		}
 	}
@@ -299,6 +305,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			let reviewedTransaction = ReviewedTransaction(
 				transactionManifest: preview.transactionManifest,
+				executionSummary: preview.analyzedManifestToReview,
 				networkID: preview.networkID,
 				feePayer: .loading,
 				transactionFee: preview.transactionFee,
@@ -314,8 +321,15 @@ struct TransactionReview: Sendable, FeatureReducer {
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .buildTransactionIntentResult(.success(intent)):
+			guard let reviewedTx = state.reviewedTransaction else {
+				return .none
+			}
 			return .run { [notary = state.ephemeralNotaryPrivateKey] send in
-				let signedIntent = try await SargonOS.shared.signTransaction(transactionIntent: intent, roleKind: .primary)
+				let signedIntent = try await SargonOS.shared.signTransaction(
+					transactionIntent: intent,
+					executionSummary: reviewedTx.executionSummary
+				)
+
 				let notarizedTransaction = try await transactionClient.notarizeTransaction(
 					.init(
 						signedIntent: signedIntent,
@@ -335,12 +349,11 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .notarizeResult(.success(notarizedTX)):
 			loggerGlobal.error("\(notarizedTX.notarized.signedIntent.intentSignatures.signatures)")
-			state.destination = .submitting(.init(
-				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
-				route: state.p2pRoute
-			))
-			return .none
+			state.notarizedTransaction = notarizedTX.notarized
+			if isAccessControllerTimedRecoveryManifest(manifest: notarizedTX.intent.manifest) {
+				return handleTimedRecoveryTransaction(&state, notarizedTX: notarizedTX)
+			}
+			return submitTransaction(&state, notarizedTX: notarizedTX)
 
 		case let .buildTransactionIntentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
@@ -403,7 +416,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+			return .send(.delegate(.signedTXAndSubmittedToGateway(txID, state.notarizedTransaction)))
 
 		case .submitting(.delegate(.failedToSubmit)):
 			return .send(.delegate(.failed(.failedToSubmit)))
@@ -422,10 +435,19 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return delayedShortEffect(for: .delegate(.dismiss))
 
 		case let .tooManyFactorSkipped(.delegate(.restart(.transaction(intent)))):
+			state.destination = nil
 			return .send(.internal(.buildTransactionIntentResult(.success(intent))))
 
 		case .tooManyFactorSkipped(.delegate(.restart(.preAuth))):
 			fatalError("Bad implementation, tried to restart with subintent")
+
+		case let .confirmUseOfTimedRecovery(.delegate(.restartSigning(intent))):
+			state.destination = nil
+			return .send(.internal(.buildTransactionIntentResult(.success(intent))))
+
+		case let .confirmUseOfTimedRecovery(.delegate(.useEmergencyFallback(notarizedTX))):
+			state.destination = nil
+			return submitTransaction(&state, notarizedTX: notarizedTX)
 
 		default:
 			return .none
@@ -438,7 +460,47 @@ struct TransactionReview: Sendable, FeatureReducer {
 			return delayedShortEffect(for: .delegate(.dismiss))
 		}
 
+		if case .confirmUseOfTimedRecovery = state.destination {
+			return resetToApprovable(&state)
+		}
+
 		return .none
+	}
+
+	private func submitTransaction(_ state: inout State, notarizedTX: NotarizeTransactionResponse) -> Effect<Action> {
+		state.destination = .submitting(.init(
+			notarizedTX: notarizedTX,
+			inProgressDismissalDisabled: state.waitsForTransactionToBeComitted,
+			route: state.p2pRoute
+		))
+		return .none
+	}
+
+	private func handleTimedRecoveryTransaction(_ state: inout State, notarizedTX: NotarizeTransactionResponse) -> Effect<Action> {
+		guard let reviewedTx = state.reviewedTransaction else {
+			return .none
+		}
+		guard case let .accessControllerRecovery(acAddresses) = reviewedTx.executionSummary.detailedClassification,
+		      let acAddress = acAddresses.first
+		else {
+			fatalError("Bad implementation: timed recovery manifest, but the classification is not recovery")
+		}
+
+		do {
+			let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
+			guard case let .securified(secControl) = entity.securityState else {
+				fatalError("Recovery for an unsecurified account?")
+			}
+			state.destination = .confirmUseOfTimedRecovery(
+				.init(
+					periodUntilAutoConfirm: secControl.securityStructure.matrixOfFactors.timeUntilDelayedConfirmationIsCallable,
+					notarizedTimedRecovery: notarizedTX
+				)
+			)
+			return .none
+		} catch {
+			fatalError("No account present  for the access controller address?")
+		}
 	}
 }
 
@@ -514,8 +576,7 @@ extension TransactionReview {
 						transactionSigners: reviewedTransaction.transactionSigners,
 						signingFactors: reviewedTransaction.signingFactors,
 						signingPurpose: .signTransaction(state.signTransactionPurpose),
-						manifest: reviewedTransaction.transactionManifest,
-						accountWithdraws: reviewedTransaction.accountWithdraws
+						executionSummary: reviewedTransaction.executionSummary
 					))
 				}
 
@@ -723,6 +784,7 @@ struct TransactionReviewFailure: LocalizedError {
 // MARK: - ReviewedTransaction
 struct ReviewedTransaction: Hashable, Sendable {
 	let transactionManifest: TransactionManifest
+	let executionSummary: ExecutionSummary
 	let networkID: NetworkID
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 

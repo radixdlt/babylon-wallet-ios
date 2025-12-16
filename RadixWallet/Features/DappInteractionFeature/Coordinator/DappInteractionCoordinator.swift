@@ -40,7 +40,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(WalletToDappInteractionResponse, DappMetadata)
+		case submit(WalletToDappInteractionResponse, DappMetadata, NotarizedTransaction?)
 		case dismiss(DappMetadata, DappInteractionCompletionKind)
 		case dismissSilently
 	}
@@ -94,7 +94,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			return startFlow(&state, dappMetadata: dappMetadata)
 
 		case let .flow(.delegate(.dismissWithFailure(error))):
-			return .send(.delegate(.submit(.failure(error), .request(state.request.interaction.metadata))))
+			return .send(.delegate(.submit(.failure(error), .request(state.request.interaction.metadata), nil)))
 
 		case let .flow(.delegate(.dismissWithSuccess(dappMetadata, kind))):
 			return .send(.delegate(.dismiss(dappMetadata, kind)))
@@ -102,8 +102,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case .flow(.delegate(.dismiss)):
 			return .send(.delegate(.dismissSilently))
 
-		case let .flow(.delegate(.submit(response, dappMetadata))):
-			return .send(.delegate(.submit(.success(response), dappMetadata)))
+		case let .flow(.delegate(.submit(response, dappMetadata, notarizedTx))):
+			return .send(.delegate(.submit(.success(response), dappMetadata, notarizedTx)))
 
 		default:
 			return .none
@@ -140,7 +140,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 					message: nil
 				)
 			),
-			.request(state.request.interaction.metadata)
+			.request(state.request.interaction.metadata),
+			nil
 		)))
 	}
 }

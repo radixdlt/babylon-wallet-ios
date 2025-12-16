@@ -43,21 +43,52 @@ extension InteractionReview.Sections {
 		case nil:
 			return nil
 
-		case let .securifyEntity(entityAddress, metadata):
-			guard let entity = try await extractEntity(entityAddress) else { return nil }
+		case let .securifyEntity(entityAddresses):
+			guard let entityAddress = entityAddresses.first,
+			      let entity = try await extractEntity(entityAddress) else { return nil }
 
-			let shield = try SargonOs.shared.securityStructureOfFactorSourceIdsBySecurityStructureId(
-				shieldId: metadata.id
-			)
-
-			let allFactorSourcesFromProfile = try await factorSourcesClient.getFactorSources().elements
+			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entityAddress)
 
 			return Common.SectionsData(
 				shieldUpdate: .init(
 					entity: entity,
-					shield: shield,
-					allFactorSourcesFromProfile: allFactorSourcesFromProfile
+					shield: shield
 				)
+			)
+
+		case let .accessControllerRecovery(acAddresses):
+			guard let acAddress = acAddresses.first else {
+				return nil
+			}
+			let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
+			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entity.asGeneral.address)
+
+			return Common.SectionsData(
+				shieldUpdate: .init(
+					entity: entity,
+					shield: shield
+				)
+			)
+
+		case let .accessControllerConfirmTimedRecovery(acAddresses):
+			guard let acAddress = acAddresses.first else {
+				return nil
+			}
+			let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
+			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entity.asGeneral.address)
+
+			return Common.SectionsData(
+				confirmShieldUpdate: .init(
+					entity: entity,
+					shield: shield
+				)
+			)
+
+		case let .accessControllerStopTimedRecovery(acAddresses):
+			let stopRecovery: Common.StopTimedRecoveryState? = try await extractStopTimedRecovery(acAddresses: acAddresses)
+
+			return Common.SectionsData(
+				stopTimedRecovery: stopRecovery
 			)
 
 		case .general, .transfer:
@@ -539,6 +570,15 @@ extension InteractionReview.Sections {
 			.asIdentified()
 
 		return .init(accounts: accounts, enableCustomizeGuarantees: false)
+	}
+
+	private func extractStopTimedRecovery(acAddresses: [AccessControllerAddress]) async throws -> Common.StopTimedRecoveryState? {
+		guard let acAddress = acAddresses.first else { return nil }
+
+		// Get the entity (account or persona) from access controller address
+		let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
+
+		return .init(entity: entity)
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> Common.ValidatorsState? {

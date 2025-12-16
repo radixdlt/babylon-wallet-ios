@@ -260,7 +260,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 			state.destination = nil
 			return loadSecState(state: state)
 		case let .selectShield(.delegate(.confirmed(shield))):
-			state.destination = .applyShield(.init(securityStructure: shield, selectedAccounts: [state.account.address], root: .completion))
+			state.destination = .applyShield(.init(securityStructure: shield, entityAddress: .account(state.account.address), root: .completion))
 			return .none
 		case .applyShield(.delegate(.finished)):
 			state.destination = nil
@@ -369,7 +369,18 @@ extension AccountPreferences {
 			return .none
 
 		case .securifiedWith(.shield):
-			state.destination = .shieldDetails(.init(entityAddress: .account(state.account.address)))
+			let acAddress: AccessControllerAddress? = switch state.account.securityState {
+			case let .securified(control):
+				control.accessControllerAddress
+			case .unsecured:
+				nil
+			}
+
+			guard let acAddress else {
+				return .none
+			}
+
+			state.destination = .shieldDetails(.init(entityAddress: .account(state.account.address), accessControllerAddress: acAddress))
 			return .none
 		}
 	}

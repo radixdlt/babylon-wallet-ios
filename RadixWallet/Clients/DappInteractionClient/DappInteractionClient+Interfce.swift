@@ -24,8 +24,25 @@ extension DappInteractionClient {
 		case shieldUpdate
 	}
 
-	typealias AddWalletInteraction = @Sendable (_ items: DappToWalletInteractionItems, _ interaction: WalletInteraction) async -> P2P.RTCOutgoingMessage.Response?
-	typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
+	/// Result of a wallet interaction containing both P2P response (for external dApps)
+	/// and internal data (for wallet-initiated interactions)
+	struct WalletInteractionResult: Sendable, Hashable {
+		/// The P2P response sent to external dApps
+		let p2pResponse: P2P.RTCOutgoingMessage.Response
+		/// The notarized transaction (populated for transaction interactions)
+		let notarizedTransaction: NotarizedTransaction?
+
+		init(
+			p2pResponse: P2P.RTCOutgoingMessage.Response,
+			notarizedTransaction: NotarizedTransaction? = nil
+		) {
+			self.p2pResponse = p2pResponse
+			self.notarizedTransaction = notarizedTransaction
+		}
+	}
+
+	typealias AddWalletInteraction = @Sendable (_ items: DappToWalletInteractionItems, _ interaction: WalletInteraction) async -> WalletInteractionResult
+	typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage, _ notarizedTransaction: NotarizedTransaction?) async throws -> Void
 }
 
 extension WalletInteractionId {
