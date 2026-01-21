@@ -52,6 +52,8 @@ jobs:
       - linting
 
     steps:
+      - uses: RDXWorks-actions/checkout@main
+      
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
           role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
@@ -79,16 +81,16 @@ jobs:
           secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/swift-ssh-dLcxg6'
           parse_json: true
 
-      - uses: RDXWorks-actions/checkout@main
-        with:
-          submodules: recursive
-          token: ${{ env.WALLET_RADIX_BOT_PAT }}
-
       - uses: RDXWorks-actions/ssh-agent@master
         with:
           ssh-private-key: |
             ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
             ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
+
+      - uses: RDXWorks-actions/checkout@main
+        with:
+          submodules: recursive
+          token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
