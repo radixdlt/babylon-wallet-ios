@@ -23,7 +23,7 @@ jobs:
       ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
       ( github.event.action == 'ready_for_review' ) ||
       ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -45,7 +45,7 @@ jobs:
       contents: read
       checks: write
     name: "Unit test"
-    runs-on: macos-15-xlarge
+    runs-on: macos-26-xlarge
     timeout-minutes: 20
 
     needs:
@@ -92,7 +92,7 @@ jobs:
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "16.3"
+          xcode-version: "26.2"
 
       - name: "Set up ruby"
         uses: RDXWorks-actions/setup-ruby@master
