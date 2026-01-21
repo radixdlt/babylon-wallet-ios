@@ -34,12 +34,14 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	}
 
 	struct Destination: DestinationReducer {
+		@CasePathable
 		enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case nameLedger(ImportOlympiaNameLedger.State)
 		}
 
+		@CasePathable
 		enum Action: Sendable, Equatable {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
@@ -47,10 +49,10 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 		}
 
 		var body: some ReducerOf<Self> {
-			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
+			Scope(state: \.addNewP2PLink, action: \.addNewP2PLink) {
 				NewConnection()
 			}
-			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
+			Scope(state: \.nameLedger, action: \.nameLedger) {
 				ImportOlympiaNameLedger()
 			}
 		}

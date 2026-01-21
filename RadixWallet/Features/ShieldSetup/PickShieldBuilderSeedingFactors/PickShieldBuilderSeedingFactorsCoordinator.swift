@@ -1,5 +1,12 @@
 import ComposableArchitecture
 
+// MARK: - PickShieldBuilderSeedingFactorsCoordinator.Path.State + Hashable
+extension PickShieldBuilderSeedingFactorsCoordinator.Path.State: Hashable {}
+
+// MARK: - PickShieldBuilderSeedingFactorsCoordinator.Path.Action + Equatable
+extension PickShieldBuilderSeedingFactorsCoordinator.Path.Action: Equatable {}
+
+// MARK: - PickShieldBuilderSeedingFactorsCoordinator
 @Reducer
 struct PickShieldBuilderSeedingFactorsCoordinator: Sendable, FeatureReducer {
 	@ObservableState
@@ -7,7 +14,7 @@ struct PickShieldBuilderSeedingFactorsCoordinator: Sendable, FeatureReducer {
 		var path: Path.State
 	}
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case pickShieldBuilderSeedingFactors(PickShieldBuilderSeedingFactors)
 	}

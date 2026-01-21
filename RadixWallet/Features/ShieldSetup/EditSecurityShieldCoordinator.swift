@@ -1,4 +1,4 @@
-// MARK: - ShieldSetupCoordinator
+// MARK: - EditSecurityShieldCoordinator
 @Reducer
 struct EditSecurityShieldCoordinator: Sendable, FeatureReducer {
 	@ObservableState
@@ -9,7 +9,7 @@ struct EditSecurityShieldCoordinator: Sendable, FeatureReducer {
 		var path: StackState<Path.State> = .init()
 	}
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case rolesSetup(RolesSetupCoordinator)
 	}
@@ -58,3 +58,9 @@ struct EditSecurityShieldCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - EditSecurityShieldCoordinator.Path.State + Hashable
+extension EditSecurityShieldCoordinator.Path.State: Hashable {}
+
+// MARK: - EditSecurityShieldCoordinator.Path.Action + Equatable
+extension EditSecurityShieldCoordinator.Path.Action: Equatable {}

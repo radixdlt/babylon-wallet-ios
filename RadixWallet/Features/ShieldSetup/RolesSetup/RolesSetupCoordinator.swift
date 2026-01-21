@@ -1,3 +1,4 @@
+// MARK: - RolesSetupCoordinator
 @Reducer
 struct RolesSetupCoordinator: Sendable, FeatureReducer {
 	@ObservableState
@@ -8,7 +9,7 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 		var destination: Destination.State?
 	}
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case primaryRoleSetup(PrimaryRoleSetup)
 		case recoveryRoleSetup(RecoveryRoleSetup)
@@ -81,3 +82,9 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - RolesSetupCoordinator.Path.State + Hashable
+extension RolesSetupCoordinator.Path.State: Hashable {}
+
+// MARK: - RolesSetupCoordinator.Path.Action + Equatable
+extension RolesSetupCoordinator.Path.Action: Equatable {}

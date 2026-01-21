@@ -275,8 +275,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "d602618c628e5123f66643437151079d3664970d",
-        "version" : "1.17.0"
+        "revision" : "5b0890fabfd68a2d375d68502bc3f54a8548c494",
+        "version" : "1.23.1"
       }
     },
     {
@@ -311,8 +311,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tgrapperon/swift-dependencies-additions",
       "state" : {
-        "revision" : "7b1d88ec23f80b0b5d4832d51af7647fa5062d8e",
-        "version" : "1.1.1"
+        "branch" : "xcode26",
+        "revision" : "0afff683710e63433847641562da5908fe01205f"
       }
     },
     {

@@ -15,12 +15,22 @@ protocol EmptyInitializable {
 	init()
 }
 
+// MARK: - FeatureActionPayload
+protocol FeatureActionPayload {
+	associatedtype ViewAction: Sendable & Equatable
+	associatedtype InternalAction: Sendable & Equatable
+	associatedtype ChildAction: Sendable & Equatable
+	associatedtype DelegateAction: Sendable & Equatable
+	associatedtype DestinationAction: Sendable & Equatable
+}
+
 // MARK: - FeatureReducer
-protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action == FeatureAction<Self> {
+protocol FeatureReducer: Reducer, FeatureActionPayload where State: Sendable & Hashable, Action == FeatureAction<Self>, DestinationAction == Destination.Action {
 	associatedtype ViewAction: Sendable & Equatable = Never
 	associatedtype InternalAction: Sendable & Equatable = Never
 	associatedtype ChildAction: Sendable & Equatable = Never
 	associatedtype DelegateAction: Sendable & Equatable = Never
+	associatedtype DestinationAction: Sendable & Equatable = Destination.Action
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action>
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action>
@@ -36,12 +46,12 @@ protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action == Fea
 
 // MARK: - FeatureAction
 @CasePathable
-enum FeatureAction<Feature: FeatureReducer> {
-	case destination(PresentationAction<Feature.Destination.Action>)
-	case view(Feature.ViewAction)
-	case `internal`(Feature.InternalAction)
-	case child(Feature.ChildAction)
-	case delegate(Feature.DelegateAction)
+enum FeatureAction<Payload: FeatureActionPayload> {
+	case destination(PresentationAction<Payload.DestinationAction>)
+	case view(Payload.ViewAction)
+	case `internal`(Payload.InternalAction)
+	case child(Payload.ChildAction)
+	case delegate(Payload.DelegateAction)
 }
 
 // MARK: - DestinationReducer
@@ -112,7 +122,7 @@ typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
 extension FeatureAction: Sendable, Equatable {}
 
 // MARK: - FeatureAction + Hashable
-extension FeatureAction: Hashable where Feature.Destination.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
+extension FeatureAction: Hashable where Payload.DestinationAction: Hashable, Payload.ViewAction: Hashable, Payload.ChildAction: Hashable, Payload.InternalAction: Hashable, Payload.DelegateAction: Hashable {
 	func hash(into hasher: inout Hasher) {
 		switch self {
 		case let .destination(action):

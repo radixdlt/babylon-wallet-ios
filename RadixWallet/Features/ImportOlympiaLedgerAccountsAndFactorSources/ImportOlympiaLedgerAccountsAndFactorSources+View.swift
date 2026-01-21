@@ -95,10 +95,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 private extension StoreOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 	var destination: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination> {
-		func scopeState(state: State) -> PresentationState<ImportOlympiaLedgerAccountsAndFactorSources.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
+		scope(state: \.$destination, action: \.destination)
 	}
 }
 
@@ -112,28 +109,18 @@ private extension View {
 	}
 
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.noP2PLink,
-			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.noP2PLink
-		)
+		alert(store: destinationStore.scope(state: \.noP2PLink, action: \.noP2PLink))
 	}
 
 	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.addNewP2PLink,
-			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.addNewP2PLink,
-			content: { NewConnection.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.addNewP2PLink, action: \.addNewP2PLink)) {
+			NewConnection.View(store: $0)
+		}
 	}
 
 	private func nameLedgerSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.nameLedger,
-			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.nameLedger,
-			content: { ImportOlympiaNameLedger.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.nameLedger, action: \.nameLedger)) {
+			ImportOlympiaNameLedger.View(store: $0)
+		}
 	}
 }

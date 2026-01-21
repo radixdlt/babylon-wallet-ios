@@ -1,5 +1,6 @@
 import Sargon
 
+// MARK: - ApplyShield.Coordinator
 extension ApplyShield {
 	@Reducer
 	struct Coordinator: Sendable, FeatureReducer {
@@ -22,7 +23,7 @@ extension ApplyShield {
 			}
 		}
 
-		@Reducer(state: .hashable, action: .equatable)
+		@Reducer
 		enum Path {
 			case intro(Intro)
 			case chooseAccounts(ChooseAccountsForShield)
@@ -140,3 +141,9 @@ extension ApplyShield {
 		}
 	}
 }
+
+// MARK: - ApplyShield.Coordinator.Path.State + Hashable
+extension ApplyShield.Coordinator.Path.State: Hashable {}
+
+// MARK: - ApplyShield.Coordinator.Path.Action + Equatable
+extension ApplyShield.Coordinator.Path.Action: Equatable {}

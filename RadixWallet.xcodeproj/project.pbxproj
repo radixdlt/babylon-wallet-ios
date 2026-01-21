@@ -356,7 +356,6 @@
 		48CFC4202ADC10DA00E77A5C /* RandomBytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF302ADC10D900E77A5C /* RandomBytes.swift */; };
 		48CFC4212ADC10DA00E77A5C /* Swift.DecodingError+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF312ADC10D900E77A5C /* Swift.DecodingError+Equatable.swift */; };
 		48CFC4222ADC10DA00E77A5C /* BitArray+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF322ADC10D900E77A5C /* BitArray+Extra.swift */; };
-		48CFC4232ADC10DA00E77A5C /* Identified+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF332ADC10D900E77A5C /* Identified+Extensions.swift */; };
 		48CFC4242ADC10DA00E77A5C /* URL+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF352ADC10D900E77A5C /* URL+Extra.swift */; };
 		48CFC4252ADC10DA00E77A5C /* String+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF362ADC10D900E77A5C /* String+Extra.swift */; };
 		48CFC4262ADC10DA00E77A5C /* LocalizedError+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF372ADC10D900E77A5C /* LocalizedError+Equatable.swift */; };
@@ -1790,7 +1789,6 @@
 		48CFBF302ADC10D900E77A5C /* RandomBytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomBytes.swift; sourceTree = "<group>"; };
 		48CFBF312ADC10D900E77A5C /* Swift.DecodingError+Equatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Swift.DecodingError+Equatable.swift"; sourceTree = "<group>"; };
 		48CFBF322ADC10D900E77A5C /* BitArray+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BitArray+Extra.swift"; sourceTree = "<group>"; };
-		48CFBF332ADC10D900E77A5C /* Identified+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Identified+Extensions.swift"; sourceTree = "<group>"; };
 		48CFBF352ADC10D900E77A5C /* URL+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Extra.swift"; sourceTree = "<group>"; };
 		48CFBF362ADC10D900E77A5C /* String+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extra.swift"; sourceTree = "<group>"; };
 		48CFBF372ADC10D900E77A5C /* LocalizedError+Equatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalizedError+Equatable.swift"; sourceTree = "<group>"; };
@@ -4629,7 +4627,6 @@
 				48CFBF302ADC10D900E77A5C /* RandomBytes.swift */,
 				48CFBF312ADC10D900E77A5C /* Swift.DecodingError+Equatable.swift */,
 				48CFBF322ADC10D900E77A5C /* BitArray+Extra.swift */,
-				48CFBF332ADC10D900E77A5C /* Identified+Extensions.swift */,
 				48CFBF342ADC10D900E77A5C /* Foundation */,
 				48CFBF3C2ADC10D900E77A5C /* Identifiable+RawRepresentable.swift */,
 				48CFBF3D2ADC10D900E77A5C /* Unit.swift */,
@@ -8657,7 +8654,6 @@
 				E7607DE22D4CF9B10083B3A5 /* ChoosePersonas+View.swift in Sources */,
 				4813AFF52BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift in Sources */,
 				48CFC2892ADC10D900E77A5C /* TransactionReviewGuarantees+View.swift in Sources */,
-				48CFC4232ADC10DA00E77A5C /* Identified+Extensions.swift in Sources */,
 				A40816362C7E0D08005E65B9 /* StateValidatorsListResponse.swift in Sources */,
 				A40815952C7E0D08005E65B9 /* MetadataNonFungibleGlobalIdArrayValue.swift in Sources */,
 				48CFC4292ADC10DA00E77A5C /* Result+Async.swift in Sources */,
@@ -10129,8 +10125,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tgrapperon/swift-dependencies-additions";
 			requirement = {
-				kind = exactVersion;
-				version = 1.1.1;
+				branch = xcode26;
+				kind = branch;
 			};
 		};
 		48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */ = {
@@ -10306,7 +10302,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
 				kind = exactVersion;
-				version = 1.17.0;
+				version = 1.23.1;
 			};
 		};
 		A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */ = {
