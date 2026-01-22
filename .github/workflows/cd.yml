@@ -80,13 +80,13 @@ jobs:
           submodules: recursive
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
+     #No visible output: The entire command produces no stdout that GitHub Actions would log
+     #GitHub's secret masking: Even if the secret appeared in output, GitHub Actions automatically masks registered secrets in logs with ***
       - name: Decode Firebase Crashlytics json
-        uses: RDXWorks-actions/base64-to-file@main
-        id: crashlytics_credentials
-        with:
-          fileName: "GoogleService-Info.plist"
-          fileDir: "Aux/"
-          encodedString: ${{ github.event.inputs.flavour == 'release' && secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}
+        run: |
+          mkdir -p Aux
+          echo "${{ secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}" | base64 --decode > Aux/GoogleService-Info.plist
+        if: ${{ github.event.inputs.flavour == 'release' }}
 
       - name: Verify GoogleService-Info.plist
         run: |
