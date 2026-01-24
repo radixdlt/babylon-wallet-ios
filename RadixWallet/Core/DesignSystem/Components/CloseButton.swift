@@ -32,7 +32,7 @@ struct CloseButton: View {
 				.tint(.primaryText)
 				.padding(.zero)
 		}
-		.frame(.small, alignment: .leading)
+		// .frame(.small, alignment: .leading)
 	}
 }
 

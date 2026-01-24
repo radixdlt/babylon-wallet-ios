@@ -140,6 +140,17 @@ extension AccountDetails {
 	}
 }
 
+// MARK: - GlassButtonBackground
+private struct GlassButtonBackground: ViewModifier {
+	func body(content: Content) -> some View {
+		if #available(iOS 26, *) {
+			content.glassEffect(.clear.interactive(), in: .rect(cornerRadius: .small2))
+		} else {
+			content
+		}
+	}
+}
+
 private extension StoreOf<AccountDetails> {
 	var destination: PresentationStoreOf<AccountDetails.Destination> {
 		func scopeState(state: State) -> PresentationState<AccountDetails.Destination.State> {
