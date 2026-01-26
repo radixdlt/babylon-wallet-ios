@@ -10,7 +10,7 @@ extension AddShieldBuilderSeedingFactors {
 			var destination: Destination.State?
 		}
 
-		@Reducer(state: .hashable, action: .equatable)
+		@Reducer
 		enum Path {
 			case intro
 			case addFactor(AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd)
@@ -97,6 +97,12 @@ extension AddShieldBuilderSeedingFactors {
 		}
 	}
 }
+
+// MARK: - AddShieldBuilderSeedingFactors.Coordinator.Path.State + Hashable
+extension AddShieldBuilderSeedingFactors.Coordinator.Path.State: Hashable {}
+
+// MARK: - AddShieldBuilderSeedingFactors.Coordinator.Path.Action + Equatable
+extension AddShieldBuilderSeedingFactors.Coordinator.Path.Action: Equatable {}
 
 private extension AddShieldBuilderSeedingFactors.Coordinator {
 	func determineNextStepEffect() -> Effect<Action> {

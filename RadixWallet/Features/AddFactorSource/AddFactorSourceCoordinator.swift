@@ -40,7 +40,7 @@ extension AddFactorSource {
 			}
 		}
 
-		@Reducer(state: .hashable, action: .equatable)
+		@Reducer
 		enum Path {
 			case intro(AddFactorSource.Intro)
 			case deviceSeedPhrase(AddFactorSource.InputSeedPhrase)
@@ -128,6 +128,12 @@ extension AddFactorSource {
 		}
 	}
 }
+
+// MARK: - AddFactorSource.Coordinator.Path.State + Hashable
+extension AddFactorSource.Coordinator.Path.State: Hashable {}
+
+// MARK: - AddFactorSource.Coordinator.Path.Action + Equatable
+extension AddFactorSource.Coordinator.Path.Action: Equatable {}
 
 // MARK: - FactorSourceStrategy
 struct FactorSourceStrategy: Sendable, Hashable {

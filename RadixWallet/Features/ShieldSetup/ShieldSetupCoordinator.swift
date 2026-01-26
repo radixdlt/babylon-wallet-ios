@@ -9,7 +9,7 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		var path: StackState<Path.State> = .init()
 	}
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case addShieldBuilderSeedingFactors(AddShieldBuilderSeedingFactors.Coordinator)
 		case pickShieldBuilderSeedingFactors(PickShieldBuilderSeedingFactorsCoordinator)
@@ -84,6 +84,12 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - ShieldSetupCoordinator.Path.State + Hashable
+extension ShieldSetupCoordinator.Path.State: Hashable {}
+
+// MARK: - ShieldSetupCoordinator.Path.Action + Equatable
+extension ShieldSetupCoordinator.Path.Action: Equatable {}
 
 private extension ShieldSetupCoordinator {
 	func onboardingFinishedEffect() -> Effect<Action> {

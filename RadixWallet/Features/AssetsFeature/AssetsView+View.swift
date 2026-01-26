@@ -20,6 +20,7 @@ extension AssetsView {
 						.listRowSeparator(.hidden)
 						.listRowBackground(Color.clear)
 						.listRowInsets(.init())
+						.padding(.vertical, 4)
 
 					if viewStore.isLoadingResources {
 						ProgressView()
@@ -107,15 +108,11 @@ extension AssetsView {
 						ForEach(viewStore.assetKinds) { kind in
 							let isSelected = viewStore.activeAssetKind == kind
 							Text(kind.displayText)
-								.foregroundColor(isSelected ? .white : .primaryText)
+								.foregroundColor(assetTypeTextColor(isSelected: isSelected))
 								.textStyle(.body1HighImportance)
 								.frame(height: .large1)
 								.padding(.horizontal, .medium2)
-								.background(
-									isSelected
-										? RoundedRectangle(cornerRadius: .medium2).fill(.chipBackground)
-										: nil
-								)
+								.modifier(AssetTypeSelectorBubble(isSelected: isSelected))
 								.id(kind)
 								.onTapGesture {
 									viewStore.send(.didSelectList(kind))
@@ -127,6 +124,33 @@ extension AssetsView {
 					}
 				}
 			}
+		}
+
+		private func assetTypeTextColor(isSelected: Bool) -> Color {
+			if isSelected {
+				if #available(iOS 26, *) {
+					return .primaryText
+				} else {
+					return .white
+				}
+			}
+
+			return .primaryText
+		}
+	}
+}
+
+// MARK: - AssetTypeSelectorBubble
+private struct AssetTypeSelectorBubble: ViewModifier {
+	let isSelected: Bool
+
+	func body(content: Content) -> some View {
+		if !isSelected {
+			content
+		} else if #available(iOS 26, *) {
+			content.glassEffect(.regular.interactive(), in: .rect(cornerRadius: .medium2))
+		} else {
+			content.background(.chipBackground, in: RoundedRectangle(cornerRadius: .medium2))
 		}
 	}
 }

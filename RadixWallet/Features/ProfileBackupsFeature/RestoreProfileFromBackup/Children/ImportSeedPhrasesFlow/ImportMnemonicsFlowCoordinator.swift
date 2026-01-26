@@ -24,7 +24,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case importMnemonic(ImportMnemonicForFactorSource)
 	}
@@ -144,6 +144,12 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - ImportMnemonicsFlowCoordinator.Path.State + Hashable
+extension ImportMnemonicsFlowCoordinator.Path.State: Hashable {}
+
+// MARK: - ImportMnemonicsFlowCoordinator.Path.Action + Equatable
+extension ImportMnemonicsFlowCoordinator.Path.Action: Equatable {}
 
 extension ProfileToCheck {
 	func profile() throws -> Profile {

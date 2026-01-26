@@ -1,5 +1,5 @@
-// MARK: - JSONEncoder + DependencyKey
-extension JSONEncoder: DependencyKey {
+// MARK: - JSONEncoder + @retroactive DependencyKey
+extension JSONEncoder: @retroactive DependencyKey {
 	public typealias Value = @Sendable () -> JSONEncoder
 
 	public static let liveValue = { @Sendable in
@@ -11,9 +11,6 @@ extension JSONEncoder: DependencyKey {
 	public static var previewValue: Value { liveValue }
 	public static var testValue: Value { liveValue }
 }
-
-// MARK: - JSONEncoder + @unchecked Sendable
-extension JSONEncoder: @unchecked Sendable {}
 
 extension DependencyValues {
 	var jsonEncoder: @Sendable () -> JSONEncoder {

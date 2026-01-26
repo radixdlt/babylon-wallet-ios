@@ -5,6 +5,11 @@ struct AccountBannerView: View {
 	let kind: Kind
 
 	var body: some View {
+		content
+			.modifier(GlassPromptBackground())
+	}
+
+	private var content: some View {
 		HStack(spacing: .zero) {
 			image
 				.resizable()
@@ -20,8 +25,6 @@ struct AccountBannerView: View {
 		}
 		.foregroundColor(.white)
 		.padding(.small1)
-		.background(.backgroundTransparent)
-		.cornerRadius(.small2)
 	}
 
 	private var image: Image {
@@ -59,6 +62,19 @@ struct AccountBannerView: View {
 			case .unknown:
 				L10n.HandleAccessControllerTimedRecovery.Banner.unknownRecovery
 			}
+		}
+	}
+}
+
+// MARK: - GlassPromptBackground
+private struct GlassPromptBackground: ViewModifier {
+	func body(content: Content) -> some View {
+		if #available(iOS 26, *) {
+			content.glassEffect(.clear.interactive(), in: .rect(cornerRadius: .small2))
+		} else {
+			content
+				.background(.backgroundTransparent)
+				.cornerRadius(.small2)
 		}
 	}
 }

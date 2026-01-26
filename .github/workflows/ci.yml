@@ -23,7 +23,7 @@ jobs:
       ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
       ( github.event.action == 'ready_for_review' ) ||
       ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -45,13 +45,15 @@ jobs:
       contents: read
       checks: write
     name: "Unit test"
-    runs-on: macos-15-xlarge
+    runs-on: macos-26-xlarge
     timeout-minutes: 20
 
     needs:
       - linting
 
     steps:
+      - uses: RDXWorks-actions/checkout@main
+      
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
         with:
           role_name: 'arn:aws:iam::${{ secrets.SECRETS_ACCOUNT_ID }}:role/gh-babylon-wallet-ios-secrets-read-access'
@@ -79,20 +81,20 @@ jobs:
           secret_name: 'arn:aws:secretsmanager:eu-west-2:${{ secrets.SECRETS_ACCOUNT_ID }}:secret:github-actions/radixdlt/babylon-wallet-ios/swift-ssh-dLcxg6'
           parse_json: true
 
-      - uses: RDXWorks-actions/checkout@main
-        with:
-          submodules: recursive
-          token: ${{ env.WALLET_RADIX_BOT_PAT }}
-
       - uses: RDXWorks-actions/ssh-agent@master
         with:
           ssh-private-key: |
             ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
             ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
 
+      - uses: RDXWorks-actions/checkout@main
+        with:
+          submodules: recursive
+          token: ${{ env.WALLET_RADIX_BOT_PAT }}
+
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "16.3"
+          xcode-version: "26.2"
 
       - name: "Set up ruby"
         uses: RDXWorks-actions/setup-ruby@master

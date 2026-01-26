@@ -18,7 +18,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	// MARK: - Path
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case selectFactorSource(SelectFactorSource)
 		case accountRecoveryScan(AccountRecoveryScanCoordinator)
@@ -119,3 +119,9 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - ManualAccountRecoveryCoordinator.Path.State + Hashable
+extension ManualAccountRecoveryCoordinator.Path.State: Hashable {}
+
+// MARK: - ManualAccountRecoveryCoordinator.Path.Action + Equatable
+extension ManualAccountRecoveryCoordinator.Path.Action: Equatable {}

@@ -34,7 +34,7 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case nameAccount(NameAccount)
 		case selectFactorSource(SelectFactorSource)
@@ -80,6 +80,12 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 			.forEach(\.path, action: \.child.path)
 	}
 }
+
+// MARK: - CreateAccountCoordinator.Path.State + Hashable
+extension CreateAccountCoordinator.Path.State: Hashable {}
+
+// MARK: - CreateAccountCoordinator.Path.Action + Equatable
+extension CreateAccountCoordinator.Path.Action: Equatable {}
 
 extension CreateAccountCoordinator {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -163,7 +169,7 @@ extension CreateAccountCoordinator {
 	}
 }
 
-// MARK: CreateAccountCoordinator.Mode
+// MARK: - CreateAccountCoordinator.Mode
 extension CreateAccountCoordinator {
 	enum Mode: Sendable, Hashable {
 		case bdfs

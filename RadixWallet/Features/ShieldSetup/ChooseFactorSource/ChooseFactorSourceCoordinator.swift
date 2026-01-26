@@ -15,7 +15,7 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	@Reducer(state: .hashable, action: .equatable)
+	@Reducer
 	enum Path {
 		case list(FactorSourcesList)
 	}
@@ -63,6 +63,12 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 		}
 	}
 }
+
+// MARK: - ChooseFactorSourceCoordinator.Path.State + Hashable
+extension ChooseFactorSourceCoordinator.Path.State: Hashable {}
+
+// MARK: - ChooseFactorSourceCoordinator.Path.Action + Equatable
+extension ChooseFactorSourceCoordinator.Path.Action: Equatable {}
 
 private extension ChooseFactorSourceCoordinator {
 	func selectedFactorSourceEffect(state: State, factorSourceId: FactorSourceID) -> Effect<Action> {
