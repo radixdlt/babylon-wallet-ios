@@ -34,7 +34,8 @@ extension Profile {
 				accounts: [account],
 				personas: [],
 				authorizedDapps: [],
-				resourcePreferences: []
+				resourcePreferences: [],
+				mfaFactorInstances: []
 			)
 			var identifiedNetworks = networks.asIdentified()
 			try identifiedNetworks.add(network)

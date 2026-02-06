@@ -959,6 +959,8 @@ Code: %@";
 "factorSources_detail_test" = "Test";
 "factorSources_detail_advanced" = "Advanced";
 "factorSources_detail_rename" = "Rename this factor";
+"factorSources_detail_mfaSignatureResourceTitle" = "MFA Signature Resource";
+"factorSources_detail_mfaSignatureResourceSubtitle" = "Derive a new public key for configuring authentication rules";
 "factorSources_detail_spotCheck" = "Spot Check";
 "factorSources_detail_testCanUse" = "Test that you can use this factor";
 "factorSources_detail_lastUsed" = "**Last used:** %@";
