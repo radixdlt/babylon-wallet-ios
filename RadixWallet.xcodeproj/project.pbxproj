@@ -872,6 +872,7 @@
 		A018C8762E0030C100461852 /* BlogPostsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8722E0030C100461852 /* BlogPostsClient+Interface.swift */; };
 		A018C8772E0030C100461852 /* BlogPostsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A018C8742E0030C100461852 /* BlogPostsClient+Test.swift */; };
 		A029CF042E79492700F7F325 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A029CF032E79492700F7F325 /* Sargon */; };
+		A03080352F425BB400AD2D57 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A03080342F425BB400AD2D57 /* Sargon */; };
 		A03194212E411A640015C231 /* ArculusForgotPIN-EnterNewPIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A031941F2E411A640015C231 /* ArculusForgotPIN-EnterNewPIN.swift */; };
 		A03194222E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03194202E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift */; };
 		A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */; };
@@ -2898,6 +2899,7 @@
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
 				A0777B482E253E1E00E82892 /* Sargon in Frameworks */,
+				A03080352F425BB400AD2D57 /* Sargon in Frameworks */,
 				83BE7C532D51F40100AF5D28 /* Sargon in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
 				48FFFAF52ADC241A00B2B213 /* BitCollections in Frameworks */,
@@ -7995,6 +7997,7 @@
 				A029CF032E79492700F7F325 /* Sargon */,
 				A0DA89132E96A2CF005254CB /* Sargon */,
 				A06AD20D2F2A5403009004C5 /* Sargon */,
+				A03080342F425BB400AD2D57 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -8059,7 +8062,7 @@
 				A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				A00B33402E5A4E7500528171 /* XCLocalSwiftPackageReference "arculus-ios-csdk" */,
-				A06AD20C2F2A5402009004C5 /* XCLocalSwiftPackageReference "../sargon" */,
+				A03080332F425BB300AD2D57 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -10094,10 +10097,6 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "arculus-ios-csdk";
 		};
-		A06AD20C2F2A5402009004C5 /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -10285,6 +10284,14 @@
 				version = 1.3.2;
 			};
 		};
+		A03080332F425BB300AD2D57 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.2.50;
+			};
+		};
 		A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -10469,6 +10476,11 @@
 		};
 		A029CF032E79492700F7F325 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		A03080342F425BB400AD2D57 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A03080332F425BB300AD2D57 /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */ = {

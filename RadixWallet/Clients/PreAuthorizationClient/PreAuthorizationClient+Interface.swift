@@ -25,6 +25,7 @@ extension PreAuthorizationClient {
 		let manifest: SubintentManifest
 		let expiration: DappToWalletInteractionSubintentExpiration
 		let message: String?
+		let header: DappToWalletInteractionSubintentHeader?
 	}
 
 	struct PollStatusRequest: Sendable {

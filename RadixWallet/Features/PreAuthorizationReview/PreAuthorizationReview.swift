@@ -10,6 +10,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init()
 		let dAppMetadata: DappMetadata
 		let message: Message
+		let header: DappToWalletInteractionSubintentHeader?
 
 		var preview: PreAuthorizationPreview?
 
@@ -18,7 +19,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 		var secondsToExpiration: Int?
 
-		// Sections
+		/// Sections
 		var sections: Common.Sections.State = .init(kind: .preAuthorization)
 
 		@PresentationState
@@ -238,12 +239,13 @@ private extension PreAuthorizationReview {
 			return .none
 		}
 
-		return .run { [expiration = state.expiration, message = state.message] send in
+		return .run { [expiration = state.expiration, message = state.message, header = state.header] send in
 			let subintent = try await preAuthorizationClient.buildSubintent(.init(
 				intentDiscriminator: .secureRandom(),
 				manifest: preview.manifest,
 				expiration: expiration,
-				message: message.plaintext
+				message: message.plaintext,
+				header: header
 			))
 			await send(.internal(.builtSubintent(subintent)))
 		} catch: { error, send in
