@@ -7,7 +7,10 @@ private let stringValuesTestKey = "stringValuesTestKey"
 struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		struct KeyValues: Sendable, Hashable, Identifiable {
-			var id: String { key.rawValue }
+			var id: String {
+				key.rawValue
+			}
+
 			let key: UserDefaults.Dependency.Key
 			let values: [String]
 			init(key: UserDefaults.Dependency.Key, values: [String]) {
@@ -102,10 +105,6 @@ extension UserDefaults.Dependency.Key {
 			return userDefaults.getFactorSourceIDOfBackedUpMnemonics().map(String.init(describing:))
 		case .transactionsCompletedCounter:
 			return userDefaults.getTransactionsCompletedCounter().map(String.init(describing:)).asArray(\.self)
-		case .dateOfLastSubmittedNPSSurvey:
-			return userDefaults.getDateOfLastSubmittedNPSSurvey().map(String.init(describing:)).asArray(\.self)
-		case .npsSurveyUserID:
-			return userDefaults.getNPSSurveyUserId().map(String.init(describing:)).asArray(\.self)
 		case .migratedKeychainProfiles:
 			return userDefaults.getMigratedKeychainProfiles.map(\.uuidString)
 		case .lastCloudBackups:

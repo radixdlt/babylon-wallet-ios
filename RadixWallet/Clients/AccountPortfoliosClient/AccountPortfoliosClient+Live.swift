@@ -1,7 +1,7 @@
 // MARK: - AccountPortfoliosClient + DependencyKey
 extension AccountPortfoliosClient: DependencyKey {
 	private static func registerSubscribers(state: State) {
-		/// Update currency amount visibility based on the profile state
+		// Update currency amount visibility based on the profile state
 		Task {
 			@Dependency(\.appPreferencesClient) var appPreferencesClient
 			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
@@ -10,7 +10,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 		}
 
-		/// Update used currency based on the profile state
+		// Update used currency based on the profile state
 		Task {
 			@Dependency(\.appPreferencesClient) var appPreferencesClient
 			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
@@ -19,7 +19,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 		}
 
-		/// Update when hidden resources change
+		// Update when hidden resources change
 		Task {
 			@Dependency(\.resourcesVisibilityClient) var resourcesVisibilityClient
 			for try await hiddenResources in await resourcesVisibilityClient.hiddenValues().removeDuplicates() {
@@ -107,11 +107,11 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Sendable
 		func applyNonFungiblePrices(_ ids: [NonFungibleGlobalID], forceRefresh: Bool) async {
 			if !ids.isEmpty {
-//				let nftPrices = await Result {
-//					try await SargonOS.shared.fetchNftFiatValues(nftIds: ids, currency: state.selectedCurrency, forceFetch: forceRefresh)
-//				}
-//
-//				await state.setNFTPrices(nftPrices)
+				let nftPrices = await Result {
+					try await SargonOS.shared.fetchNftFiatValues(nftIds: ids, currency: state.selectedCurrency, forceFetch: forceRefresh)
+				}
+
+				await state.setNFTPrices(nftPrices)
 			}
 		}
 
@@ -129,8 +129,8 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 			}
 
-			/// Explicetely load and set the currency target and visibility to make sure
-			/// it is available for usage before resources are loaded
+			// Explicetely load and set the currency target and visibility to make sure
+			// it is available for usage before resources are loaded
 			let preferences = await appPreferencesClient.getPreferences()
 			let display = preferences.display
 			await state.setSelectedCurrency(display.fiatCurrencyPriceTarget)
@@ -142,32 +142,28 @@ extension AccountPortfoliosClient: DependencyKey {
 			let portfolios = accounts.map { AccountPortfolio(account: $0, hiddenResources: hiddenResources) }
 			await state.handlePortfoliosUpdate(portfolios)
 
-			/// Put together all resources from already fetched and new accounts
+			// Put together all resources from already fetched and new accounts
 			let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
 			let allResources: [ResourceAddress] = {
 				if gateway == .mainnet {
-					/// Only Mainnet resources have prices
+					// Only Mainnet resources have prices
 					return (currentAccounts + accounts).flatMap(\.resourcesWithPrices) + [.mainnetXRD]
 				} else {
 					#if DEBUG
-					/// Helpful for testing on stokenet
+					// Helpful for testing on stokenet
 					return [
 						.mainnetXRD,
 						try! .init(validatingAddress:
-							"resource_rdx1t4tjx4g3qzd98nayqxm7qdpj0a0u8ns6a0jrchq49dyfevgh6u0gj3"
-						),
+							"resource_rdx1t4tjx4g3qzd98nayqxm7qdpj0a0u8ns6a0jrchq49dyfevgh6u0gj3"),
 						try! .init(validatingAddress:
-							"resource_rdx1t45js47zxtau85v0tlyayerzrgfpmguftlfwfr5fxzu42qtu72tnt0"
-						),
+							"resource_rdx1t45js47zxtau85v0tlyayerzrgfpmguftlfwfr5fxzu42qtu72tnt0"),
 						try! .init(validatingAddress:
-							"resource_rdx1tk7g72c0uv2g83g3dqtkg6jyjwkre6qnusgjhrtz0cj9u54djgnk3c"
-						),
+							"resource_rdx1tk7g72c0uv2g83g3dqtkg6jyjwkre6qnusgjhrtz0cj9u54djgnk3c"),
 						try! .init(validatingAddress:
-							"resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq"
-						),
+							"resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq"),
 					]
 					#else
-					/// No price for resources on testnets
+					// No price for resources on testnets
 					return []
 					#endif
 				}

@@ -31,11 +31,6 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 		}
 	}
 
-	func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-		@Dependency(\.appsFlyerClient) var appsFlyerClient
-		appsFlyerClient.continue(userActivity)
-	}
-
 	func sceneWillEnterForeground(_ scene: UIScene) {
 		guard didEnterBackground, let scene = scene as? UIWindowScene else { return }
 
@@ -65,7 +60,8 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 			store: .init(
 				initialState: .init(),
 				reducer: ContentOverlay.init
-			))
+			)
+		)
 
 		let overlayWindow = UIWindow(windowScene: scene)
 		overlayWindow.rootViewController = UIHostingController(rootView: overlayView)
@@ -93,7 +89,8 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 			store: .init(
 				initialState: .init(),
 				reducer: StatusOverlay.init
-			))
+			)
+		)
 
 		let overlayWindow = UIWindow(windowScene: scene)
 		overlayWindow.rootViewController = UIHostingController(rootView: overlayView)
@@ -121,7 +118,8 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 			store: .init(
 				initialState: .init(context: .appForegrounded),
 				reducer: Splash.init
-			))
+			)
+		)
 
 		biometricsSplashWindow = UIWindow(windowScene: scene)
 		biometricsSplashWindow?.rootViewController = UIHostingController(rootView: splashView)

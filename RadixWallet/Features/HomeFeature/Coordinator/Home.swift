@@ -61,7 +61,6 @@ struct Home: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case accountsLoadedResult(TaskResult<Accounts>)
 		case currentGatewayChanged(to: Gateway)
-		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
@@ -83,7 +82,6 @@ struct Home: Sendable, FeatureReducer {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
-			case npsSurvey(NPSSurvey.State)
 			case relinkConnector(NewConnection.State)
 			case securityCenter(SecurityCenter.State)
 			case p2pLinks(P2PLinksFeature.State)
@@ -98,7 +96,6 @@ struct Home: Sendable, FeatureReducer {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
-			case npsSurvey(NPSSurvey.Action)
 			case relinkConnector(NewConnection.Action)
 			case securityCenter(SecurityCenter.Action)
 			case p2pLinks(P2PLinksFeature.Action)
@@ -116,9 +113,6 @@ struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: \.createAccount, action: \.createAccount) {
 				CreateAccountCoordinator()
-			}
-			Scope(state: \.npsSurvey, action: \.npsSurvey) {
-				NPSSurvey()
 			}
 			Scope(state: \.relinkConnector, action: \.relinkConnector) {
 				NewConnection()
@@ -151,8 +145,6 @@ struct Home: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
-	@Dependency(\.npsSurveyClient) var npsSurveyClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.continuousClock) var clock
@@ -161,8 +153,6 @@ struct Home: Sendable, FeatureReducer {
 	@Dependency(\.accessControllerClient) var accessControllerClient
 
 	private let accountPortfoliosRefreshIntervalInSeconds = 300 // 5 minutes
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.carousel, action: \.child.carousel) {
@@ -206,7 +196,6 @@ struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 			.merge(with: loadGateways())
-			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
 			.merge(with: securityProblemsEffect())
@@ -281,12 +270,6 @@ struct Home: Sendable, FeatureReducer {
 				rowState.showFiatWorth = state.showFiatWorth
 			}
 			#endif
-			return .none
-
-		case let .shouldShowNPSSurvey(shouldShow):
-			if shouldShow {
-				state.addDestination(.npsSurvey(.init()))
-			}
 			return .none
 
 		case let .accountsFiatWorthLoaded(fiatWorths):
@@ -385,10 +368,6 @@ struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
-			state.destination = nil
-			return uploadUserFeedback(userFeedback)
-
 		case let .relinkConnector(.delegate(.newConnection(connectedClient))):
 			state.destination = nil
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
@@ -414,11 +393,7 @@ struct Home: Sendable, FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		var effect: Effect<Action>?
-
 		switch state.destination {
-		case .npsSurvey:
-			effect = uploadUserFeedback(nil)
 		case .relinkConnector:
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
 			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
@@ -427,7 +402,7 @@ struct Home: Sendable, FeatureReducer {
 		}
 
 		state.showNextDestination()
-		return effect ?? .none
+		return .none
 	}
 
 	func loadGateways() -> Effect<Action> {
@@ -436,23 +411,6 @@ struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
-		}
-	}
-
-	private func loadNPSSurveyStatus() -> Effect<Action> {
-		.run { send in
-			for try await shouldAsk in await npsSurveyClient.shouldAskForUserFeedback() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.shouldShowNPSSurvey(shouldAsk)))
-			}
-		}
-	}
-
-	private func uploadUserFeedback(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
-		overlayWindowClient.scheduleHUD(.thankYou)
-
-		return .run { _ in
-			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 

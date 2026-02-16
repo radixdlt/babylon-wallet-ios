@@ -17,8 +17,11 @@ extension DependencyValues {
 
 // MARK: - SensitiveInfoClient.Key
 extension SensitiveInfoClient {
-	enum Key: String {
-		case appsFlyerAppId = "APPS_FLYER_APP_ID"
-		case appsFlyerDevKey = "APPS_FLYER_DEV_KEY"
+	struct Key: RawRepresentable, Hashable, Sendable {
+		let rawValue: String
+
+		init(rawValue: String) {
+			self.rawValue = rawValue
+		}
 	}
 }
