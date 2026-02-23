@@ -86,7 +86,6 @@ jobs:
         run: |
           mkdir -p Aux
           echo "${{ secrets.GH_CRASHLYTICS_GOOGLE_SERVICES_JSON_FILE_BASE64_RELEASE }}" | base64 --decode > Aux/GoogleService-Info.plist
-        if: ${{ github.event.inputs.flavour == 'release' }}
 
       - name: Verify GoogleService-Info.plist
         run: |
