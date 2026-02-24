@@ -5,12 +5,17 @@ import Network
 extension RadixConnectClient {
 	static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
+		@Dependency(\.p2pTransportProfilesClient) var p2pTransportProfilesClient
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.accountsClient) var accountsClient
 
 		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
 
-		let rtcClients = RTCClients()
+		let rtcClients = RTCClients(
+			p2pTransportProfileProvider: {
+				await p2pTransportProfilesClient.getCurrentProfile()
+			}
+		)
 		let radixConnectMobile = RadixConnectMobile()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
@@ -41,12 +46,12 @@ extension RadixConnectClient {
 				accounts: accounts
 			)
 
-			/// The keys in the JSON will be sorted alphabetically before encoding, ensuring consistent hashing
+			// The keys in the JSON will be sorted alphabetically before encoding, ensuring consistent hashing
 			encoder.outputFormatting = .sortedKeys
 
 			let accountsHash = try encoder.encode(accountListMessage).hash().hex
 
-			/// Send `AccountListMessage` to CE only if `accountsHash` has changed
+			// Send `AccountListMessage` to CE only if `accountsHash` has changed
 			guard userDefaults.getLastSyncedAccountsWithCE() != accountsHash else { return }
 
 			_ = try await rtcClients.sendRequest(.connectorExtension(.accountListMessage(accountListMessage)), strategy: .broadcastToAllPeersWith(purpose: .general))
@@ -73,6 +78,22 @@ extension RadixConnectClient {
 		let connectToP2PLinks: ConnectToP2PLinks = { links in
 			for client in links {
 				try await rtcClients.connect(client, isNewConnection: false)
+			}
+		}
+
+		Task {
+			for try await _ in await p2pTransportProfilesClient
+				.p2pTransportProfilesValues()
+				.dropFirst()
+			{
+				guard !Task.isCancelled else { return }
+				let links = await p2pLinksClient.getP2PLinks()
+				await rtcClients.disconnectAndRemoveAll()
+				do {
+					try await connectToP2PLinks(links)
+				} catch {
+					errorQueue.schedule(error)
+				}
 			}
 		}
 
@@ -124,7 +145,7 @@ extension RadixConnectClient {
 					waitsForConnectionToBeEstablished: true
 				)
 
-				/// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
+				// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
 				userDefaults.remove(.lastSyncedAccountsWithCE)
 			},
 			receiveMessages: {

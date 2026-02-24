@@ -330,6 +330,8 @@ extension SecureStorageClient: DependencyKey {
 				keychainKey = activeProfileId.keychainKey
 			case let .deviceFactorSourceMnemonic(factorSourceId):
 				keychainKey = key(factorSourceID: factorSourceId)
+			case let .radixConnectMobileSession(sessionId: sessionId):
+				keychainKey = .init(.init(rawValue: sessionId)!)
 			}
 			return try keychainClient.contains(keychainKey)
 		}

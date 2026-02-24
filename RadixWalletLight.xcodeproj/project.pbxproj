@@ -9681,6 +9681,7 @@
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Dev.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				VERSIONING_SYSTEM = "apple-generic";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
@@ -9705,6 +9706,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = RadixWallet/RadixWalletRelease.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				VERSIONING_SYSTEM = "apple-generic";
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";
@@ -9790,6 +9792,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Alpha.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
+				VERSIONING_SYSTEM = "apple-generic";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
@@ -9879,6 +9882,7 @@
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-PreAlpha.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1;
+				VERSIONING_SYSTEM = "apple-generic";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
@@ -9959,6 +9963,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = RadixWallet/RadixWalletBeta.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				VERSIONING_SYSTEM = "apple-generic";
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "\"This lets you scan QR codes for Radix Connect linking.\"";

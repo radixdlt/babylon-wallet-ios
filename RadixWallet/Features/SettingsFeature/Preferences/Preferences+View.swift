@@ -137,6 +137,12 @@ extension Preferences.View {
 				icon: .asset(.gateway),
 				action: .gatewaysButtonTapped
 			),
+			.model(
+				title: "Signaling Servers",
+				subtitle: "Manage signaling server and ICE profile options.",
+				icon: .systemImage("dot.radiowaves.left.and.right"),
+				action: .signalingServersButtonTapped
+			),
 			.toggleModel(
 				icon: .developerMode,
 				title: L10n.Preferences.DeveloperMode.title,
@@ -187,6 +193,7 @@ private extension View {
 			.hiddenAssets(with: destinationStore)
 			.themeSelection(with: destinationStore)
 			.gateways(with: destinationStore)
+			.signalingServers(with: destinationStore)
 	}
 
 	private func depositGuarantees(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
@@ -210,6 +217,12 @@ private extension View {
 	private func gateways(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.gateways, action: \.gateways)) {
 			GatewaySettings.View(store: $0)
+		}
+	}
+
+	private func signalingServers(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.signalingServers, action: \.signalingServers)) {
+			SignalingServersSettings.View(store: $0)
 		}
 	}
 

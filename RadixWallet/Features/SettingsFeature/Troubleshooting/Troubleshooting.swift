@@ -1,6 +1,8 @@
 // MARK: - Troubleshooting
 import FirebaseCrashlytics
+import Sargon
 
+// MARK: - Troubleshooting
 struct Troubleshooting: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var isLegacyImportEnabled = true
@@ -16,6 +18,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 		case onFirstTask
 		case accountScanButtonTapped
 		case legacyImportButtonTapped
+		case rawManifestButtonTapped
 		case contactSupportButtonTapped
 		case discordButtonTapped
 		case factoryResetButtonTapped
@@ -32,6 +35,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 			case factoryReset(FactoryReset.State)
+			case rawManifestTransaction(RawManifestTransaction.State)
 		}
 
 		@CasePathable
@@ -39,6 +43,7 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 			case factoryReset(FactoryReset.Action)
+			case rawManifestTransaction(RawManifestTransaction.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -51,6 +56,9 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			Scope(state: \.factoryReset, action: \.factoryReset) {
 				FactoryReset()
 			}
+			Scope(state: \.rawManifestTransaction, action: \.rawManifestTransaction) {
+				RawManifestTransaction()
+			}
 		}
 	}
 
@@ -58,8 +66,6 @@ struct Troubleshooting: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.contactSupportClient) var contactSupport
 	@Dependency(\.userDefaults) var userDefaults
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -82,6 +88,10 @@ struct Troubleshooting: Sendable, FeatureReducer {
 
 		case .legacyImportButtonTapped:
 			state.destination = .importOlympiaWallet(.init())
+			return .none
+
+		case .rawManifestButtonTapped:
+			state.destination = .rawManifestTransaction(.init())
 			return .none
 
 		case .contactSupportButtonTapped:
@@ -137,6 +147,63 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			await send(.internal(.loadedIsLegacyImportEnabled(
 				gatewaysClient.getCurrentGateway().networkID == .mainnet
 			)))
+		}
+	}
+}
+
+// MARK: - RawManifestTransaction
+struct RawManifestTransaction: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		var manifest: String = ""
+		var isSending: Bool = false
+
+		var canSend: Bool {
+			!manifest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+		}
+	}
+
+	enum ViewAction: Sendable, Equatable {
+		case manifestChanged(String)
+		case sendTapped
+	}
+
+	enum InternalAction: Sendable, Equatable {
+		case interactionCompleted
+	}
+
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
+
+	var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case let .manifestChanged(manifest):
+			state.manifest = manifest
+			return .none
+
+		case .sendTapped:
+			guard state.canSend, !state.isSending else {
+				return .none
+			}
+			state.isSending = true
+			return .run { [manifest = state.manifest] send in
+				let txManifest = TransactionManifest(instructions: .string(manifest))
+				_ = await dappInteractionClient.addWalletInteraction(
+					.transaction(.init(send: .init(transactionManifest: txManifest))),
+					.accountTransfer
+				)
+				await send(.internal(.interactionCompleted))
+			}
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .interactionCompleted:
+			state.isSending = false
+			return .none
 		}
 	}
 }

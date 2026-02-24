@@ -64,6 +64,13 @@ extension Troubleshooting.View {
 				icon: .asset(.recovery),
 				action: .legacyImportButtonTapped
 			).valid(if: isLegacyImportEnabled),
+			.header("Transaction"),
+			.model(
+				title: "Raw transaction manifest",
+				subtitle: "Paste and submit a manifest using the wallet interaction flow",
+				icon: .asset(.code),
+				action: .rawManifestButtonTapped
+			),
 			.header(L10n.Troubleshooting.support),
 			.model(
 				title: L10n.Troubleshooting.ContactSupport.title,
@@ -112,6 +119,7 @@ private extension View {
 		return accountRecovery(with: destinationStore)
 			.importOlympiaWallet(with: destinationStore)
 			.factoryReset(with: destinationStore)
+			.rawManifestTransaction(with: destinationStore)
 	}
 
 	private func accountRecovery(with destinationStore: PresentationStoreOf<Troubleshooting.Destination>) -> some View {
@@ -140,10 +148,80 @@ private extension View {
 			destination: { FactoryReset.View(store: $0) }
 		)
 	}
+
+	private func rawManifestTransaction(with destinationStore: PresentationStoreOf<Troubleshooting.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Troubleshooting.Destination.State.rawManifestTransaction,
+			action: Troubleshooting.Destination.Action.rawManifestTransaction,
+			destination: { RawManifestTransaction.View(store: $0) }
+		)
+	}
 }
 
 private extension SettingsRow.Kind {
 	func valid(if condition: Bool) -> Self? {
 		condition ? self : nil
+	}
+}
+
+extension RawManifestTransaction.State {
+	var viewState: RawManifestTransaction.ViewState {
+		.init(
+			manifest: manifest,
+			sendButtonState: isSending ? .loading(.local) : (canSend ? .enabled : .disabled)
+		)
+	}
+}
+
+extension RawManifestTransaction {
+	struct ViewState: Equatable {
+		let manifest: String
+		let sendButtonState: ControlState
+	}
+
+	@MainActor
+	struct View: SwiftUI.View {
+		private let store: StoreOf<RawManifestTransaction>
+
+		init(store: StoreOf<RawManifestTransaction>) {
+			self.store = store
+		}
+	}
+}
+
+extension RawManifestTransaction.View {
+	var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			VStack(alignment: .leading, spacing: .medium2) {
+				Text("Paste the full transaction manifest. It will be queued as a wallet interaction and go through the same review/sign/send flow as a transfer.")
+					.textStyle(.body1Regular)
+					.foregroundColor(.secondaryText)
+
+				AppTextEditor(
+					placeholder: "CALL_METHOD ...",
+					text: viewStore.binding(
+						get: \.manifest,
+						send: RawManifestTransaction.ViewAction.manifestChanged
+					)
+				)
+				.padding(.medium3)
+				.frame(minHeight: 260, alignment: .topLeading)
+				.background(.secondaryBackground)
+				.roundedCorners(strokeColor: .border)
+				.textStyle(.monospace)
+				.scrollContentBackground(.hidden)
+
+				Button("Review and Send") {
+					viewStore.send(.sendTapped)
+				}
+				.buttonStyle(.primaryRectangular(shouldExpand: true))
+				.controlState(viewStore.sendButtonState)
+
+				Spacer(minLength: 0)
+			}
+			.padding(.medium3)
+			.radixToolbar(title: "Raw Manifest")
+		}
 	}
 }

@@ -19,6 +19,7 @@ struct Preferences: Sendable, FeatureReducer {
 		case hiddenAssetsButtonTapped
 		case themeSelectionButtonTapped
 		case gatewaysButtonTapped
+		case signalingServersButtonTapped
 		case developerModeToogled(Bool)
 		case advancedLockToogled(Bool)
 		case exportLogsButtonTapped
@@ -38,6 +39,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case hiddenAssets(HiddenAssets.State)
 			case themeSelection(ThemeSelection.State)
 			case gateways(GatewaySettings.State)
+			case signalingServers(SignalingServersSettings.State)
 		}
 
 		@CasePathable
@@ -47,6 +49,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case hiddenAssets(HiddenAssets.Action)
 			case themeSelection(ThemeSelection.Action)
 			case gateways(GatewaySettings.Action)
+			case signalingServers(SignalingServersSettings.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -65,6 +68,9 @@ struct Preferences: Sendable, FeatureReducer {
 			Scope(state: \.gateways, action: \.gateways) {
 				GatewaySettings()
 			}
+			Scope(state: \.signalingServers, action: \.signalingServers) {
+				SignalingServersSettings()
+			}
 		}
 	}
 
@@ -72,8 +78,6 @@ struct Preferences: Sendable, FeatureReducer {
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.userDefaults) var userDefaults
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -111,6 +115,10 @@ struct Preferences: Sendable, FeatureReducer {
 
 		case .gatewaysButtonTapped:
 			state.destination = .gateways(.init())
+			return .none
+
+		case .signalingServersButtonTapped:
+			state.destination = .signalingServers(.init())
 			return .none
 
 		case let .developerModeToogled(isEnabled):

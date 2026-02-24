@@ -26,6 +26,9 @@ final class SargonSecureStorage: SecureStorageDriver {
 			}
 
 			return try secureStorageClient.loadProfileSnapshotData(activeProfileId)
+
+		case let .radixConnectMobileSession(sessionId: sessionId):
+			<#code#>
 		}
 	}
 
@@ -82,6 +85,9 @@ final class SargonSecureStorage: SecureStorageDriver {
 					throw error
 				}
 			}
+
+		case let .radixConnectMobileSession(sessionId: sessionId):
+			<#code#>
 		}
 	}
 

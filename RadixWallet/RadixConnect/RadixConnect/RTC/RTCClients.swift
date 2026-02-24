@@ -43,23 +43,23 @@ actor RTCClients {
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
-	private let signalingServerBaseURL: URL
+	private let p2pTransportProfileProvider: @Sendable () async -> P2PTransportProfile
 
 	// MARK: - Internal state
 	private var clients: [RTCClient.ID: RTCClient] = [:]
 
 	// MARK: - Initializers
 	init(
-		peerConnectionFactory: PeerConnectionFactory,
-		signalingServerBaseURL: URL = SignalingClient.default
+		peerConnectionFactory: PeerConnectionFactory = WebRTCFactory(),
+		p2pTransportProfileProvider: @escaping @Sendable () async -> P2PTransportProfile = { SavedP2PTransportProfiles.default.current }
 	) {
 		self.peerConnectionFactory = peerConnectionFactory
-		self.signalingServerBaseURL = signalingServerBaseURL
+		self.p2pTransportProfileProvider = p2pTransportProfileProvider
 	}
 }
 
 extension RTCClients {
-	// Initializer for clients
+	/// Initializer for clients
 	init() {
 		self.init(peerConnectionFactory: WebRTCFactory())
 	}
@@ -77,7 +77,7 @@ extension RTCClients {
 			loggerGlobal.notice("Ignored connecting RTCClient with connectionPassword/id: \(p2pLink.connectionPassword), since it is already in RTCClients.clients")
 			return
 		}
-		let client = try makeRTCClient(p2pLink, isNewConnection: isNewConnection)
+		let client = try await makeRTCClient(p2pLink, isNewConnection: isNewConnection)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
 		}
@@ -222,23 +222,23 @@ extension RTCClients {
 	func makeRTCClient(
 		_ p2pLink: P2PLink,
 		isNewConnection: Bool
-	) throws -> RTCClient {
+	) async throws -> RTCClient {
+		let p2pTransportProfile = await p2pTransportProfileProvider()
 		let signalingClient = try SignalingClient(
 			password: p2pLink.connectionPassword,
-			baseURL: signalingServerBaseURL
+			baseURL: p2pTransportProfile.signalingServer
 		)
 		let negotiator = PeerConnectionNegotiator(
 			p2pLink: p2pLink,
+			p2pTransportProfile: p2pTransportProfile,
 			isNewConnection: isNewConnection,
 			signalingClient: signalingClient,
 			factory: peerConnectionFactory
 		)
-		let client = RTCClient(
+		return RTCClient(
 			p2pLink: p2pLink,
 			peerConnectionNegotiator: negotiator
 		)
-
-		return client
 	}
 }
 
@@ -338,8 +338,8 @@ extension RTCClient {
 
 		let encoder = JSONEncoder()
 
-		/// Important to not escape slashes for derivation paths, which otherwise will look:
-		/// `m\/44H\/1022H\/0H\/0\/4H` but should be `m/44H/1022H/0H/0/4H` ofc.
+		// Important to not escape slashes for derivation paths, which otherwise will look:
+		// `m\/44H\/1022H\/0H\/0\/4H` but should be `m/44H/1022H/0H/0/4H` ofc.
 		encoder.outputFormatting = [.withoutEscapingSlashes]
 
 		let data = try encoder.encode(request)
