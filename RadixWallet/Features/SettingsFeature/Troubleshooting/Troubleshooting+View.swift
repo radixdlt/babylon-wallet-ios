@@ -183,6 +183,7 @@ extension RawManifestTransaction {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<RawManifestTransaction>
+		@Dependency(\.pasteboardClient) var pasteboardClient
 
 		init(store: StoreOf<RawManifestTransaction>) {
 			self.store = store
@@ -193,35 +194,68 @@ extension RawManifestTransaction {
 extension RawManifestTransaction.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			VStack(alignment: .leading, spacing: .medium2) {
-				Text("Paste the full transaction manifest. It will be queued as a wallet interaction and go through the same review/sign/send flow as a transfer.")
-					.textStyle(.body1Regular)
-					.foregroundColor(.secondaryText)
+			VStack(spacing: .zero) {
+				ScrollView {
+					VStack(alignment: .leading, spacing: .medium2) {
+						Text("Enter a raw transaction manifest to preview and submit to the network.")
+							.textStyle(.body1Regular)
+							.foregroundColor(.secondaryText)
 
-				AppTextEditor(
-					placeholder: "CALL_METHOD ...",
-					text: viewStore.binding(
-						get: \.manifest,
-						send: RawManifestTransaction.ViewAction.manifestChanged
-					)
-				)
-				.padding(.medium3)
-				.frame(minHeight: 260, alignment: .topLeading)
-				.background(.secondaryBackground)
-				.roundedCorners(strokeColor: .border)
-				.textStyle(.monospace)
-				.scrollContentBackground(.hidden)
+						HStack(spacing: .small2) {
+							Button {
+								let pastedText = pasteboardClient.getString() ?? ""
+								viewStore.send(.manifestChanged(pastedText))
+							} label: {
+								Label("Paste", systemImage: "doc.on.clipboard")
+									.labelStyle(.titleAndIcon)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: true))
 
-				Button("Review and Send") {
+							Button {
+								viewStore.send(.manifestChanged(""))
+							} label: {
+								Label("Clear", systemImage: "xmark")
+									.labelStyle(.titleAndIcon)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: true))
+
+							Button {
+								pasteboardClient.copyString(viewStore.manifest)
+							} label: {
+								Label("Copy", systemImage: "doc.on.doc")
+									.labelStyle(.titleAndIcon)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: true))
+						}
+
+						AppTextEditor(
+							placeholder: "CALL_METHOD\n    Address(\"...\")\n    ...",
+							text: viewStore.binding(
+								get: \.manifest,
+								send: RawManifestTransaction.ViewAction.manifestChanged
+							)
+						)
+						.padding(.medium3)
+						.frame(minHeight: 640, alignment: .topLeading)
+						.background(.secondaryBackground)
+						.roundedCorners(strokeColor: .border)
+						.textStyle(.monospace)
+						.scrollContentBackground(.hidden)
+					}
+					.padding(.medium3)
+				}
+
+				Separator()
+
+				Button("Transaction Preview") {
 					viewStore.send(.sendTapped)
 				}
 				.buttonStyle(.primaryRectangular(shouldExpand: true))
 				.controlState(viewStore.sendButtonState)
-
-				Spacer(minLength: 0)
+				.padding(.medium3)
 			}
-			.padding(.medium3)
-			.radixToolbar(title: "Raw Manifest")
+			.background(.secondaryBackground)
+			.radixToolbar(title: "Submit Transaction Manifest")
 		}
 	}
 }

@@ -3,16 +3,6 @@ struct DappInteractionClient: Sendable {
 	let interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>
 	let addWalletInteraction: AddWalletInteraction
 	let completeInteraction: CompleteInteraction
-
-	init(
-		interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>,
-		addWalletInteraction: @escaping AddWalletInteraction,
-		completeInteraction: @escaping CompleteInteraction
-	) {
-		self.interactions = interactions
-		self.addWalletInteraction = addWalletInteraction
-		self.completeInteraction = completeInteraction
-	}
 }
 
 extension DappInteractionClient {
@@ -22,6 +12,7 @@ extension DappInteractionClient {
 		case accountLockerClaim
 		case accountDelete
 		case shieldUpdate
+		case rawManifestTransaction
 	}
 
 	/// Result of a wallet interaction containing both P2P response (for external dApps)
@@ -70,12 +61,17 @@ extension WalletInteractionId {
 		hasPrefix(DappInteractionClient.WalletInteraction.shieldUpdate.rawValue)
 	}
 
+	var isWalletRawManifestTransactionInteraction: Bool {
+		hasPrefix(DappInteractionClient.WalletInteraction.rawManifestTransaction.rawValue)
+	}
+
 	var isWalletInteraction: Bool {
 		isWalletAccountTransferInteraction
 			|| isWalletAccountDepositSettingsInteraction
 			|| isWalletAccountLockerClaimInteraction
 			|| isWalletAccountDeleteInteraction
 			|| isWalletShieldUpdateInteraction
+			|| isWalletRawManifestTransactionInteraction
 	}
 }
 

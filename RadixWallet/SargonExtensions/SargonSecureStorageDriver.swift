@@ -28,7 +28,7 @@ final class SargonSecureStorage: SecureStorageDriver {
 			return try secureStorageClient.loadProfileSnapshotData(activeProfileId)
 
 		case let .radixConnectMobileSession(sessionId: sessionId):
-			<#code#>
+			return try secureStorageClient.loadRadixConnectMobileSession(.init(uuidString: sessionId)!)
 		}
 	}
 
@@ -86,8 +86,8 @@ final class SargonSecureStorage: SecureStorageDriver {
 				}
 			}
 
-		case let .radixConnectMobileSession(sessionId: sessionId):
-			<#code#>
+		case let .radixConnectMobileSession(sessionId):
+			try secureStorageClient.saveRadixConnectMobileSession(.init(uuidString: sessionId)!, data)
 		}
 	}
 
@@ -106,6 +106,8 @@ final class SargonSecureStorage: SecureStorageDriver {
 				profileID: activeProfileId,
 				keepInICloudIfPresent: true
 			)
+		case let .radixConnectMobileSession(sessionId):
+			break
 		}
 	}
 

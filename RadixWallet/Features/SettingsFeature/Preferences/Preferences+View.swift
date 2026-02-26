@@ -143,6 +143,12 @@ extension Preferences.View {
 				icon: .systemImage("dot.radiowaves.left.and.right"),
 				action: .signalingServersButtonTapped
 			),
+			.model(
+				title: "Relay Services",
+				subtitle: "Manage relay service endpoints for Radix Connect Mobile.",
+				icon: .systemImage("point.3.connected.trianglepath.dotted"),
+				action: .relayServicesButtonTapped
+			),
 			.toggleModel(
 				icon: .developerMode,
 				title: L10n.Preferences.DeveloperMode.title,
@@ -194,6 +200,7 @@ private extension View {
 			.themeSelection(with: destinationStore)
 			.gateways(with: destinationStore)
 			.signalingServers(with: destinationStore)
+			.relayServices(with: destinationStore)
 	}
 
 	private func depositGuarantees(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
@@ -223,6 +230,12 @@ private extension View {
 	private func signalingServers(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.signalingServers, action: \.signalingServers)) {
 			SignalingServersSettings.View(store: $0)
+		}
+	}
+
+	private func relayServices(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.relayServices, action: \.relayServices)) {
+			RelayServicesSettings.View(store: $0)
 		}
 	}
 

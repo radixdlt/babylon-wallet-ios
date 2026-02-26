@@ -172,6 +172,8 @@ struct RawManifestTransaction: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -187,15 +189,9 @@ struct RawManifestTransaction: Sendable, FeatureReducer {
 			guard state.canSend, !state.isSending else {
 				return .none
 			}
+
 			state.isSending = true
-			return .run { [manifest = state.manifest] send in
-				let txManifest = TransactionManifest(instructions: .string(manifest))
-				_ = await dappInteractionClient.addWalletInteraction(
-					.transaction(.init(send: .init(transactionManifest: txManifest))),
-					.accountTransfer
-				)
-				await send(.internal(.interactionCompleted))
-			}
+			return submitTransaction(state.manifest)
 		}
 	}
 
@@ -204,6 +200,39 @@ struct RawManifestTransaction: Sendable, FeatureReducer {
 		case .interactionCompleted:
 			state.isSending = false
 			return .none
+		}
+	}
+
+	private func submitTransaction(_ manifestString: String) -> Effect<Action> {
+		.run { send in
+			do {
+				let networkID = await gatewaysClient.getCurrentGateway().networkID
+				let manifest = try TransactionManifest(
+					instructionsString: manifestString,
+					networkID: networkID
+				)
+
+				let result = await dappInteractionClient.addWalletInteraction(
+					.transaction(.init(send: .init(transactionManifest: manifest))),
+					.rawManifestTransaction
+				)
+
+				switch result.p2pResponse {
+				case let .dapp(.success(success)):
+					if case .transaction = success.items {
+						await send(.internal(.interactionCompleted))
+						return
+					}
+					assertionFailure("Not a transaction response for raw manifest")
+
+				case .dapp(.failure):
+					break
+				}
+			} catch {
+				errorQueue.schedule(error)
+			}
+
+			await send(.internal(.interactionCompleted))
 		}
 	}
 }

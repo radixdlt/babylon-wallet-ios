@@ -20,6 +20,7 @@ struct Preferences: Sendable, FeatureReducer {
 		case themeSelectionButtonTapped
 		case gatewaysButtonTapped
 		case signalingServersButtonTapped
+		case relayServicesButtonTapped
 		case developerModeToogled(Bool)
 		case advancedLockToogled(Bool)
 		case exportLogsButtonTapped
@@ -40,6 +41,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case themeSelection(ThemeSelection.State)
 			case gateways(GatewaySettings.State)
 			case signalingServers(SignalingServersSettings.State)
+			case relayServices(RelayServicesSettings.State)
 		}
 
 		@CasePathable
@@ -50,6 +52,7 @@ struct Preferences: Sendable, FeatureReducer {
 			case themeSelection(ThemeSelection.Action)
 			case gateways(GatewaySettings.Action)
 			case signalingServers(SignalingServersSettings.Action)
+			case relayServices(RelayServicesSettings.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -70,6 +73,9 @@ struct Preferences: Sendable, FeatureReducer {
 			}
 			Scope(state: \.signalingServers, action: \.signalingServers) {
 				SignalingServersSettings()
+			}
+			Scope(state: \.relayServices, action: \.relayServices) {
+				RelayServicesSettings()
 			}
 		}
 	}
@@ -119,6 +125,10 @@ struct Preferences: Sendable, FeatureReducer {
 
 		case .signalingServersButtonTapped:
 			state.destination = .signalingServers(.init())
+			return .none
+
+		case .relayServicesButtonTapped:
+			state.destination = .relayServices(.init())
 			return .none
 
 		case let .developerModeToogled(isEnabled):
