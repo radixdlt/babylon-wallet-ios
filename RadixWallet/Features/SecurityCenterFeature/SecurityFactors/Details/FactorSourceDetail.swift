@@ -6,11 +6,13 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		var integrity: FactorSourceIntegrity
 		var name: String
 		var lastUsed: Timestamp
+		var isFetchingSignatureNft: Bool
 
 		init(integrity: FactorSourceIntegrity) {
 			self.integrity = integrity
 			self.name = integrity.factorSource.asGeneral.name
 			self.lastUsed = integrity.factorSource.asGeneral.common.lastUsedOn
+			self.isFetchingSignatureNft = false
 		}
 
 		@Presents
@@ -25,6 +27,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case renameTapped
+		case signatureNftTapped
 		case viewSeedPhraseTapped
 		case enterSeedPhraseTapped
 		case changePinTapped
@@ -34,12 +37,15 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Hashable {
 		case integrityUpdated(FactorSourceIntegrity)
+		case signatureNftLoaded(NonFungibleGlobalId)
+		case signatureNftFailed
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
 		enum State: Sendable, Hashable {
 			case rename(RenameLabel.State)
+			case addressDetails(AddressDetails.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case importMnemonic(ImportMnemonicForFactorSource.State)
 			case arculusUpdatePIN(ArculusChangePIN.EnterOldPIN.State)
@@ -49,6 +55,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		@CasePathable
 		enum Action: Sendable, Equatable {
 			case rename(RenameLabel.Action)
+			case addressDetails(AddressDetails.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case importMnemonic(ImportMnemonicForFactorSource.Action)
 			case arculusUpdatePIN(ArculusChangePIN.EnterOldPIN.Action)
@@ -58,6 +65,9 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		var body: some ReducerOf<Self> {
 			Scope(state: \.rename, action: \.rename) {
 				RenameLabel()
+			}
+			Scope(state: \.addressDetails, action: \.addressDetails) {
+				AddressDetails()
 			}
 			Scope(state: \.displayMnemonic, action: \.displayMnemonic) {
 				DisplayMnemonic()
@@ -91,6 +101,24 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 			state.destination = .rename(.init(kind: .factorSource(state.factorSource, name: state.name)))
 			return .none
 
+		case .signatureNftTapped:
+			guard !state.isFetchingSignatureNft else {
+				return .none
+			}
+			state.isFetchingSignatureNft = true
+			let factorSource = state.factorSource.asGeneral
+			return .run { send in
+				let mfaFactorInstance = try await SargonOs.shared.getNewMfaFactorInstance(factorSource: factorSource)
+				let globalId = switch mfaFactorInstance.factorInstance.badge {
+				case let .virtual(.hierarchicalDeterministic(key)):
+					try key.nonFungibleGlobalId()
+				}
+				await send(.internal(.signatureNftLoaded(globalId)))
+			} catch: { err, send in
+				await send(.internal(.signatureNftFailed))
+				errorQueue.schedule(err)
+			}
+
 		case .viewSeedPhraseTapped:
 			return exportMnemonic(integrity: state.integrity) {
 				state.destination = .displayMnemonic(.init(mnemonic: $0.mnemonicWithPassphrase.mnemonic, factorSourceID: $0.factorSourceID))
@@ -123,6 +151,15 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .integrityUpdated(factorSourceIntegrity):
 			state.integrity = factorSourceIntegrity
+			return .none
+
+		case let .signatureNftLoaded(globalId):
+			state.isFetchingSignatureNft = false
+			state.destination = .addressDetails(.init(address: .nonFungibleGlobalID(globalId)))
+			return .none
+
+		case .signatureNftFailed:
+			state.isFetchingSignatureNft = false
 			return .none
 		}
 	}

@@ -2,11 +2,6 @@
 struct AppEventsClient: Sendable {
 	var handleEvent: HandleEvent
 	var events: Events
-
-	init(handleEvent: @escaping HandleEvent, events: @escaping Events) {
-		self.handleEvent = handleEvent
-		self.events = events
-	}
 }
 
 // MARK: AppEventsClient.HandleEvent
@@ -27,6 +22,5 @@ enum AppEvent: Sendable, Hashable {
 	case appStarted
 	case walletCreated
 	case walletRestored
-	case deferredDeepLinkReceived(String)
 	case walletDidReset
 }

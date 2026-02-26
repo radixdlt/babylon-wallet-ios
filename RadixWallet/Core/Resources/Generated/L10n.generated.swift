@@ -2278,6 +2278,10 @@ internal enum L10n {
       internal static let manage = L10n.tr("Localizable", "factorSources_detail_manage", fallback: "Manage Factor")
       /// Rename this factor
       internal static let rename = L10n.tr("Localizable", "factorSources_detail_rename", fallback: "Rename this factor")
+      /// Derive a new public key for configuring authentication rules
+      internal static let mfaSignatureResourceSubtitle = L10n.tr("Localizable", "factorSources_detail_mfaSignatureResourceSubtitle", fallback: "Derive a new public key for configuring authentication rules")
+      /// MFA Signature Resource
+      internal static let mfaSignatureResourceTitle = L10n.tr("Localizable", "factorSources_detail_mfaSignatureResourceTitle", fallback: "MFA Signature Resource")
       /// Seed Phrase Lost
       internal static let seedPhraseLost = L10n.tr("Localizable", "factorSources_detail_seedPhraseLost", fallback: "Seed Phrase Lost")
       /// Spot Check

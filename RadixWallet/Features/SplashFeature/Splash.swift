@@ -69,8 +69,6 @@ struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.errorQueue) var errorQueue
 
-	init() {}
-
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(destinationPath, action: /Action.destination) {
@@ -216,14 +214,7 @@ struct Splash: Sendable, FeatureReducer {
 			do {
 				try await SargonOS.creatingShared(
 					bootingWith: .creatingShared(
-						drivers: .init(
-							bundle: Bundle.main,
-							userDefaultsSuite: UserDefaults.Dependency.radixSuiteName,
-							unsafeStorageKeyMapping: .sargonOSMapping,
-							secureStorageDriver: SargonSecureStorage(),
-							arculuCSDKDriver: ArculusCSDKDriver(),
-							nftTagDriver: NFCSessionClient()
-						)
+						drivers: SargonDriversFactory.make()
 					),
 					hostInteractor: SargonHostInteractor()
 				)

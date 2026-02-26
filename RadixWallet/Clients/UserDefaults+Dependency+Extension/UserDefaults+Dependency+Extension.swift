@@ -7,8 +7,6 @@ enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
 	case epochForWhenLastUsedByAccountAddress
 	case transactionsCompletedCounter
-	case dateOfLastSubmittedNPSSurvey
-	case npsSurveyUserID
 	case migratedKeychainProfiles
 	case lastCloudBackups
 	case lastManualBackups
@@ -133,22 +131,6 @@ extension UserDefaults.Dependency {
 
 	func transactionsCompletedCounterValues() -> AsyncStream<Int?> {
 		integerValues(forKey: Key.transactionsCompletedCounter.rawValue)
-	}
-
-	func getDateOfLastSubmittedNPSSurvey() -> Date? {
-		date(forKey: Key.dateOfLastSubmittedNPSSurvey.rawValue)
-	}
-
-	func setDateOfLastSubmittedNPSSurvey(_ date: Date) {
-		set(date, forKey: Key.dateOfLastSubmittedNPSSurvey.rawValue)
-	}
-
-	func getNPSSurveyUserId() -> UUID? {
-		string(forKey: Key.npsSurveyUserID.rawValue).flatMap(UUID.init(uuidString:))
-	}
-
-	func setNPSSurveyUserId(_ id: UUID) {
-		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
 	}
 
 	var getMigratedKeychainProfiles: Set<ProfileID> {

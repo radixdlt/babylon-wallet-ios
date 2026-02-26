@@ -35,7 +35,8 @@ extension PreAuthorizationClient: DependencyKey {
 				intentDiscriminator: request.intentDiscriminator,
 				subintentManifest: request.manifest,
 				expiration: request.expiration,
-				message: request.message
+				message: request.message,
+				header: request.header
 			)
 		}
 

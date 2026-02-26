@@ -493,7 +493,7 @@ extension DappInteractionFlow {
 			let proofs = accountProofs.map(WalletToDappInteractionProofOfOwnership.account)
 			let challenge = signedAuthIntent.intent.challengeNonce
 
-			// A predicate that checks if a given response item matches the challenge.
+			/// A predicate that checks if a given response item matches the challenge.
 			func isMatchingChallenge(_ item: State.AnyInteractionResponseItem) -> Bool {
 				if case let .remote(.proofOfOwnership(response)) = item {
 					return response.challenge == challenge
@@ -765,7 +765,7 @@ extension DappInteractionFlow {
 				state.root = destination
 			} else if state.path.last != destination {
 				return .run { send in
-					/// For more information about that `sleep` and not setting it directly here please check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
+					// For more information about that `sleep` and not setting it directly here please check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
 					try? await clock.sleep(for: .milliseconds(250))
 					await send(.internal(.delayedAppendToPath(destination)))
 				}
@@ -1062,7 +1062,8 @@ extension DappInteractionFlow.Path.State {
 				dAppMetadata: dappMetadata,
 				message: item.message.map {
 					Message.plaintext(string: $0)
-				} ?? Message.none
+				} ?? Message.none,
+				header: item.header
 			))
 		}
 	}

@@ -21,8 +21,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		@PresentationState
 		var destination: Destination.State?
-
-		fileprivate var shouldIncrementNPSCounterOnCompletionDismiss = false
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -104,7 +102,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
-	@Dependency(\.npsSurveyClient) var npsSurveyClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -121,23 +118,20 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return handleIncomingRequests()
+			handleIncomingRequests()
 
 		case .moveToBackground:
-			return .run { _ in
+			.run { _ in
 				await radixConnectClient.disconnectAll()
 			}
 
 		case .moveToForeground:
-			return .run { _ in
+			.run { _ in
 				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 			}
 
 		case .completionDismissed:
-			if state.shouldIncrementNPSCounterOnCompletionDismiss {
-				npsSurveyClient.incrementTransactionCompleteCounter()
-			}
-			return .none
+			.none
 		}
 	}
 
@@ -219,7 +213,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 
 		case let .presentResponseSuccessView(dappMetadata, kind, p2pRoute):
-			state.shouldIncrementNPSCounterOnCompletionDismiss = kind.shouldIncrementNPSCounterOnCompletionDismiss
 			if !state.requestQueue.isEmpty {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
@@ -546,17 +539,6 @@ extension DappInteractor {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
-		}
-	}
-}
-
-private extension DappInteractionCompletionKind {
-	var shouldIncrementNPSCounterOnCompletionDismiss: Bool {
-		switch self {
-		case .transaction:
-			true
-		case .personaData:
-			false
 		}
 	}
 }

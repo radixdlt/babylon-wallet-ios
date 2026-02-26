@@ -6,7 +6,6 @@ import SwiftUI
 // MARK: - AppDelegate
 final class AppDelegate: NSObject, UIApplicationDelegate {
 	@Dependency(\.bootstrapClient) var bootstrapClient
-	@Dependency(\.appsFlyerClient) var appsFlyerClient
 	@Dependency(\.userDefaults) var userDefaults
 
 	func application(
@@ -23,11 +22,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 		configureFirebase()
 		bootstrapClient.bootstrap()
 		Crashlytics.crashlytics().log("Clients bootstrapped")
-		return true
-	}
-
-	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([any UIUserActivityRestoring]?) -> Void) -> Bool {
-		appsFlyerClient.continue(userActivity)
 		return true
 	}
 

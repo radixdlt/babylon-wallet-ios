@@ -27,6 +27,7 @@ extension FactorSourceDetail {
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
 					deviceSeedPhraseRow(device),
+					signatureNftRow(),
 					// .header(L10n.FactorSources.Detail.test),
 					// spotCheckRow(viewStore),
 				]
@@ -34,6 +35,7 @@ extension FactorSourceDetail {
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
+					signatureNftRow(),
 					//					.header(L10n.FactorSources.Detail.test),
 					//					spotCheckRow(viewStore),
 				]
@@ -43,15 +45,18 @@ extension FactorSourceDetail {
 					renameRow(),
 					changePinRow(),
 					forgotPinRow(),
+					signatureNftRow(),
 				]
 			case .offDeviceMnemonic:
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
+					signatureNftRow(),
 				]
 			default:
 				[
 					.header(L10n.FactorSources.Detail.manage),
+					signatureNftRow(),
 				]
 			}
 		}
@@ -62,6 +67,15 @@ extension FactorSourceDetail {
 				subtitle: L10n.FactorSources.Detail.rename,
 				icon: .asset(.create),
 				action: .renameTapped
+			)
+		}
+
+		private func signatureNftRow() -> SettingsRow<FactorSourceDetail>.Kind {
+			.model(
+				title: L10n.FactorSources.Detail.mfaSignatureResourceTitle,
+				subtitle: L10n.FactorSources.Detail.mfaSignatureResourceSubtitle,
+				icon: .asset(.signingKey),
+				action: .signatureNftTapped
 			)
 		}
 
@@ -130,6 +144,7 @@ private extension View {
 	func destination(store: StoreOf<FactorSourceDetail>) -> some View {
 		let destinationStore = store.destination
 		return rename(with: destinationStore)
+			.addressDetails(with: destinationStore)
 			.displayMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.arculusChangePIN(with: destinationStore)
@@ -146,6 +161,12 @@ private extension View {
 	private func displayMnemonic(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.displayMnemonic, action: \.displayMnemonic)) {
 			DisplayMnemonic.View(store: $0)
+		}
+	}
+
+	private func addressDetails(with destinationStore: PresentationStoreOf<FactorSourceDetail.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addressDetails, action: \.addressDetails)) {
+			AddressDetails.View(store: $0)
 		}
 	}
 
