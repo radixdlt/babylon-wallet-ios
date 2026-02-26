@@ -94,21 +94,14 @@ private extension StoreOf<RelayServicesSettings> {
 }
 
 @MainActor
-private extension RelayServicesSettings.View {
+private extension View {
 	func destinations(with store: StoreOf<RelayServicesSettings>) -> some View {
 		let destinationStore = store.destination
-		return addRelayService(with: destinationStore)
-			.removeRelayService(with: destinationStore)
-	}
-
-	private func addRelayService(with destinationStore: PresentationStoreOf<RelayServicesSettings.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.addNewService, action: \.addNewService)) {
-			AddNewRelayService.View(store: $0)
-		}
-	}
-
-	private func removeRelayService(with destinationStore: PresentationStoreOf<RelayServicesSettings.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.removeService, action: \.removeService))
+		return self
+			.sheet(store: destinationStore.scope(state: \.addNewService, action: \.addNewService)) {
+				AddNewRelayService.View(store: $0)
+			}
+			.alert(store: destinationStore.scope(state: \.removeService, action: \.removeService))
 	}
 }
 

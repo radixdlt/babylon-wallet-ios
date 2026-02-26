@@ -5,7 +5,7 @@ import WebRTC
 protocol PeerConnectionFactory: Sendable {
 	func makePeerConnectionClient(
 		for clientId: RemoteClientID,
-		using iceServers: [P2PIceServer]
+		using transportProfile: P2PTransportProfile
 	) throws -> PeerConnectionClient
 }
 
@@ -139,7 +139,7 @@ extension PeerConnectionNegotiator {
 		log("Triggered")
 		let peerConnectionClient = try factory.makePeerConnectionClient(
 			for: clientID,
-			using: p2pTransportProfile.iceServers
+			using: p2pTransportProfile
 		)
 
 		let onLocalIceCandidate = peerConnectionClient
@@ -164,14 +164,14 @@ extension PeerConnectionNegotiator {
 		let onConnectionEstablished = peerConnectionClient
 			.iceConnectionStates
 			.filter {
-				$0 == .connected
+				$0 == ICEConnectionState.connected
 			}
 			.prefix(1)
 
 		let onDataChannelReady = peerConnectionClient
 			.dataChannelReadyStates
 			.filter {
-				$0 == .connected
+				$0 == DataChannelReadyState.connected
 			}
 			.prefix(1)
 

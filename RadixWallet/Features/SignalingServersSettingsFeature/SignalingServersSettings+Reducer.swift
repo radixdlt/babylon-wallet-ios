@@ -7,8 +7,8 @@ struct SignalingServersSettings: Sendable, FeatureReducer {
 	@ObservableState
 	struct State: Sendable, Hashable {
 		struct Row: Sendable, Hashable, Identifiable {
-			typealias ID = URL
-			var id: URL {
+			typealias ID = String
+			var id: String {
 				profile.signalingServer
 			}
 
@@ -28,8 +28,8 @@ struct SignalingServersSettings: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case task
 		case addProfileButtonTapped
-		case rowTapped(URL)
-		case rowRemoveTapped(URL)
+		case rowTapped(String)
+		case rowRemoveTapped(String)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -51,7 +51,7 @@ struct SignalingServersSettings: Sendable, FeatureReducer {
 			case removeProfile(RemoveProfileAlert)
 
 			enum RemoveProfileAlert: Sendable, Hashable {
-				case removeButtonTapped(URL)
+				case removeButtonTapped(String)
 				case cancelButtonTapped
 			}
 		}
@@ -118,7 +118,7 @@ struct SignalingServersSettings: Sendable, FeatureReducer {
 				if lhsName != rhsName {
 					return lhsName < rhsName
 				}
-				return lhs.signalingServer.absoluteString < rhs.signalingServer.absoluteString
+				return lhs.signalingServer < rhs.signalingServer
 			}
 
 			state.rows = .init(uniqueElements: sorted.map { profile in
@@ -192,7 +192,7 @@ struct SignalingServersSettings: Sendable, FeatureReducer {
 }
 
 extension AlertState<SignalingServersSettings.Destination.Action.RemoveProfileAlert> {
-	static func removeProfile(id: URL) -> AlertState {
+	static func removeProfile(id: String) -> AlertState {
 		AlertState {
 			TextState("Remove signaling server?")
 		} actions: {
@@ -299,16 +299,21 @@ struct AddNewSignalingServer: Sendable, FeatureReducer {
 
 			let username = optionalString(state.username)
 			let credential = optionalString(state.credential)
-			let iceServers: [P2PIceServer] = if urls.isEmpty {
-				[]
+			let stunURLs = urls.filter { $0.lowercased().hasPrefix("stun:") }
+			let turnURLs = urls.filter { $0.lowercased().hasPrefix("turn:") }
+			let fallbackStunURLs = if stunURLs.isEmpty, turnURLs.isEmpty {
+				urls
 			} else {
-				[.init(urls: urls, username: username, credential: credential)]
+				stunURLs
 			}
+			let stun = P2PStunServer(urls: fallbackStunURLs)
+			let turn = P2PTurnServer(urls: turnURLs, username: username, credential: credential)
 
 			let newProfile = P2PTransportProfile(
 				name: trimmedName,
-				signalingServer: signalingFfiUrl.url,
-				iceServers: iceServers
+				signalingServer: signalingFfiUrl.url.absoluteString,
+				stun: stun,
+				turn: turn
 			)
 
 			return .run { send in

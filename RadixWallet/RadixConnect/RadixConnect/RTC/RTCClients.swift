@@ -226,7 +226,7 @@ extension RTCClients {
 		let p2pTransportProfile = await p2pTransportProfileProvider()
 		let signalingClient = try SignalingClient(
 			password: p2pLink.connectionPassword,
-			baseURL: p2pTransportProfile.signalingServer
+			baseURL: .init(string: p2pTransportProfile.signalingServer)!
 		)
 		let negotiator = PeerConnectionNegotiator(
 			p2pLink: p2pLink,

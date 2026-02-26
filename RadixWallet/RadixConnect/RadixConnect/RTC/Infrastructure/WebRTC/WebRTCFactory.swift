@@ -16,19 +16,39 @@ struct WebRTCFactory: PeerConnectionFactory {
 	}()
 
 	static func peerConnectionConfig(
-		iceServers: [P2PIceServer]
+		transportProfile: P2PTransportProfile
 	) -> RTCConfiguration {
 		let config = RTCConfiguration()
 		config.sdpSemantics = .unifiedPlan
 		config.continualGatheringPolicy = .gatherContinually
-		config.iceServers = iceServers.map {
-			RTCIceServer(
-				urlStrings: $0.urls,
-				username: $0.username,
-				credential: $0.credential,
-				tlsCertPolicy: .insecureNoCheck
-			)
+
+		let stunIceServers: [RTCIceServer] = if transportProfile.stun.urls.isEmpty {
+			[]
+		} else {
+			[
+				RTCIceServer(
+					urlStrings: transportProfile.stun.urls,
+					username: nil,
+					credential: nil,
+					tlsCertPolicy: .insecureNoCheck
+				),
+			]
 		}
+
+		let turnIceServers: [RTCIceServer] = if transportProfile.turn.urls.isEmpty {
+			[]
+		} else {
+			[
+				RTCIceServer(
+					urlStrings: transportProfile.turn.urls,
+					username: transportProfile.turn.username,
+					credential: transportProfile.turn.credential,
+					tlsCertPolicy: .insecureNoCheck
+				),
+			]
+		}
+
+		config.iceServers = stunIceServers + turnIceServers
 
 		return config
 	}
@@ -52,11 +72,11 @@ struct WebRTCFactory: PeerConnectionFactory {
 
 	func makePeerConnectionClient(
 		for clientId: RemoteClientID,
-		using iceServers: [P2PIceServer]
+		using transportProfile: P2PTransportProfile
 	) throws -> PeerConnectionClient {
 		let delegate = RTCPeerConnectionAsyncDelegate()
 		guard let peerConnection = Self.factory.peerConnection(
-			with: Self.peerConnectionConfig(iceServers: iceServers),
+			with: Self.peerConnectionConfig(transportProfile: transportProfile),
 			constraints: Self.peerConnectionConstraints,
 			delegate: delegate
 		) else {

@@ -48,7 +48,7 @@ extension P2PTransportProfilesClient: DependencyKey {
 			hasProfileWithSignalingServerURL: { url in
 				await appPreferencesClient
 					.getPreferences()
-					.hasP2PTransportProfile(withSignalingServerURL: url)
+					.hasP2PTransportProfile(withSignalingServer: url.url.absoluteString)
 			}
 		)
 	}

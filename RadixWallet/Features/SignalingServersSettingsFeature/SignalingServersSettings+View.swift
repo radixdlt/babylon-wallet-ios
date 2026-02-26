@@ -5,7 +5,7 @@ extension SignalingServersSettings.State.Row {
 	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(
 			title: profile.name,
-			detail: profile.signalingServer.absoluteString
+			detail: profile.signalingServer
 		)
 	}
 }
@@ -97,18 +97,11 @@ private extension StoreOf<SignalingServersSettings> {
 private extension View {
 	func destinations(with store: StoreOf<SignalingServersSettings>) -> some View {
 		let destinationStore = store.destination
-		return addSignalingServer(with: destinationStore)
-			.removeSignalingServer(with: destinationStore)
-	}
-
-	private func addSignalingServer(with destinationStore: PresentationStoreOf<SignalingServersSettings.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.addNewProfile, action: \.addNewProfile)) {
-			AddNewSignalingServer.View(store: $0)
-		}
-	}
-
-	private func removeSignalingServer(with destinationStore: PresentationStoreOf<SignalingServersSettings.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.removeProfile, action: \.removeProfile))
+		return self
+			.sheet(store: destinationStore.scope(state: \.addNewProfile, action: \.addNewProfile)) {
+				AddNewSignalingServer.View(store: $0)
+			}
+			.alert(store: destinationStore.scope(state: \.removeProfile, action: \.removeProfile))
 	}
 }
 
