@@ -11,6 +11,27 @@ The Radix Wallet can be downloaded from [the App Store][appStoreLink] (requires 
 ### Getting Started
 Head over to [wallet.radixdlt.com][walletGuide] for guide on getting started using the Radix Wallet.
 
+### Build Variants (Normal vs Light)
+
+This repository includes two iOS project variants:
+
+- **Normal**: `RadixWallet.xcodeproj`
+- **Light**: `RadixWalletLight.xcodeproj`
+
+Each variant has the same environment scheme set, where the Light variant adds the `Light` suffix:
+
+- `Dev`: `Radix Wallet Dev` / `Radix Wallet Dev Light`
+- `Alpha`: `Radix Wallet Alpha` / `Radix Wallet Alpha Light`
+- `Pre-Alpha`: `Radix Wallet Pre-Alpha` / `Radix Wallet Pre-Alpha Light`
+- `Beta`: `Radix Wallet Beta` / `Radix Wallet Beta Light`
+- `PROD`: `Radix Wallet PROD` / `Radix Wallet PROD Light`
+
+How to use:
+
+1. Open the project matching your variant (`RadixWallet.xcodeproj` or `RadixWalletLight.xcodeproj`).
+2. Select the matching scheme for your environment.
+3. Build and run from Xcode as usual.
+
 ### Screenshots
 
 <p float="middle">
@@ -49,5 +70,4 @@ The iOS Radix Wallet code is released under the [Apache 2.0 license](./LICENSE).
 [radixdlt]: https://radixdlt.com
 [appStoreLink]: https://apps.apple.com/se/app/radix-wallet/id6448950995
 [walletGuide]: https://wallet.radixdlt.com
-
 
