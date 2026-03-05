@@ -62,6 +62,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying AsyncSequence of distinct signaling server profiles.
+	func p2pTransportProfilesValues() -> AnyAsyncSequence<SavedP2PTransportProfiles> {
+		_lens {
+			$0.appPreferences.p2pTransportProfiles
+		}
+	}
+
 	/// A multicasting replaying AsyncSequence of distinct AuthorizedDapp for the currently selected network.
 	func authorizedDappValues() -> AnyAsyncSequence<AuthorizedDapps> {
 		_lens {
@@ -70,15 +77,15 @@ extension ProfileStore {
 	}
 
 	@_disfavoredOverload
-	private func lens<Property>(
+	private func lens<Property: Sendable & Equatable>(
 		_ keyPath: KeyPath<Profile, Property?>
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+	) -> AnyAsyncSequence<Property> {
 		_lens { $0[keyPath: keyPath] }
 	}
 
-	private func lens<Property>(
+	private func lens<Property: Sendable & Equatable>(
 		_ keyPath: KeyPath<Profile, Property>
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+	) -> AnyAsyncSequence<Property> {
 		_lens { $0[keyPath: keyPath] }
 	}
 }

@@ -1,11 +1,12 @@
 import Sargon
 
 // MARK: - P2PTransportProfilesClient
-struct P2PTransportProfilesClient: Sendable {
+struct P2PTransportProfilesClient {
 	var p2pTransportProfilesValues: P2PTransportProfilesValues
+	var getProfiles: GetProfiles
 	var getCurrentProfile: GetCurrentProfile
-	var getAllProfiles: GetAllProfiles
 	var addProfile: AddProfile
+	var updateProfile: UpdateProfile
 	var removeProfile: RemoveProfile
 	var changeProfile: ChangeProfile
 	var hasProfileWithSignalingServerURL: HasProfileWithSignalingServerURL
@@ -13,12 +14,13 @@ struct P2PTransportProfilesClient: Sendable {
 
 extension P2PTransportProfilesClient {
 	typealias P2PTransportProfilesValues = @Sendable () async -> AnyAsyncSequence<SavedP2PTransportProfiles>
-	typealias GetCurrentProfile = @Sendable () async -> P2PTransportProfile
-	typealias GetAllProfiles = @Sendable () async -> [P2PTransportProfile]
-	typealias AddProfile = @Sendable (P2PTransportProfile) async throws -> Void
-	typealias RemoveProfile = @Sendable (P2PTransportProfile) async throws -> Void
-	typealias ChangeProfile = @Sendable (P2PTransportProfile) async throws -> Void
-	typealias HasProfileWithSignalingServerURL = @Sendable (FfiUrl) async -> Bool
+	typealias GetProfiles = @Sendable () async throws -> SavedP2PTransportProfiles
+	typealias GetCurrentProfile = @Sendable () async throws -> P2PTransportProfile
+	typealias AddProfile = @Sendable (P2PTransportProfile) async throws -> Bool
+	typealias UpdateProfile = @Sendable (P2PTransportProfile) async throws -> Bool
+	typealias RemoveProfile = @Sendable (P2PTransportProfile) async throws -> Bool
+	typealias ChangeProfile = @Sendable (P2PTransportProfile) async throws -> Bool
+	typealias HasProfileWithSignalingServerURL = @Sendable (String) async throws -> Bool
 }
 
 extension DependencyValues {

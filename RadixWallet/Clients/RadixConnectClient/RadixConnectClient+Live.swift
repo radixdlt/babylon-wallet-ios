@@ -13,7 +13,7 @@ extension RadixConnectClient {
 
 		let rtcClients = RTCClients(
 			p2pTransportProfileProvider: {
-				await p2pTransportProfilesClient.getCurrentProfile()
+				await (try? p2pTransportProfilesClient.getCurrentProfile()) ?? SavedP2PTransportProfiles.default.current
 			}
 		)
 		let radixConnectMobile = RadixConnectMobile()

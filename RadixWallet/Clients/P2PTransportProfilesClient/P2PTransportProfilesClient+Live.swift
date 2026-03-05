@@ -7,48 +7,33 @@ extension P2PTransportProfilesClient: DependencyKey {
 	static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
-		@Dependency(\.appPreferencesClient) var appPreferencesClient
-
-		return Self(
+		Self(
 			p2pTransportProfilesValues: {
-				await profileStore.appPreferencesValues()
-					.map(\.p2pTransportProfiles)
-					.eraseToAnyAsyncSequence()
+				await profileStore.p2pTransportProfilesValues()
+			},
+			getProfiles: {
+				try SargonOs.shared.p2pTransportProfiles()
 			},
 			getCurrentProfile: {
-				await appPreferencesClient.getPreferences().p2pTransportProfiles.current
-			},
-			getAllProfiles: {
-				await appPreferencesClient.getPreferences().p2pTransportProfiles.all
+				try SargonOs.shared.p2pTransportProfiles().current
 			},
 			addProfile: { profile in
-				try await appPreferencesClient.updating { appPreferences in
-					var profiles = appPreferences.p2pTransportProfiles
-					let inserted = profiles.append(profile)
-					guard inserted else { return }
-					appPreferences.p2pTransportProfiles = profiles
-				}
+				try await SargonOs.shared.addP2pTransportProfile(profile: profile)
+			},
+			updateProfile: { profile in
+				try await SargonOs.shared.updateP2pTransportProfile(updated: profile)
 			},
 			removeProfile: { profile in
-				try await appPreferencesClient.updating { appPreferences in
-					var profiles = appPreferences.p2pTransportProfiles
-					let removed = profiles.remove(profile)
-					guard removed else { return }
-					appPreferences.p2pTransportProfiles = profiles
-				}
+				try await SargonOs.shared.deleteP2pTransportProfile(profile: profile)
 			},
 			changeProfile: { profile in
-				try await appPreferencesClient.updating { appPreferences in
-					var profiles = appPreferences.p2pTransportProfiles
-					let changed = profiles.changeCurrent(to: profile)
-					guard changed else { return }
-					appPreferences.p2pTransportProfiles = profiles
-				}
+				try await SargonOs.shared.changeCurrentP2pTransportProfile(to: profile)
 			},
-			hasProfileWithSignalingServerURL: { url in
-				await appPreferencesClient
-					.getPreferences()
-					.hasP2PTransportProfile(withSignalingServer: url.url.absoluteString)
+			hasProfileWithSignalingServerURL: { signalingServerURL in
+				try SargonOs.shared
+					.p2pTransportProfiles()
+					.all
+					.contains(where: { $0.signalingServer == signalingServerURL })
 			}
 		)
 	}
