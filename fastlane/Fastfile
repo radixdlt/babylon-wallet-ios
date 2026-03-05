@@ -1,4 +1,6 @@
 fastlane_require 'dotenv'
+require 'shellwords'
+require 'tmpdir'
 default_platform(:ios)
 
 before_all do
@@ -53,7 +55,7 @@ platform :ios do
             initial_build_number: 0
         ) + 1
 
-        increment_build_number(
+        increment_build_number_with_isolated_project(
             xcodeproj: ENV['PROJ_PATH'],
             build_number: build_number
         )
@@ -170,6 +172,22 @@ def exist_at_path?(filePath)
     puts "🤷‍♂️ Found no file or dir at '#{filePath}'\n"
 
     false
+end
+
+def increment_build_number_with_isolated_project(xcodeproj:, build_number:)
+    repo_root = File.expand_path("..", __dir__)
+    project_path = File.expand_path(xcodeproj, repo_root)
+
+    UI.user_error!("Xcode project not found at '#{project_path}'") unless File.directory?(project_path)
+
+    Dir.mktmpdir("agvtool-single-project-") do |tmp_dir|
+        isolated_project_path = File.join(tmp_dir, File.basename(project_path))
+
+        sh("ln -s #{Shellwords.escape(project_path)} #{Shellwords.escape(isolated_project_path)}")
+        Dir.chdir(tmp_dir) do
+            sh("agvtool new-version -all #{build_number}")
+        end
+    end
 end
 
 private_lane :locate_dsym do |options|
