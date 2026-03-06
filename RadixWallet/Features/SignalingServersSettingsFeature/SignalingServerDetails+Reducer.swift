@@ -224,11 +224,7 @@ struct SignalingServerDetails: FeatureReducer {
 				}
 
 				let result = await TaskResult {
-					if isEditMode {
-						try await p2pTransportProfilesClient.updateProfile(profile)
-					} else {
-						try await p2pTransportProfilesClient.addProfile(profile)
-					}
+					isEditMode ? try await p2pTransportProfilesClient.updateProfile(profile) : try await p2pTransportProfilesClient.addProfile(profile)
 				}
 				await send(.internal(.saveResult(result)))
 			}
