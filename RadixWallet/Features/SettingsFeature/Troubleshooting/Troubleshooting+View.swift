@@ -75,7 +75,7 @@ extension Troubleshooting.View {
 			.model(
 				title: L10n.Troubleshooting.ContactSupport.title,
 				subtitle: L10n.Troubleshooting.ContactSupport.subtitle,
-				icon: .systemImage("envelope"),
+				icon: .systemImage("paperplane"),
 				accessory: .iconLinkOut,
 				action: .contactSupportButtonTapped
 			),

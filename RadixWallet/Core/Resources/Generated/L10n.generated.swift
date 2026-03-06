@@ -2022,12 +2022,12 @@ internal enum L10n {
     }
   }
   internal enum Error {
-    /// Email Support
-    internal static let emailSupportButtonTitle = L10n.tr("Localizable", "error_emailSupportButtonTitle", fallback: "Email Support")
-    /// Please email support to automatically provide debugging info, and get assistance.
+    /// Reference Code
+    internal static let emailSupportButtonTitle = L10n.tr("Localizable", "error_emailSupportButtonTitle", fallback: "Reference Code")
+    /// Keep this code for support reference.
     /// Code: %@
     internal static func emailSupportMessage(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "error_emailSupportMessage", String(describing: p1), fallback: "Please email support to automatically provide debugging info, and get assistance.\nCode: %@")
+      return L10n.tr("Localizable", "error_emailSupportMessage", String(describing: p1), fallback: "Keep this code for support reference.\nCode: %@")
     }
     /// Unknown Arculus Card
     internal static let unknownArculusCard = L10n.tr("Localizable", "error_unknownArculusCard", fallback: "Unknown Arculus Card")
@@ -2554,8 +2554,8 @@ internal enum L10n {
       internal static func okCountdown(_ p1: Int) -> String {
         return L10n.tr("Localizable", "homePage_profileOlympiaError_okCountdown", p1, fallback: "OK (%d)")
       }
-      /// Your wallet is in a rare condition that must be resolved manually. Please email support at hello@radixdlt.com with subject line BDFS ERROR. Somebody will respond and help you resolve the issue safely.
-      internal static let subtitle = L10n.tr("Localizable", "homePage_profileOlympiaError_subtitle", fallback: "Your wallet is in a rare condition that must be resolved manually. Please email support at hello@radixdlt.com with subject line BDFS ERROR. Somebody will respond and help you resolve the issue safely.")
+      /// Your wallet is in a rare condition that must be resolved manually. Please visit the Radix Telegram channel and mention BDFS ERROR so the team can help you resolve the issue safely.
+      internal static let subtitle = L10n.tr("Localizable", "homePage_profileOlympiaError_subtitle", fallback: "Your wallet is in a rare condition that must be resolved manually. Please visit the Radix Telegram channel and mention BDFS ERROR so the team can help you resolve the issue safely.")
       /// SERIOUS ERROR - PLEASE READ
       internal static let title = L10n.tr("Localizable", "homePage_profileOlympiaError_title", fallback: "SERIOUS ERROR - PLEASE READ")
     }
@@ -2568,8 +2568,8 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "homePage_radixBanner_title", fallback: "Start Using Radix")
     }
     internal enum SecureFolder {
-      /// Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the "Secure Folder". Please contact support at hello@radixdlt.com for assistance.
-      internal static let warning = L10n.tr("Localizable", "homePage_secureFolder_warning", fallback: "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please contact support at hello@radixdlt.com for assistance.")
+      /// Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the "Secure Folder". Please visit the Radix Telegram channel for assistance.
+      internal static let warning = L10n.tr("Localizable", "homePage_secureFolder_warning", fallback: "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please visit the Radix Telegram channel for assistance.")
     }
     internal enum Tab {
       /// dApps
@@ -5352,10 +5352,10 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "troubleshooting_accountScan_title", fallback: "Account Recovery Scan")
     }
     internal enum ContactSupport {
-      /// Connect directly with the Radix support team
-      internal static let subtitle = L10n.tr("Localizable", "troubleshooting_contactSupport_subtitle", fallback: "Connect directly with the Radix support team")
-      /// Contact Support
-      internal static let title = L10n.tr("Localizable", "troubleshooting_contactSupport_title", fallback: "Contact Support")
+      /// Open the official Radix Telegram channel
+      internal static let subtitle = L10n.tr("Localizable", "troubleshooting_contactSupport_subtitle", fallback: "Open the official Radix Telegram channel")
+      /// Open Telegram
+      internal static let title = L10n.tr("Localizable", "troubleshooting_contactSupport_title", fallback: "Open Telegram")
     }
     internal enum FactoryReset {
       /// Restore your Radix wallet to its original state
@@ -5412,8 +5412,8 @@ internal enum L10n {
       internal static let title = L10n.tr("Localizable", "walletSettings_securityCenter_title", fallback: "Security Center")
     }
     internal enum Troubleshooting {
-      /// Add your existing Accounts and contact support
-      internal static let subtitle = L10n.tr("Localizable", "walletSettings_troubleshooting_subtitle", fallback: "Add your existing Accounts and contact support")
+      /// Add your existing Accounts and find support resources
+      internal static let subtitle = L10n.tr("Localizable", "walletSettings_troubleshooting_subtitle", fallback: "Add your existing Accounts and find support resources")
       /// Troubleshooting
       internal static let title = L10n.tr("Localizable", "walletSettings_troubleshooting_title", fallback: "Troubleshooting")
     }
