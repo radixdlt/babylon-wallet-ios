@@ -29,7 +29,9 @@ platform :ios do
     desc "Runs test"
     lane :tests do
         Dotenv.load ".env.ios.dev"
-        run_tests
+        run_tests(
+            project: ENV["PROJ_PATH"] || ENV["XCODE_PROJECT"] || "./RadixWallet.xcodeproj"
+        )
     end
 
     desc "Creates GoogleService-Info.plist if it doesn't exist"
