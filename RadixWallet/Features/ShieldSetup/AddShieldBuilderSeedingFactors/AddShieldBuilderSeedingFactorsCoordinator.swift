@@ -1,9 +1,9 @@
 // MARK: - AddShieldBuilderSeedingFactors.Coordinator
 extension AddShieldBuilderSeedingFactors {
 	@Reducer
-	struct Coordinator: Sendable, FeatureReducer {
+	struct Coordinator: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			var path: Path.State
 
 			@Presents
@@ -19,30 +19,30 @@ extension AddShieldBuilderSeedingFactors {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case introButtonTapped
 			case completionButtonTapped
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case path(Path.Action)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case finished(shouldSkipAutomaticShield: Bool)
 			case push(Path.State)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case addFactorSource(AddFactorSource.Coordinator.State)
 				case todo
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Equatable {
 				case addFactorSource(AddFactorSource.Coordinator.Action)
 				case todo(Never)
 			}

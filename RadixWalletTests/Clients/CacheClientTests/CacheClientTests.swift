@@ -15,7 +15,7 @@ final class CacheClientTests: TestCase {
 		super.tearDown()
 	}
 
-	func test_saveLoadAndDeleteEntry() async throws {
+	func test_saveLoadAndDeleteEntry() throws {
 		// given
 		guard let dataToBeSaved = URL(string: "https://test.com") else {
 			XCTFail("Could not create URL from string")
@@ -44,7 +44,7 @@ final class CacheClientTests: TestCase {
 		}
 	}
 
-	func test_saveAndLoadExpiredEntry() async throws {
+	func test_saveAndLoadExpiredEntry() throws {
 		// given
 		guard let dataToBeSaved = URL(string: "https://test.com") else {
 			XCTFail("Could not create URL from string")

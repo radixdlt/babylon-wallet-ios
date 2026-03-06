@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - FactorSourcesClient
-struct FactorSourcesClient: Sendable {
+struct FactorSourcesClient {
 	var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
 	var getCurrentNetworkID: GetCurrentNetworkID
 	var getFactorSources: GetFactorSources
@@ -13,32 +13,6 @@ struct FactorSourcesClient: Sendable {
 	var getSigningFactors: GetSigningFactors
 	var updateLastUsed: UpdateLastUsed
 	var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
-
-	init(
-		indicesOfEntitiesControlledByFactorSource: @escaping IndicesOfEntitiesControlledByFactorSource,
-		getCurrentNetworkID: @escaping GetCurrentNetworkID,
-		getFactorSources: @escaping GetFactorSources,
-		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
-		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
-		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
-		saveFactorSource: @escaping SaveFactorSource,
-		updateFactorSource: @escaping UpdateFactorSource,
-		getSigningFactors: @escaping GetSigningFactors,
-		updateLastUsed: @escaping UpdateLastUsed,
-		flagFactorSourceForDeletion: @escaping FlagFactorSourceForDeletion
-	) {
-		self.indicesOfEntitiesControlledByFactorSource = indicesOfEntitiesControlledByFactorSource
-		self.getCurrentNetworkID = getCurrentNetworkID
-		self.getFactorSources = getFactorSources
-		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
-		self.addPrivateHDFactorSource = addPrivateHDFactorSource
-		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
-		self.saveFactorSource = saveFactorSource
-		self.updateFactorSource = updateFactorSource
-		self.getSigningFactors = getSigningFactors
-		self.updateLastUsed = updateLastUsed
-		self.flagFactorSourceForDeletion = flagFactorSourceForDeletion
-	}
 }
 
 // MARK: - NextEntityIndexForFactorSourceRequest
@@ -57,7 +31,7 @@ struct NextEntityIndexForFactorSourceRequest {
 }
 
 // MARK: - IndicesOfEntitiesControlledByFactorSourceRequest
-struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
+struct IndicesOfEntitiesControlledByFactorSourceRequest: Hashable {
 	let entityKind: EntityKind
 	let factorSourceID: FactorSourceID
 
@@ -69,7 +43,7 @@ struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
 }
 
 // MARK: - IndicesUsedByFactorSource
-struct IndicesUsedByFactorSource: Sendable, Hashable {
+struct IndicesUsedByFactorSource: Hashable {
 	let indices: OrderedSet<HdPathComponent>
 	let factorSource: FactorSource
 	let currentNetworkID: NetworkID
@@ -91,20 +65,11 @@ extension FactorSourcesClient {
 }
 
 // MARK: - AddPrivateHDFactorSourceRequest
-struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
+struct AddPrivateHDFactorSourceRequest: Hashable {
 	let privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource
 	let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	let saveIntoProfile: Bool
-	init(
-		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
-		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
-		saveIntoProfile: Bool
-	) {
-		self.privateHDFactorSource = privateHDFactorSource
-		self.saveIntoProfile = saveIntoProfile
-		self.onMnemonicExistsStrategy = onMnemonicExistsStrategy
-	}
 }
 
 typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
@@ -116,15 +81,10 @@ extension SigningFactors {
 }
 
 // MARK: - GetSigningFactorsRequest
-struct GetSigningFactorsRequest: Sendable, Hashable {
+struct GetSigningFactorsRequest: Hashable {
 	let networkID: NetworkID
 	let signers: NonEmpty<Set<AccountOrPersona>>
 	let signingPurpose: SigningPurpose
-	init(networkID: NetworkID, signers: NonEmpty<Set<AccountOrPersona>>, signingPurpose: SigningPurpose) {
-		self.networkID = networkID
-		self.signers = signers
-		self.signingPurpose = signingPurpose
-	}
 }
 
 extension FactorSourcesClient {
@@ -186,7 +146,7 @@ extension FactorSourcesClient {
 }
 
 // MARK: - UpdateFactorSourceLastUsedRequest
-struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
+struct UpdateFactorSourceLastUsedRequest: Hashable {
 	let factorSourceIDs: [FactorSourceID]
 	let lastUsedOn: Date
 
@@ -204,9 +164,12 @@ struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 }
 
 // MARK: - SigningFactor
-struct SigningFactor: Sendable, Hashable, Identifiable {
+struct SigningFactor: Hashable, Identifiable {
 	typealias ID = FactorSourceID
-	var id: ID { factorSource.id }
+	var id: ID {
+		factorSource.id
+	}
+
 	let factorSource: FactorSource
 	typealias Signers = NonEmpty<IdentifiedArrayOf<Signer>>
 	var signers: Signers
@@ -286,7 +249,7 @@ extension FactorSourcesClient {
 }
 
 // MARK: - OnDeviceMnemonicKind
-enum OnDeviceMnemonicKind: Sendable, Hashable {
+enum OnDeviceMnemonicKind: Hashable {
 	case babylon
 	case olympia
 }

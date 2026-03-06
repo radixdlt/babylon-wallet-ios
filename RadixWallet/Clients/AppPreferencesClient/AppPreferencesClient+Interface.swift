@@ -1,5 +1,5 @@
 // MARK: - AppPreferencesClient
-struct AppPreferencesClient: Sendable {
+struct AppPreferencesClient {
 	var appPreferenceUpdates: AppPreferenceUpdates
 	var getPreferences: GetPreferences
 	var updatePreferences: UpdatePreferences

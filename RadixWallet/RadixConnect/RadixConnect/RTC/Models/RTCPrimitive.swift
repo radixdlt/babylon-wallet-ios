@@ -7,7 +7,7 @@ typealias IdentifiedRTCICECandidate = Identified<RemoteClientID, RTCPrimitive.IC
 
 // MARK: - RTCPrimitive
 /// Describes the possible RTC primitive exchanged during the WebRTC negotiation
-enum RTCPrimitive: Equatable, Sendable {
+enum RTCPrimitive: Equatable {
 	case offer(RTCPrimitive.Offer)
 	case answer(RTCPrimitive.Answer)
 	case iceCandidate(RTCPrimitive.ICECandidate)
@@ -17,23 +17,26 @@ extension RTCPrimitive {
 	enum SDPTag {}
 	typealias SDP = Tagged<SDPTag, String>
 
-	struct Offer: Sendable, Codable, Equatable {
+	struct Offer: Codable, Equatable {
 		let sdp: SDP
 		init(sdp: SDP) {
 			self.sdp = sdp
 		}
 	}
 
-	struct Answer: Sendable, Codable, Equatable {
+	struct Answer: Codable, Equatable {
 		let sdp: SDP
 		init(sdp: SDP) {
 			self.sdp = sdp
 		}
 	}
 
-	struct ICECandidate: Sendable, Codable, Equatable {
+	struct ICECandidate: Codable, Equatable {
 		let candidate: SDP
-		var sdp: SDP { candidate }
+		var sdp: SDP {
+			candidate
+		}
+
 		let sdpMLineIndex: Int32
 		let sdpMid: String?
 

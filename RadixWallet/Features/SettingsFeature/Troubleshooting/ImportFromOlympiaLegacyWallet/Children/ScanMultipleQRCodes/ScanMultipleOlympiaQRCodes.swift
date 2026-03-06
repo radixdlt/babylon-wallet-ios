@@ -2,11 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ScanMultipleOlympiaQRCodes
-struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		struct ScannedPayload: Sendable, Hashable, Identifiable {
+struct ScanMultipleOlympiaQRCodes: FeatureReducer {
+	struct State: Hashable {
+		struct ScannedPayload: Hashable, Identifiable {
 			typealias ID = Int
-			var id: ID { payloadIndex }
+			var id: ID {
+				payloadIndex
+			}
+
 			let unparsedPayload: NonEmptyString
 			let payloadIndex: Int
 		}
@@ -28,19 +31,19 @@ struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case scanQR(ScanQRCoordinator.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case scannedParsedOlympiaWalletToMigrate(ScannedParsedOlympiaWalletToMigrate)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case viewAppeared
 		case finishedScanning(ScannedParsedOlympiaWalletToMigrate)
 	}

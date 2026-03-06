@@ -3,7 +3,7 @@ import WebRTC
 // MARK: - SignalingClient.IncomingMessage
 /// IncomingMessage from SignalingClient
 extension SignalingClient {
-	enum IncomingMessage: Sendable, Equatable {
+	enum IncomingMessage: Equatable {
 		case fromSignalingServer(FromSignalingServer)
 		case fromRemoteClient(RemoteData)
 	}
@@ -11,13 +11,13 @@ extension SignalingClient {
 
 extension SignalingClient.IncomingMessage {
 	/// Received from SignalingServer itself
-	enum FromSignalingServer: Sendable, Equatable {
+	enum FromSignalingServer: Equatable {
 		case notification(Notification)
 		case responseForRequest(ResponseForRequest)
 	}
 
 	/// Received from Remote client itself
-	struct RemoteData: Equatable, Sendable {
+	struct RemoteData: Equatable {
 		/// The id of the remote client which sent the message.
 		/// This field is actualy set by the SignalingServer, it is never configured by the client.
 		let remoteClientId: RemoteClientID
@@ -41,13 +41,13 @@ extension SignalingClient.IncomingMessage {
 
 extension SignalingClient.IncomingMessage.FromSignalingServer {
 	/// Remote client status notifications
-	enum Notification: Sendable, Equatable {
+	enum Notification: Equatable {
 		case remoteClientJustConnected(RemoteClientID)
 		case remoteClientDisconnected(RemoteClientID)
 		case remoteClientIsAlreadyConnected(RemoteClientID)
 	}
 
-	enum ResponseForRequest: Sendable, Equatable {
+	enum ResponseForRequest: Equatable {
 		case success(SignalingClient.ClientMessage.RequestID)
 		case failure(RequestFailure)
 	}
@@ -94,18 +94,18 @@ extension SignalingClient.IncomingMessage.RemoteData {
 }
 
 extension SignalingClient.IncomingMessage.FromSignalingServer.ResponseForRequest {
-	enum RequestFailure: Sendable, Equatable, Error {
+	enum RequestFailure: Equatable, Error {
 		case noRemoteClientToTalkTo(SignalingClient.ClientMessage.RequestID)
 		case validationError(ValidationError)
 		case invalidMessageError(InvalidMessageError)
 	}
 
-	struct ValidationError: Sendable, Equatable {
+	struct ValidationError: Equatable {
 		let reason: JSONValue
 		let requestId: SignalingClient.ClientMessage.RequestID
 	}
 
-	struct InvalidMessageError: Sendable, Equatable {
+	struct InvalidMessageError: Equatable {
 		let reason: JSONValue
 		let messageSentThatWasInvalid: SignalingClient.ClientMessage
 	}

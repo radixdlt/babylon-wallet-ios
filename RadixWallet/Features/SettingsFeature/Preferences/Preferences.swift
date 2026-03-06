@@ -1,8 +1,8 @@
 // MARK: - Preferences
 
-struct Preferences: Sendable, FeatureReducer {
+struct Preferences: FeatureReducer {
 	@Environment(\.colorScheme) var colorScheme
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var appPreferences: AppPreferences?
 		var exportLogsUrl: URL?
 
@@ -12,7 +12,7 @@ struct Preferences: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
@@ -27,14 +27,14 @@ struct Preferences: Sendable, FeatureReducer {
 		case exportLogsDismissed
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadedAppPreferences(AppPreferences)
 		case advancedLockToggleResult(authResult: TaskResult<Bool>, isEnabled: Bool)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case hiddenEntities(HiddenEntities.State)
 			case hiddenAssets(HiddenAssets.State)
@@ -45,7 +45,7 @@ struct Preferences: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case hiddenEntities(HiddenEntities.Action)
 			case hiddenAssets(HiddenAssets.Action)

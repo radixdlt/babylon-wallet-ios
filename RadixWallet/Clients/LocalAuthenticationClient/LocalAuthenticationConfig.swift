@@ -1,8 +1,8 @@
 // MARK: - LocalAuthenticationConfig
-struct LocalAuthenticationConfig: Equatable, Sendable, CustomStringConvertible {
+struct LocalAuthenticationConfig: Equatable, CustomStringConvertible {
 	let isPasscodeSetUp: Bool
 
-	// Optional since user or app might have cancelled query after passcode query finished
+	/// Optional since user or app might have cancelled query after passcode query finished
 	let isBiometricsSetUp: Bool?
 
 	private init(

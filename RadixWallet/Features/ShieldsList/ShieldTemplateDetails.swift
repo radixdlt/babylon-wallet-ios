@@ -1,8 +1,8 @@
 // MARK: - ShieldTemplateDetails
 @Reducer
-struct ShieldTemplateDetails: Sendable, FeatureReducer {
+struct ShieldTemplateDetails: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var structure: SecurityStructureOfFactorSources
@@ -13,21 +13,21 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case editFactorsTapped
 		case applyButtonTapped
 		case renameButtonTapped
 		case onFactorSourceTapped(FactorSource)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case secStructureUpdated(SecurityStructureOfFactorSources)
 		case factorSourceIntegrityLoaded(FactorSourceIntegrity)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case editShieldFactors(EditSecurityShieldCoordinator.State)
 			case applyShield(ApplyShield.Coordinator.State)
 			case rename(RenameLabel.State)
@@ -35,7 +35,7 @@ struct ShieldTemplateDetails: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case editShieldFactors(EditSecurityShieldCoordinator.Action)
 			case applyShield(ApplyShield.Coordinator.Action)
 			case rename(RenameLabel.Action)

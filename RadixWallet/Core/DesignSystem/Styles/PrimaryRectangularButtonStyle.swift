@@ -51,7 +51,9 @@ extension PrimaryRectangularButtonStyle {
 }
 
 extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
-	static var primaryRectangular: Self { .primaryRectangular() }
+	static var primaryRectangular: Self {
+		.primaryRectangular()
+	}
 
 	static func primaryRectangular(
 		shouldExpand: Bool = true,

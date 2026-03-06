@@ -1,8 +1,8 @@
 // MARK: - NameLedgerFactorSource
 @Reducer
-struct NameLedgerFactorSource: Sendable, FeatureReducer {
+struct NameLedgerFactorSource: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let deviceInfo: LedgerDeviceInfo
 		var ledgerName = ""
 
@@ -14,12 +14,12 @@ struct NameLedgerFactorSource: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case ledgerNameChanged(String)
 		case confirmNameButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case complete(LedgerHardwareWalletFactorSource)
 		case failedToCreateLedgerFactorSource
 	}

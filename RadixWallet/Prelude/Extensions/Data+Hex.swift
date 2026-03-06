@@ -121,8 +121,7 @@ extension ContiguousBytes {
 
 extension FixedWidthInteger {
 	var data: Data {
-		let data = withUnsafeBytes(of: bigEndian) { Data($0) }
-		return data
+		withUnsafeBytes(of: bigEndian) { Data($0) }
 	}
 
 	var bytes: [UInt8] {

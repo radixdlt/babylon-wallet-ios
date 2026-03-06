@@ -1,5 +1,5 @@
 // MARK: - TransactionFee
-struct TransactionFee: Hashable, Sendable {
+struct TransactionFee: Hashable {
 	/// FeeSummary after transaction was analyzed
 	let feeSummary: FeeSummary
 
@@ -136,12 +136,12 @@ extension TransactionFee {
 		}
 	}
 
-	enum Mode: Hashable, Sendable {
+	enum Mode: Hashable {
 		case normal(NormalFeeCustomization)
 		case advanced(AdvancedFeeCustomization)
 	}
 
-	struct FeeSummary: Hashable, Sendable {
+	struct FeeSummary: Hashable {
 		let executionCost: Decimal192
 		let finalizationCost: Decimal192
 		let storageExpansionCost: Decimal192
@@ -193,7 +193,7 @@ extension TransactionFee {
 		}
 	}
 
-	struct FeeLocks: Hashable, Sendable {
+	struct FeeLocks: Hashable {
 		let nonContingentLock: Decimal192
 		let contingentLock: Decimal192
 
@@ -203,7 +203,7 @@ extension TransactionFee {
 		}
 	}
 
-	struct AdvancedFeeCustomization: Hashable, Sendable {
+	struct AdvancedFeeCustomization: Hashable {
 		let feeSummary: FeeSummary
 		var paddingFee: Decimal192
 		var tipPercentage: UInt16
@@ -227,12 +227,12 @@ extension TransactionFee {
 			self.paddingFee = (feeSummary.totalExecutionCost + feeSummary.finalizationCost + feeSummary.storageExpansionCost) * PredefinedFeeConstants.networkFeeMultiplier
 			self.tipPercentage = .zero
 
-			/// NonContingent lock will pay for some of the fee.
+			// NonContingent lock will pay for some of the fee.
 			self.paidByDapps = -feeLocks.nonContingentLock
 		}
 	}
 
-	struct NormalFeeCustomization: Hashable, Sendable {
+	struct NormalFeeCustomization: Hashable {
 		let networkFee: Decimal192
 		let royaltyFee: Decimal192
 		let total: Decimal192
@@ -258,7 +258,7 @@ extension TransactionFee {
 		}
 	}
 
-	struct TotalFee: Hashable, Sendable {
+	struct TotalFee: Hashable {
 		let min: Decimal192
 		let max: Decimal192
 

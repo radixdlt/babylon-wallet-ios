@@ -2,18 +2,18 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PreviewResult
-struct PreviewResult<ResultFromFeature>: FeatureReducer where ResultFromFeature: Hashable & Sendable {
-	enum ViewAction: Sendable, Hashable {
+struct PreviewResult<ResultFromFeature: Hashable & Sendable>: FeatureReducer {
+	enum ViewAction: Hashable {
 		case restart
 		case showJSONToggled(Bool)
 		case showDebugDescriptionToggled(Bool)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case restart
 	}
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let previewResult: TaskResult<ResultFromFeature>
 		var isShowingJSON: Bool = true
 		var isShowingDebugDescription: Bool = true

@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReviewNetworkFee
-struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct TransactionReviewNetworkFee: FeatureReducer {
+	struct State: Hashable {
 		var reviewedTransaction: ReviewedTransaction
 		var fiatValue: Loadable<String> = .idle
 		let id: UUID
@@ -16,20 +16,20 @@ struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case customizeTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setTokenPrices(TaskResult<PriceResult>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case showCustomizeFees
 	}
 
-	struct PriceResult: Sendable, Equatable {
+	struct PriceResult: Equatable {
 		let prices: TokenPricesClient.TokenPrices
 		let currency: FiatCurrency
 	}

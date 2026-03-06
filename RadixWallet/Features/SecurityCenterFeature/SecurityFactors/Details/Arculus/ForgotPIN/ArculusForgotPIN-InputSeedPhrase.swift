@@ -5,9 +5,9 @@ enum ArculusForgotPIN {}
 extension ArculusForgotPIN {
 	// MARK: - ArculusForgotPIN-InputSeedPhrase
 	@Reducer
-	struct InputSeedPhrase: Sendable, FeatureReducer {
+	struct InputSeedPhrase: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let factorSource: ArculusCardFactorSource
 
 			var grid: ImportMnemonicGrid.State = .init(count: .twentyFour, wordCounts: [.twelve, .twentyFour])
@@ -42,27 +42,27 @@ extension ArculusForgotPIN {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Hashable {
+		enum ViewAction: Hashable {
 			case confirmButtonTapped(Mnemonic)
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Hashable {
+		enum ChildAction: Hashable {
 			case grid(ImportMnemonicGrid.Action)
 		}
 
-		enum DelegateAction: Sendable, Hashable {
+		enum DelegateAction: Hashable {
 			case finished
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case configureNewPIN(ArculusForgotPIN.EnterNewPIN.State)
 			}
 
 			@CasePathable
-			enum Action: Sendable, Hashable {
+			enum Action: Hashable {
 				case configureNewPIN(ArculusForgotPIN.EnterNewPIN.Action)
 			}
 
@@ -107,7 +107,7 @@ extension ArculusForgotPIN {
 
 extension ImportMnemonicGrid.State {
 	/// An enum describing the different errors that can take place from user's input.
-	enum MnemonicValidationStatus: Sendable, Hashable {
+	enum MnemonicValidationStatus: Hashable {
 		/// User hasn't entered every word yet.
 		case incomplete
 

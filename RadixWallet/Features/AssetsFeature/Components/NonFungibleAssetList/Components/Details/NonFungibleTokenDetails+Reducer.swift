@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - NonFungibleTokenDetails
 @Reducer
-struct NonFungibleTokenDetails: Sendable, FeatureReducer {
+struct NonFungibleTokenDetails: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let resourceAddress: ResourceAddress
 		var resourceDetails: Loadable<OnLedgerEntity.Resource>
 		let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
@@ -39,22 +39,22 @@ struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case task
 		case tappedClaimStake
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case tappedClaimStake(OnLedgerEntitiesClient.StakeClaim)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case hideResource(HideResource.Action)
 	}
 

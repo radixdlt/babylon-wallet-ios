@@ -24,9 +24,9 @@ final class CustomizeFeePayerTests: TestCase {
 			isNonConforming: true
 		)
 
-		let state = CustomizeFees.State(
+		let state = try CustomizeFees.State(
 			reviewedTransaction: transactionStub,
-			manifestSummary: try! manifestStub.summary,
+			manifestSummary: manifestStub.summary,
 			signingPurpose: .signTransaction(.internalManifest(.transfer))
 		)
 
@@ -60,9 +60,9 @@ final class CustomizeFeePayerTests: TestCase {
 
 		transactionStub.feePayer = .success(selectedFeePayer)
 		let accountEntity = AccountOrPersona.account(selectedFeePayer.account)
-		transactionStub.transactionSigners = .init(
+		transactionStub.transactionSigners = try .init(
 			notaryPublicKey: notaryKey.publicKey,
-			intentSigning: .intentSigners(.init(rawValue: [accountEntity])!)
+			intentSigning: .intentSigners(XCTUnwrap(.init(rawValue: [accountEntity])))
 		)
 
 		let signingFactor = withDependencies {
@@ -71,7 +71,7 @@ final class CustomizeFeePayerTests: TestCase {
 			accountEntity.signingFactor
 		}
 
-		transactionStub.signingFactors = [.device: .init(rawValue: [signingFactor])!]
+		transactionStub.signingFactors = try [.device: XCTUnwrap(.init(rawValue: [signingFactor]))]
 		transactionStub.transactionFee.addLockFeeCost()
 		transactionStub.transactionFee.updateSignaturesCost(1)
 		transactionStub.transactionFee.updateNotarizingCost(notaryIsSignatory: false)

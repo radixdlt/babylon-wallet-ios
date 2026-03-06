@@ -85,7 +85,6 @@ extension NewAccountCompletion {
 }
 
 private extension NewAccountCompletion.View {
-	@ViewBuilder
 	func accountsStackView(
 		with viewStore: ViewStoreOf<NewAccountCompletion>
 	) -> some View {

@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - FungibleTokenDetails
 @Reducer
-struct FungibleTokenDetails: Sendable, FeatureReducer {
+struct FungibleTokenDetails: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let resourceAddress: ResourceAddress
 		var resource: Loadable<OnLedgerEntity.Resource>
 		let isXRD: Bool
@@ -31,17 +31,17 @@ struct FungibleTokenDetails: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case task
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case hideResource(HideResource.Action)
 	}
 

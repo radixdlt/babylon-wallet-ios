@@ -1,7 +1,7 @@
 #if DEBUG
 private let keychainService = "Radix Wallet DEBUG"
 #else
-// DO NOT CHANGE THIS EVER
+/// DO NOT CHANGE THIS EVER
 private let keychainService = "Radix Wallet"
 #endif
 
@@ -56,14 +56,13 @@ extension KeychainHolder {
 					true
 				}
 			}
-			.filter({
+			.filter {
 				if let accessibilityRawValue = $0["accessibility"] as? String, let accessibility = KeychainAccess.Accessibility(rawValue: accessibilityRawValue), let needle = needleAccessibility {
 					accessibility == needle
 				} else {
 					true
 				}
-			}
-			).compactMap { $0["key"] as? String }
+			}.compactMap { $0["key"] as? String }
 	}
 }
 

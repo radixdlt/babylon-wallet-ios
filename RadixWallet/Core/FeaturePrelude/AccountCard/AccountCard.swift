@@ -4,20 +4,8 @@ import SwiftUI
 struct AccountCard<Trailing: View, Bottom: View>: View {
 	let kind: Kind
 	let account: AccountCardDataSource
-	let trailing: Trailing
-	let bottom: Bottom
-
-	init(
-		kind: Kind,
-		account: AccountCardDataSource,
-		@ViewBuilder trailing: () -> Trailing,
-		@ViewBuilder bottom: () -> Bottom
-	) {
-		self.kind = kind
-		self.account = account
-		self.trailing = trailing()
-		self.bottom = bottom()
-	}
+	@ViewBuilder let trailing: Trailing
+	@ViewBuilder let bottom: Bottom
 
 	var body: some View {
 		VStack(spacing: .zero) {
@@ -107,7 +95,7 @@ extension AccountCard {
 }
 
 // MARK: - AccountCardTag
-enum AccountCardTag: Hashable, Sendable {
+enum AccountCardTag: Hashable {
 	case legacy
 	case dAppDefinition
 	case factorSource(FactorSource)

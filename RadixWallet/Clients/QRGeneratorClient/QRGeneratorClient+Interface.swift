@@ -1,12 +1,6 @@
 // MARK: - QRGeneratorClient
-struct QRGeneratorClient: Sendable {
+struct QRGeneratorClient {
 	var generate: Generate
-
-	init(
-		generate: @escaping Generate
-	) {
-		self.generate = generate
-	}
 }
 
 // MARK: QRGeneratorClient.Generate
@@ -15,7 +9,7 @@ extension QRGeneratorClient {
 }
 
 // MARK: - GenerateQRImageIntent
-struct GenerateQRImageIntent: Sendable {
+struct GenerateQRImageIntent {
 	let data: Data
 	let inputCorrectionLevel: InputCorrectionLevel
 	let size: CGSize
@@ -64,7 +58,7 @@ extension GenerateQRImageIntent {
 
 // MARK: GenerateQRImageIntent.InputCorrectionLevel
 extension GenerateQRImageIntent {
-	enum InputCorrectionLevel: Int, Sendable, Hashable, CustomStringConvertible {
+	enum InputCorrectionLevel: Int, Hashable, CustomStringConvertible {
 		/// Level Low 7%.
 		case low7 = 7
 

@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NewConnectionApproval
-struct NewConnectionApproval: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct NewConnectionApproval: FeatureReducer {
+	struct State: Hashable {
 		let purpose: Purpose
 		var isConnecting: Bool
 
@@ -16,12 +16,12 @@ struct NewConnectionApproval: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case dismissButtonTapped
 		case continueButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case approved(State.Purpose)
 	}
 
@@ -42,7 +42,7 @@ struct NewConnectionApproval: Sendable, FeatureReducer {
 
 // MARK: - NewConnectionApproval.State.Purpose
 extension NewConnectionApproval.State {
-	enum Purpose: Sendable, Hashable {
+	enum Purpose: Hashable {
 		case approveNewConnection
 		case approveExisitingConnection(NewConnection.State.ConnectionName)
 		case approveRelinkAfterProfileRestore

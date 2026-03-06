@@ -1,9 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct PersonaDataPermissionBox: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
-		var id: Persona.ID { persona.id }
+struct PersonaDataPermissionBox: FeatureReducer {
+	struct State: Hashable, Identifiable {
+		var id: Persona.ID {
+			persona.id
+		}
+
 		let persona: Persona
 		let requested: DappToWalletInteractionPersonaDataRequestItem
 		let responseValidation: DappToWalletInteraction.RequestValidation
@@ -18,11 +21,11 @@ struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case editButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case edit
 	}
 

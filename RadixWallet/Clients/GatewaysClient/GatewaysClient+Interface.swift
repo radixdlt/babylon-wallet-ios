@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - GatewaysClient
-struct GatewaysClient: Sendable {
+struct GatewaysClient {
 	/// Async sequence of Gateways, emits new value of Gateways
 	var currentGatewayValues: CurrentGatewayValues
 	var gatewaysValues: GatewaysValues
@@ -11,26 +11,6 @@ struct GatewaysClient: Sendable {
 	var removeGateway: RemoveGateway
 	var changeGateway: ChangeGateway
 	var hasGateway: HasGateway
-
-	init(
-		currentGatewayValues: @escaping CurrentGatewayValues,
-		gatewaysValues: @escaping GatewaysValues,
-		getAllGateways: @escaping GetAllGateways,
-		getCurrentGateway: @escaping GetCurrentGateway,
-		addGateway: @escaping AddGateway,
-		removeGateway: @escaping RemoveGateway,
-		changeGateway: @escaping ChangeGateway,
-		hasGateway: @escaping HasGateway
-	) {
-		self.currentGatewayValues = currentGatewayValues
-		self.gatewaysValues = gatewaysValues
-		self.getAllGateways = getAllGateways
-		self.getCurrentGateway = getCurrentGateway
-		self.addGateway = addGateway
-		self.removeGateway = removeGateway
-		self.changeGateway = changeGateway
-		self.hasGateway = hasGateway
-	}
 }
 
 extension GatewaysClient {

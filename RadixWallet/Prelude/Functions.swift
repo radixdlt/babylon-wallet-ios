@@ -21,12 +21,12 @@ func identity<T>(_ t: T) -> T {
 	t
 }
 
-func generateElements<Element>(
+func generateElements<Element: Hashable>(
 	start: Element,
 	step: (Element) -> Element,
 	count: Int,
 	shouldInclude: (Element) -> Bool
-) -> OrderedSet<Element> where Element: Hashable {
+) -> OrderedSet<Element> {
 	var next = start
 	var elements: OrderedSet<Element> = []
 	while elements.count != count {
@@ -38,19 +38,19 @@ func generateElements<Element>(
 	return elements
 }
 
-func generateIntegers<Integer>(
+func generateIntegers<Integer: FixedWidthInteger>(
 	start: Integer,
 	count: Int,
 	shouldInclude: @escaping (Integer) -> Bool
-) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
+) -> OrderedSet<Integer> {
 	generateElements(start: start, step: { $0 + 1 }, count: count, shouldInclude: shouldInclude)
 }
 
-func generateIntegers<Integer>(
+func generateIntegers<Integer: FixedWidthInteger>(
 	start: Integer,
 	count: Int,
 	excluding disallowed: some Collection<Integer>
-) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
+) -> OrderedSet<Integer> {
 	generateIntegers(
 		start: start,
 		count: count,

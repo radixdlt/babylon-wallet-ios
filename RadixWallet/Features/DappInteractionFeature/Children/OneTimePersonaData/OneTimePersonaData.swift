@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountPermission
-struct OneTimePersonaData: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct OneTimePersonaData: FeatureReducer {
+	struct State: Hashable {
 		let dappMetadata: DappMetadata
 		var personas: IdentifiedArrayOf<PersonaDataPermissionBox.State> = []
 		var selectedPersona: PersonaDataPermissionBox.State?
@@ -25,7 +25,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case appeared
 		case selectedPersonaChanged(PersonaDataPermissionBox.State?)
@@ -33,27 +33,27 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case personasLoaded(Personas)
 		case personaPrimacyDetermined(PersonaPrimacy)
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case persona(id: PersonaDataPermissionBox.State.ID, action: PersonaDataPermissionBox.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case personaUpdated(Persona)
 		case continueButtonTapped(WalletToDappInteractionPersonaDataRequestResponseItem)
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case editPersona(EditPersona.State)
 			case createPersona(CreatePersonaCoordinator.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case editPersona(EditPersona.Action)
 			case createPersona(CreatePersonaCoordinator.Action)
 		}
@@ -116,8 +116,8 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 				config: .init(
 					personaPrimacy: personaPrimacy,
 					navigationButtonCTA: .goBackToChoosePersonas
-				))
-			)
+				)
+			))
 			return .none
 
 		case let .continueButtonTapped(request):

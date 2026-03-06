@@ -2,19 +2,19 @@
 import Sargon
 
 // MARK: - DebugKeychainContents
-struct DebugKeychainContents: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct DebugKeychainContents: FeatureReducer {
+	struct State: Hashable {
 		var keyedMnemonics: IdentifiedArrayOf<KeyedMnemonicWithMetadata> = []
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case deleteMnemonicByFactorSourceID(FactorSourceIDFromHash)
 		case deleteAllMnemonics
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadedMnemonics([KeyedMnemonicWithMetadata])
 	}
 
@@ -81,10 +81,13 @@ struct DebugKeychainContents: Sendable, FeatureReducer {
 	}
 }
 
-struct KeyedMnemonicWithMetadata: Sendable, Hashable, Identifiable {
+struct KeyedMnemonicWithMetadata: Hashable, Identifiable {
 	let keyedMnemonic: KeyedMnemonicWithPassphrase
 	typealias ID = FactorSourceIDFromHash
-	var id: ID { keyedMnemonic.factorSourceID }
+	var id: ID {
+		keyedMnemonic.factorSourceID
+	}
+
 	let entitiesControlledByFactorSource: EntitiesControlledByFactorSource?
 	init(keyedMnemonic: KeyedMnemonicWithPassphrase, entitiesControlledByFactorSource: EntitiesControlledByFactorSource? = nil) {
 		self.keyedMnemonic = keyedMnemonic

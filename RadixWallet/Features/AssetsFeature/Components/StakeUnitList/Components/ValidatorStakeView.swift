@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - ValidatorStakeView
 struct ValidatorStakeView: View {
-	struct ViewState: Sendable, Hashable, Identifiable {
+	struct ViewState: Hashable, Identifiable {
 		var id: ValidatorAddress {
 			stakeDetails.id
 		}
@@ -14,7 +14,7 @@ struct ValidatorStakeView: View {
 		var liquidStakeUnit: LiquidStakeUnit?
 		var stakeClaimResource: KnownResourceBalance.StakeClaimNFT?
 
-		struct LiquidStakeUnit: Sendable, Hashable {
+		struct LiquidStakeUnit: Hashable {
 			let lsu: ResourceBalance.ViewState.LiquidStakeUnit
 			var isSelected: Bool?
 		}
@@ -55,7 +55,6 @@ struct ValidatorStakeView: View {
 		}
 	}
 
-	@ViewBuilder
 	private func liquidStakeUnitView(viewState: ViewState.LiquidStakeUnit, action: @escaping () -> Void) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			AssetListSeparator()

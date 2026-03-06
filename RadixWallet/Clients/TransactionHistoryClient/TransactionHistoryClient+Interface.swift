@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - TransactionHistoryClient
-struct TransactionHistoryClient: Sendable, DependencyKey {
+struct TransactionHistoryClient: DependencyKey {
 	var getFirstTransactionDate: GetFirstTransactionDate
 	var getTransactionHistory: GetTransactionHistory
 }
@@ -13,7 +13,7 @@ extension TransactionHistoryClient {
 }
 
 // MARK: - TransactionHistoryRequest
-struct TransactionHistoryRequest: Sendable, Hashable {
+struct TransactionHistoryRequest: Hashable {
 	let account: AccountAddress
 	let parameters: Parameters
 	let cursor: String?
@@ -22,7 +22,7 @@ struct TransactionHistoryRequest: Sendable, Hashable {
 	let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 
 	// MARK: - Parameters
-	struct Parameters: Sendable, Hashable {
+	struct Parameters: Hashable {
 		let period: AnyRange<Date>
 		let filters: [TransactionFilter]
 		let direction: TransactionHistory.Direction
@@ -30,14 +30,14 @@ struct TransactionHistoryRequest: Sendable, Hashable {
 }
 
 // MARK: - TransactionHistoryResponse
-struct TransactionHistoryResponse: Sendable, Hashable {
+struct TransactionHistoryResponse: Hashable {
 	let nextCursor: String?
 	let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	let items: [TransactionHistoryItem]
 }
 
 // MARK: - TransactionHistoryItem
-struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
+struct TransactionHistoryItem: Hashable, Identifiable {
 	let id: TransactionIntentHash
 	let time: Date
 	let message: String?
@@ -69,12 +69,12 @@ struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 }
 
 // MARK: - TransactionFilter
-enum TransactionFilter: Hashable, Sendable {
+enum TransactionFilter: Hashable {
 	case transferType(TransferType)
 	case asset(ResourceAddress)
 	case transactionType(TransactionType)
 
-	enum TransferType: CaseIterable, Sendable {
+	enum TransferType: CaseIterable {
 		case deposit
 		case withdrawal
 	}

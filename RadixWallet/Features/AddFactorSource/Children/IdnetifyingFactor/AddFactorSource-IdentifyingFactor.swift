@@ -1,10 +1,10 @@
 // MARK: - AddFactorSource.IdentifyingFactor
 extension AddFactorSource {
 	@Reducer
-	struct IdentifyingFactor: Sendable, FeatureReducer {
+	struct IdentifyingFactor: FeatureReducer {
 		@Dependency(\.arculusCardClient) var arculusCardClient
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let kind: FactorSourceKind
 			var initialTaskExecuted = false
 
@@ -14,13 +14,13 @@ extension AddFactorSource {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case task
 			case closeButtonTapped
 			case retryButtonTapped
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case completedWithLedger(LedgerDeviceInfo)
 			case completedWithFactorSourceAlreadyExsits(FactorSource)
 		}

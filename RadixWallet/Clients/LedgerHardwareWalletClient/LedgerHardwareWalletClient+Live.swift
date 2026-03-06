@@ -235,9 +235,6 @@ extension LedgerHardwareWalletFactorSource {
 // MARK: - UnrecognizedLedgerModel
 struct UnrecognizedLedgerModel: Error {
 	let model: String
-	init(model: String) {
-		self.model = model
-	}
 }
 
 extension P2P.LedgerHardwareWallet.LedgerDevice {
@@ -253,7 +250,7 @@ struct MissingSignatureFromRequiredSigner: Swift.Error {}
 struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
-	struct Validated: Sendable, Hashable {
+	struct Validated: Hashable {
 		let signature: SignatureWithPublicKey
 		let derivationPath: DerivationPath
 	}

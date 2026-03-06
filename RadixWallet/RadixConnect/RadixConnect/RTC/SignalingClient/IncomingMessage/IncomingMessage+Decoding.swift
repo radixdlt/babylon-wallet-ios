@@ -6,7 +6,7 @@ extension CodingUserInfoKey {
 
 // MARK: - SignalingClient.IncomingMessage + Decodable
 extension SignalingClient.IncomingMessage: Decodable {
-	enum ResponseType: String, Decodable, Sendable {
+	enum ResponseType: String, Decodable {
 		// MARK: ResponseToRequest
 
 		/// Confirmation sent to us by the signaling server informing us that an RPC message sent by us was accepted by the signaling server, but necessarily received by any remote client yet. If we get this, it means that we did not get `missingRemoteClientError`, and these two events (messages) are mutually exclusive, i.e. the signaling server knows that it can dispatch our sent message to a remote client.

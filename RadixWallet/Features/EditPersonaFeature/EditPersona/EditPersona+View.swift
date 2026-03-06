@@ -21,7 +21,9 @@ extension EditPersona.State {
 	}
 
 	// FIXME: Implement avatar change functionality
-	var avatarURL: URL? { nil }
+	var avatarURL: URL? {
+		nil
+	}
 
 	var addAFieldButtonState: ControlState {
 		if alreadyAddedEntryKinds.count < EntryKind.supportedKinds.count {

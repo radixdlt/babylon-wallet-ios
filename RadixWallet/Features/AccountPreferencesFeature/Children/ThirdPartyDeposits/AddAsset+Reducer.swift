@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AddAsset
-struct AddAsset: FeatureReducer, Sendable {
-	struct State: Hashable, Sendable {
+struct AddAsset: FeatureReducer {
+	struct State: Hashable {
 		var mode: ResourcesListMode
 		let alreadyAddedResources: OrderedSet<ResourceViewState.Address>
 		let networkID: NetworkID
@@ -11,7 +11,7 @@ struct AddAsset: FeatureReducer, Sendable {
 		var resourceAddress: String = ""
 		var resourceAddressFieldFocused: Bool = false
 
-		enum AddressValidation: Sendable, Hashable {
+		enum AddressValidation: Hashable {
 			case valid(ResourceViewState.Address)
 			case wrongNetwork(ResourceViewState.Address, incorrectNetwork: UInt8)
 			case alreadyAdded
@@ -61,7 +61,7 @@ struct AddAsset: FeatureReducer, Sendable {
 		}
 	}
 
-	enum ViewAction: Hashable, Sendable {
+	enum ViewAction: Hashable {
 		case addAssetTapped(ResourceViewState.Address)
 		case resourceAddressChanged(String)
 		case exceptionRuleChanged(ResourcesListMode.ExceptionRule)
@@ -69,7 +69,7 @@ struct AddAsset: FeatureReducer, Sendable {
 		case closeTapped
 	}
 
-	enum DelegateAction: Hashable, Sendable {
+	enum DelegateAction: Hashable {
 		case addAddress(ResourcesListMode, ResourceViewState.Address)
 	}
 

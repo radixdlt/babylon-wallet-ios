@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - ChooseReceivingAccountOnDelete
-struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct ChooseReceivingAccountOnDelete: FeatureReducer {
+	struct State: Hashable {
 		var chooseAccounts: ChooseAccounts.State
 		var hasAccountsWithEnoughXRD: Bool
 		var footerControlState: ControlState = .enabled
@@ -14,39 +14,39 @@ struct ChooseReceivingAccountOnDelete: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case continueButtonTapped([ChooseAccountsRow.State])
 		case skipButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
 	@CasePathable
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished(AccountAddress?)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case confirmSkipAlert(AlertState<Action.ConfirmSkipAlert>)
 			case tooManyAssetsAlert(AlertState<Action.TooManyAssetsAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case confirmSkipAlert(ConfirmSkipAlert)
 			case tooManyAssetsAlert(TooManyAssetsAlert)
 
-			enum ConfirmSkipAlert: Hashable, Sendable {
+			enum ConfirmSkipAlert: Hashable {
 				case cancelTapped
 				case continueTapped
 			}
 
-			enum TooManyAssetsAlert: Hashable, Sendable {
+			enum TooManyAssetsAlert: Hashable {
 				case okTapped
 			}
 		}

@@ -7,9 +7,9 @@ typealias InteractionReviewDappsUsed = InteractionReviewDapps<ComponentAddress>
 
 // MARK: - InteractionReviewDapps
 @Reducer
-struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureReducer {
+struct InteractionReviewDapps<AddressType: AddressProtocol>: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var knownDapps: IdentifiedArrayOf<InteractionReview.DappEntity>
 		var unknownDapps: IdentifiedArrayOf<AddressType>
 		var isExpanded: Bool = true
@@ -31,12 +31,12 @@ struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureRe
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case dappTapped(InteractionReview.DappEntity.ID)
 		case unknownsTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case openDapp(InteractionReview.DappEntity.ID)
 		case openUnknownAddresses(IdentifiedArrayOf<AddressType>)
 	}
@@ -58,7 +58,7 @@ struct InteractionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureRe
 
 // MARK: - InteractionReview.DappEntity
 extension InteractionReview {
-	struct DappEntity: Sendable, Identifiable, Hashable {
+	struct DappEntity: Identifiable, Hashable {
 		let id: DappDefinitionAddress
 		let metadata: OnLedgerEntity.Metadata
 	}

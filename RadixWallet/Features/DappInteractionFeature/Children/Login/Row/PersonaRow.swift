@@ -3,8 +3,11 @@ import SwiftUI
 
 // MARK: - PersonaRow
 enum PersonaRow {
-	struct State: Sendable, Equatable, Hashable, Identifiable {
-		var id: Persona.ID { persona.id }
+	struct State: Equatable, Hashable, Identifiable {
+		var id: Persona.ID {
+			persona.id
+		}
+
 		let persona: Persona
 		let lastLogin: Date?
 

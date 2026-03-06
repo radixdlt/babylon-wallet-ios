@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CreateAccountConfig
-struct CreateAccountConfig: Sendable, Hashable {
+struct CreateAccountConfig: Hashable {
 	let specificNetworkID: NetworkID?
 	let isFirstAccount: Bool
 	let isNewProfile: Bool
@@ -22,7 +22,7 @@ struct CreateAccountConfig: Sendable, Hashable {
 }
 
 // MARK: - CreateAccountNavigationButtonCTA
-enum CreateAccountNavigationButtonCTA: Sendable, Equatable {
+enum CreateAccountNavigationButtonCTA: Equatable {
 	case goHome
 	case goBackToChooseAccounts
 	case goBackToGateways

@@ -3,9 +3,9 @@ import Sargon
 
 // MARK: - ShieldsList
 @Reducer
-struct ShieldsList: FeatureReducer, Sendable {
+struct ShieldsList: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		var shields: [SecurityStructureOfFactorSources] = []
 
 		@Presents
@@ -15,30 +15,30 @@ struct ShieldsList: FeatureReducer, Sendable {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case onAppear
 		case createShieldButtonTapped
 		case shieldTapped(SecurityStructureId)
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setShields([ShieldForDisplay])
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case finished
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
 			case applyShield(ApplyShield.Coordinator.State)
 			case shieldTemplateDetails(ShieldTemplateDetails.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
 			case applyShield(ApplyShield.Coordinator.Action)
 			case shieldTemplateDetails(ShieldTemplateDetails.Action)

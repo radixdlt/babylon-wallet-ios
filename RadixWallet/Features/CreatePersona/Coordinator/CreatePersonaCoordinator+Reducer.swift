@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CreatePersonaCoordinator
-struct CreatePersonaCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct CreatePersonaCoordinator: FeatureReducer {
+	struct State: Hashable {
 		var root: Path.State?
 		var path: StackState<Path.State> = .init()
 
@@ -39,9 +39,9 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	struct Path: Sendable, Reducer {
+	struct Path: Reducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case step0_introduction
 			case step1_createPersona(EditPersona.State)
 			case selectFactorSource(SelectFactorSource.State)
@@ -49,7 +49,7 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case step0_introduction
 			case step1_createPersona(EditPersona.Action)
 			case selectFactorSource(SelectFactorSource.Action)
@@ -69,23 +69,23 @@ struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case introductionContinueButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismissed
 		case completed(Persona)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case handlePersonaCreated(Persona)
 	}
 

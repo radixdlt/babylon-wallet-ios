@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - InfoLinkSheet
 struct InfoLinkSheet: FeatureReducer {
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let image: ImageSource?
 		let text: String
 
@@ -12,7 +12,7 @@ struct InfoLinkSheet: FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case infoLinkTapped(InfoLinkSheet.GlossaryItem)
 	}
 
@@ -29,7 +29,7 @@ struct InfoLinkSheet: FeatureReducer {
 
 // MARK: InfoLinkSheet.GlossaryItem
 extension InfoLinkSheet {
-	enum GlossaryItem: String, Sendable, CaseIterable, Identifiable {
+	enum GlossaryItem: String, CaseIterable, Identifiable {
 		case tokens
 		case nfts
 		case networkstaking

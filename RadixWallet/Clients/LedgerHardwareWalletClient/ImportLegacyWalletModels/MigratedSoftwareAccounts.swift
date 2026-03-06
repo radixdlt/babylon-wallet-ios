@@ -3,7 +3,7 @@ import OrderedCollections
 import Sargon
 
 // MARK: - MigratedSoftwareAccounts
-struct MigratedSoftwareAccounts: Sendable, Hashable {
+struct MigratedSoftwareAccounts: Hashable {
 	let networkID: NetworkID
 
 	let accounts: NonEmpty<OrderedSet<MigratedAccount>>

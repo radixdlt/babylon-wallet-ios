@@ -1,9 +1,9 @@
 // MARK: - AddFactorSource.Intro
 extension AddFactorSource {
 	@Reducer
-	struct Intro: Sendable, FeatureReducer {
+	struct Intro: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let kind: FactorSourceKind
 			var hasAConnectorExtension: Bool = false
 
@@ -13,24 +13,24 @@ extension AddFactorSource {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case task
 			case continueTapped
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case completed
 			case completedWithLedgerDeviceInfo(LedgerDeviceInfo)
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case handleArculusCardIdentification(ArculusMinFirmwareVersionRequirement)
 			case hasAConnectorExtension(Bool)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case addNewP2PLink(NewConnection.State)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.State)
 				case factorSourceAlreadyExists(AlertState<Never>)
@@ -39,7 +39,7 @@ extension AddFactorSource {
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Equatable {
 				case addNewP2PLink(NewConnection.Action)
 				case hardwareFactorIdentification(AddFactorSource.IdentifyingFactor.Action)
 				case factorSourceAlreadyExists(Never)
@@ -157,7 +157,7 @@ extension AddFactorSource {
 }
 
 // MARK: - NoP2PLinkAlert
-enum NoP2PLinkAlert: Sendable, Hashable {
+enum NoP2PLinkAlert: Hashable {
 	case addNewP2PLinkTapped
 	case cancelTapped
 }

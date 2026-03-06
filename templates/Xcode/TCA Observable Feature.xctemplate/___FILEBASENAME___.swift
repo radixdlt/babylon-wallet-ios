@@ -1,14 +1,14 @@
 // MARK: - ___VARIABLE_featureName___
 @Reducer
-struct ___VARIABLE_featureName___: Sendable, FeatureReducer {
+struct ___VARIABLE_featureName___: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		init() {}
 	}
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 	}
 

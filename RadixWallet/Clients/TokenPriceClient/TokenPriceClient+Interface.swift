@@ -1,5 +1,5 @@
 // MARK: - TokenPricesClient
-struct TokenPricesClient: Sendable, DependencyKey {
+struct TokenPricesClient: DependencyKey {
 	let getTokenPrices: GetTokenPrices
 }
 

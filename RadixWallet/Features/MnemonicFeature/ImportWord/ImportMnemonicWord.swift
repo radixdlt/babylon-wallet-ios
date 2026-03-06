@@ -2,13 +2,13 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ImportMnemonicWord
-struct ImportMnemonicWord: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
-		enum Field: Hashable, Sendable {
+struct ImportMnemonicWord: FeatureReducer {
+	struct State: Hashable, Identifiable {
+		enum Field: Hashable {
 			case textField
 		}
 
-		enum WordValue: Sendable, Hashable {
+		enum WordValue: Hashable {
 			case incomplete(
 				text: String,
 				hasFailedValidation: Bool
@@ -20,7 +20,7 @@ struct ImportMnemonicWord: Sendable, FeatureReducer {
 				completion: Completion
 			)
 
-			enum Completion: Sendable, Hashable {
+			enum Completion: Hashable {
 				/// We automatically completed the word, since it was unambigiously identified as a BIP39 word.
 				case auto(match: BIP39LookupResult.Known.UnambiguousMatch)
 
@@ -61,7 +61,7 @@ struct ImportMnemonicWord: Sendable, FeatureReducer {
 			}
 		}
 
-		struct AutocompletionCandidates: Sendable, Hashable {
+		struct AutocompletionCandidates: Hashable {
 			let input: NonEmptyString
 			let candidates: NonEmpty<OrderedSet<BIP39Word>>
 		}
@@ -101,14 +101,14 @@ struct ImportMnemonicWord: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case wordChanged(input: String)
 		case userSelectedCandidate(BIP39Word)
 		case focusChanged(State.Field?)
 		case onSubmit
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case lookupWord(input: String)
 		case lostFocus(displayText: String)
 		case userSelectedCandidate(BIP39Word, fromPartial: String)

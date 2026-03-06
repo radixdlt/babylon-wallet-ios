@@ -100,7 +100,7 @@ extension LAContext {
 		}
 	}
 
-	// Returns `nil` if user presses "cancel" button
+	/// Returns `nil` if user presses "cancel" button
 	fileprivate func queryLocalAuthenticationConfig() throws -> LocalAuthenticationConfig {
 		let passcodeSupportedResult = try evaluateIfPasscodeIsSetUp()
 

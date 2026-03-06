@@ -3,12 +3,12 @@ import Sargon
 import SwiftUI
 
 // MARK: - Home
-struct Home: Sendable, FeatureReducer {
+struct Home: FeatureReducer {
 	private enum CancellableId: Hashable {
 		case fetchAccountPortfolios
 	}
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		// MARK: - Components
 		var carousel: CardCarousel.State = .init()
 
@@ -49,7 +49,7 @@ struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstAppear
 		case task
 		case onDisappear
@@ -58,7 +58,7 @@ struct Home: Sendable, FeatureReducer {
 		case showFiatWorthToggled
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case accountsLoadedResult(TaskResult<Accounts>)
 		case currentGatewayChanged(to: Gateway)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
@@ -71,14 +71,14 @@ struct Home: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case carousel(CardCarousel.Action)
 		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
@@ -92,7 +92,7 @@ struct Home: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
@@ -104,7 +104,7 @@ struct Home: Sendable, FeatureReducer {
 			case enterMnemonic(ImportMnemonicForFactorSource.Action)
 			case handleACTimedRecovery(HandleAccessControllerTimedRecovery.Action)
 
-			enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
+			enum AcknowledgeJailbreakAlert: Hashable {}
 		}
 
 		var body: some ReducerOf<Self> {

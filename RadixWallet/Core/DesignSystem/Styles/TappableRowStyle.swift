@@ -1,6 +1,8 @@
 
 extension ButtonStyle where Self == TappableRowStyle {
-	static var tappableRowStyle: TappableRowStyle { TappableRowStyle() }
+	static var tappableRowStyle: TappableRowStyle {
+		TappableRowStyle()
+	}
 }
 
 // MARK: - TappableRowStyle

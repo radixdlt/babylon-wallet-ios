@@ -36,13 +36,13 @@ actor DataChannelClient {
 	private let incomingReceipts: AnyAsyncSequence<Message.Receipt>
 	private let incomingChunks: AnyAsyncSequence<Message.ChunkedMessage>
 
-	// Mutable State
+	/// Mutable State
 	private typealias ChunksWithMetaData = (
 		metaData: Message.ChunkedMessage.MetaDataPackage?,
 		chunks: [Message.ChunkedMessage.ChunkPackage]
 	)
 
-	/*
+	/**
 	 TODO: Check if this is really needed.
 	 The datachannel messages are ordered, thus it should not be possible to receive mixed chunks from different messages.
 	 So, either this can be just an array of `ChunksWithMetaData`, or maybe an extension on AsyncStream to

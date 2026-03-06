@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransferAccountList
-struct TransferAccountList: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct TransferAccountList: FeatureReducer {
+	struct State: Hashable {
 		let fromAccount: Account
 		var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {
@@ -33,35 +33,35 @@ struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case addAccountTapped
 		case addAssetCloseButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Equatable, Sendable {
+	enum ChildAction: Equatable {
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setAllDepositStatus(accountId: ReceivingAccount.State.ID, status: Loadable<DepositStatus>)
 		case setDepositStatus(accountId: ReceivingAccount.State.ID, values: DepositStatusPerResources)
 	}
 
 	struct Destination: DestinationReducer {
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let id: ReceivingAccount.State.ID
 			var state: MainState
 		}
 
 		@CasePathable
-		enum MainState: Sendable, Hashable {
+		enum MainState: Hashable {
 			case chooseTransferReceiver(ChooseTransferRecipient.State)
 			case addAsset(AssetsView.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case chooseTransferReceiver(ChooseTransferRecipient.Action)
 			case addAsset(AssetsView.Action)
 		}

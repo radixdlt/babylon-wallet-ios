@@ -87,7 +87,7 @@ extension SecurityStructureOfFactorSources {
 
 // MARK: - ShieldCard.Mode
 extension ShieldCard {
-	enum Mode: Equatable, Sendable {
+	enum Mode: Equatable {
 		case display
 		case selection(isSelected: Bool)
 	}

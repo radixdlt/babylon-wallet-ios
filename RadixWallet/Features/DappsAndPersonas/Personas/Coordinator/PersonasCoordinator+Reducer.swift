@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PersonasCoordinator
-struct PersonasCoordinator: Sendable, FeatureReducer {
+struct PersonasCoordinator: FeatureReducer {
 	// MARK: - State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var personaList: PersonaList.State
 
 		@PresentationState
@@ -27,7 +27,7 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 	}
 
@@ -36,7 +36,7 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 		case loadedPersonaDetails(PersonaDetails.State)
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case personaList(PersonaList.Action)
 	}
 
@@ -44,7 +44,7 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
 			case securityCenter(SecurityCenter.State)
@@ -53,7 +53,7 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 			case personaDetails(PersonaDetails.Action)
 			case securityCenter(SecurityCenter.Action)
@@ -85,8 +85,6 @@ struct PersonasCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {

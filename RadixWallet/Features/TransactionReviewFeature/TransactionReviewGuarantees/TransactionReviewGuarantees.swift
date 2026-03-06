@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReviewGuarantees
-struct TransactionReviewGuarantees: Sendable, FeatureReducer {
+struct TransactionReviewGuarantees: FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
 
 		var isValid: Bool {
@@ -17,17 +17,17 @@ struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case applyTapped
 		case closeTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case applyGuarantees(IdentifiedArrayOf<TransactionReviewGuarantee.State>)
 	}
 
@@ -58,8 +58,8 @@ struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 }
 
 // MARK: - TransactionReviewGuarantee
-struct TransactionReviewGuarantee: Sendable, FeatureReducer {
-	struct State: Identifiable, Sendable, Hashable {
+struct TransactionReviewGuarantee: FeatureReducer {
+	struct State: Identifiable, Hashable {
 		let id: InteractionReview.Transfer.ID
 		let account: InteractionReview.ReviewAccount
 		let resource: OnLedgerEntity.Resource
@@ -104,11 +104,11 @@ struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 	}
 

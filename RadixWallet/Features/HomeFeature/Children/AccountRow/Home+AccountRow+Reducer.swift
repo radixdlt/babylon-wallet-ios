@@ -4,14 +4,17 @@ import SwiftUI
 
 // MARK: - Home.AccountRow
 extension Home {
-	struct AccountRow: Sendable, FeatureReducer {
-		struct State: Sendable, Hashable, Identifiable, AccountWithInfoHolder {
-			enum SecurityState: Sendable, Hashable {
+	struct AccountRow: FeatureReducer {
+		struct State: Hashable, Identifiable, AccountWithInfoHolder {
+			enum SecurityState: Hashable {
 				case unsecurified(FactorSource)
 				case securified(AccessControllerAddress)
 			}
 
-			var id: AccountAddress { account.address }
+			var id: AccountAddress {
+				account.address
+			}
+
 			var accountWithInfo: AccountWithInfo
 			var securityState: SecurityState?
 
@@ -33,19 +36,19 @@ extension Home {
 			}
 		}
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case tapped
 			case securityProblemTapped(SecurityProblem)
 			case accountLockerClaimTapped(AccountLockerClaimDetails)
 			case acTimedRecoveryTapped(AccessControllerStateDetails)
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case openDetails
 			case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 			case presentHandleACTimedRecovery(AccessControllerStateDetails)

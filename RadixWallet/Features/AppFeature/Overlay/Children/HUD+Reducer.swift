@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - HUD
 struct HUD: FeatureReducer {
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		static let hiddenOffset: CGFloat = -128.0
 		static let autoDismissDelay: Double = 1.0
 
@@ -30,7 +30,7 @@ struct HUD: FeatureReducer {
 		switch viewAction {
 		case .animationCompletion:
 			if state.offset == State.hiddenOffset {
-				/// Notify the delegate only after the animation did complete.
+				// Notify the delegate only after the animation did complete.
 				return .send(.delegate(.dismiss))
 			} else {
 				return .run { send in

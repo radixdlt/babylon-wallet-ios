@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AssetsView
-struct AssetsView: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct AssetsView: FeatureReducer {
+	struct State: Hashable {
 		/// All of the possible asset list
-		enum AssetKind: String, Sendable, Hashable, CaseIterable, Identifiable {
+		enum AssetKind: String, Hashable, CaseIterable, Identifiable {
 			case fungible
 			case nonFungible
 			case stakeUnits
@@ -25,7 +25,7 @@ struct AssetsView: Sendable, FeatureReducer {
 			}
 		}
 
-		struct Resources: Hashable, Sendable {
+		struct Resources: Hashable {
 			var fungibleTokenList: FungibleAssetList.State?
 			var nonFungibleTokenList: NonFungibleAssetList.State?
 			var stakeUnitList: StakeUnitList.State?
@@ -66,7 +66,7 @@ struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstTask
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
@@ -74,22 +74,22 @@ struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
 		case stakeUnitList(StakeUnitList.Action)
 		case poolUnitsList(PoolUnitsList.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case portfolioUpdated(AccountPortfoliosClient.AccountPortfolio)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
 		case selected(Selection)
 
-		enum Selection: Sendable, Equatable {
+		enum Selection: Equatable {
 			case fungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
 			case stakeUnit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)

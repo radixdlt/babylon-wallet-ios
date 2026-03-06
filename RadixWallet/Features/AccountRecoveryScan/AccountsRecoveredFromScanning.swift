@@ -1,7 +1,7 @@
 import Foundation
 import Sargon
 
-struct AccountsRecoveredFromScanningUsingMnemonic: Sendable, Hashable {
+struct AccountsRecoveredFromScanningUsingMnemonic: Hashable {
 	let accounts: Accounts
 	let factorSource: PrivateHierarchicalDeterministicFactorSource
 }

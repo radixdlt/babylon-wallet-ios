@@ -1,22 +1,22 @@
 // MARK: - DAppTagsSelection
 @Reducer
-struct DAppTagsSelection: Sendable, FeatureReducer {
+struct DAppTagsSelection: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var selectedTags: OrderedSet<OnLedgerTag>
 		let allTags: OrderedSet<OnLedgerTag>
 	}
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case tagSelected(OnLedgerTag)
 		case closeTapped
 		case clearAllTapped
 		case confirmTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selectedTags(OrderedSet<OnLedgerTag>)
 	}
 

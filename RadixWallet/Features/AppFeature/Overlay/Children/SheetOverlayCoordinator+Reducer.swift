@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - SheetOverlayCoordinator
-struct SheetOverlayCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
+struct SheetOverlayCoordinator: FeatureReducer {
+	struct State: Hashable, Identifiable {
 		let id: UUID = .init()
 		var root: Root.State
 
@@ -11,16 +11,16 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Root.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 		case signing(Signing.DelegateAction)
 		case derivePublicKeys(DerivePublicKeys.DelegateAction)
@@ -28,9 +28,9 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		case spotCheck(SpotCheck.DelegateAction)
 	}
 
-	struct Root: Sendable, Hashable, Reducer {
+	struct Root: Hashable, Reducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case infoLink(InfoLinkSheet.State)
 			case signing(Signing.State)
 			case derivePublicKeys(DerivePublicKeys.State)
@@ -39,7 +39,7 @@ struct SheetOverlayCoordinator: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case infoLink(InfoLinkSheet.Action)
 			case signing(Signing.Action)
 			case derivePublicKeys(DerivePublicKeys.Action)

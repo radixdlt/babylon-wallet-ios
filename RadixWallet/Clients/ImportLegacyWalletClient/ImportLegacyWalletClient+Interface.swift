@@ -1,5 +1,5 @@
 // MARK: - ImportLegacyWalletClient
-struct ImportLegacyWalletClient: Sendable {
+struct ImportLegacyWalletClient {
 	var shouldShowImportWalletShortcutInSettings: ShouldShowImportWalletShortcutInSettings
 	var parseHeaderFromQRCode: ParseHeaderFromQRCode
 	var parseLegacyWalletFromQRCodes: ParseLegacyWalletFromQRCodes

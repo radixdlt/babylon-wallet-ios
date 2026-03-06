@@ -1,6 +1,6 @@
 // MARK: - JSONValue
 // https://gist.github.com/hannesoid/10a35895e4dc5d6f1bb6428f7d4d23a5
-indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hashable {
+indirect enum JSONValue: Codable, CustomStringConvertible, Hashable {
 	case double(Double)
 	case int32(Int32)
 	case int(Int)

@@ -51,7 +51,9 @@ extension SecondaryRectangularButtonStyle {
 }
 
 extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
-	static var secondaryRectangular: Self { .secondaryRectangular() }
+	static var secondaryRectangular: Self {
+		.secondaryRectangular()
+	}
 
 	static func secondaryRectangular(
 		font: SwiftUI.Font = .app.body1Header,

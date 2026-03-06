@@ -1,7 +1,7 @@
 @Reducer
-struct SelectShield: Sendable, FeatureReducer {
+struct SelectShield: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var shields: [SecurityStructureOfFactorSources] = []
 		var selected: SecurityStructureOfFactorSources?
 
@@ -11,29 +11,29 @@ struct SelectShield: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case selected(SecurityStructureOfFactorSources)
 		case confirmButtonTapped(SecurityStructureOfFactorSources)
 		case addShieldButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setShields([SecurityStructureOfFactorSources])
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case confirmed(SecurityStructureOfFactorSources)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
 		}
 

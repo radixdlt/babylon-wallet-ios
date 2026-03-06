@@ -1,15 +1,7 @@
 // MARK: - FaucetClient
-struct FaucetClient: Sendable {
+struct FaucetClient {
 	var getFreeXRD: GetFreeXRD
 	var isAllowedToUseFaucet: IsAllowedToUseFaucet
-
-	init(
-		getFreeXRD: @escaping GetFreeXRD,
-		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet
-	) {
-		self.getFreeXRD = getFreeXRD
-		self.isAllowedToUseFaucet = isAllowedToUseFaucet
-	}
 }
 
 extension FaucetClient {
@@ -19,7 +11,7 @@ extension FaucetClient {
 
 // MARK: FaucetClient.FaucetRequest
 extension FaucetClient {
-	struct FaucetRequest: Sendable, Hashable {
+	struct FaucetRequest: Hashable {
 		let recipientAccountAddress: AccountAddress
 		init(
 			recipientAccountAddress: AccountAddress
@@ -49,10 +41,13 @@ extension UserDefaults.Dependency {
 
 // MARK: - EpochForWhenLastUsedByAccountAddress
 // internal for tests
-struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
-	struct EpochForAccount: Codable, Sendable, Hashable, Identifiable {
+struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable {
+	struct EpochForAccount: Codable, Hashable, Identifiable {
 		typealias ID = AccountAddress
-		var id: ID { accountAddress }
+		var id: ID {
+			accountAddress
+		}
+
 		let accountAddress: AccountAddress
 		var epoch: Epoch
 		init(accountAddress: AccountAddress, epoch: Epoch) {

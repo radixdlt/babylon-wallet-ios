@@ -1,10 +1,12 @@
 import Sargon
 
 // MARK: - OlympiaAccountToMigrate
-struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
+struct OlympiaAccountToMigrate: Hashable, CustomDebugStringConvertible, Identifiable {
 	typealias ID = Secp256k1PublicKey
 
-	var id: ID { publicKey }
+	var id: ID {
+		publicKey
+	}
 
 	let accountType: Olympia.AccountType
 

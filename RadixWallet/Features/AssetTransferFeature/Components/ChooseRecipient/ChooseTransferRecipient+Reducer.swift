@@ -4,11 +4,11 @@ import SwiftUI
 
 // MARK: - ChooseTransferRecipient
 @Reducer
-struct ChooseTransferRecipient: Sendable, FeatureReducer {
+struct ChooseTransferRecipient: FeatureReducer {
 	static let xrdDomainsHelp = URL(string: "https://docs.xrd.domains/#/wiki/records/namelets")!
 
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var chooseAccounts: ChooseAccounts.State
 		var manualTransferRecipient: String = "" {
 			didSet {
@@ -39,7 +39,7 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case scanQRCode
 		case closeButtonTapped
 		case manualTransferRecipientChanged(String)
@@ -47,29 +47,29 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 		case chooseButtonTapped(Either<Account, State.ManualTransferRecipient>)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case rnsDomainConfiguredRecieverResult(TaskResult<RnsDomainConfiguredReceiver>)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 		case handleResult(TransferRecipient)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case scanTransferRecipient(ScanQRCoordinator.State)
 			case domainResolutionErrorAlert(AlertState<DomainResolutionErrorAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case scanTransferRecipient(ScanQRCoordinator.Action)
 			case domainResolutionErrorAlert(DomainResolutionErrorAlert)
 		}
@@ -84,8 +84,6 @@ struct ChooseTransferRecipient: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.radixNameService) var radixNameService
 	@Dependency(\.errorQueue) var errorQueue
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.chooseAccounts, action: \.child.chooseAccounts) {
@@ -208,7 +206,7 @@ extension String {
 }
 
 // MARK: - DomainResolutionErrorAlert
-enum DomainResolutionErrorAlert: Sendable, Hashable {
+enum DomainResolutionErrorAlert: Hashable {
 	case okTapped
 	case visitXrdDomain
 }

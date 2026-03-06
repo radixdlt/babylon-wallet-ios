@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - ChoosePersonas
 @Reducer
-struct ChoosePersonas: Sendable, FeatureReducer {
+struct ChoosePersonas: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var availablePersonas: IdentifiedArrayOf<PersonaRow.State> = []
 		var selectedPersonas: [PersonaRow.State]? = nil
 		let selectionRequirement: SelectionRequirement
@@ -15,12 +15,12 @@ struct ChoosePersonas: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case selectedPersonasChanged([PersonaRow.State]?)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case personasLoaded(Personas)
 	}
 

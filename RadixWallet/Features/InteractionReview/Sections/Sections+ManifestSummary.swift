@@ -2,7 +2,7 @@ import Sargon
 
 extension InteractionReview.Sections {
 	func sections(for summary: ManifestSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
-		/// Only GeneralSubintent classification is allowed for PreAuth transactions
+		// Only GeneralSubintent classification is allowed for PreAuth transactions
 		guard summary.classification.first == .generalSubintent else {
 			return nil
 		}

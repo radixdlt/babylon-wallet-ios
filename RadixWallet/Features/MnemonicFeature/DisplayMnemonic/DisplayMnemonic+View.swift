@@ -45,7 +45,6 @@ extension DisplayMnemonic {
 			.radixToolbar(title: L10n.RevealSeedPhrase.title)
 		}
 
-		@ViewBuilder
 		private func wordsGrid() -> some SwiftUI.View {
 			SwiftUI.Grid(horizontalSpacing: .small2, verticalSpacing: .medium1) {
 				ForEach(Array(store.words.chunks(ofCount: 3).enumerated()), id: \.offset) { _, row in
@@ -58,7 +57,6 @@ extension DisplayMnemonic {
 			}
 		}
 
-		@ViewBuilder
 		private func wordBox(_ word: OffsetIdentified<BIP39Word>) -> some SwiftUI.View {
 			AppTextField(
 				primaryHeading: .init(

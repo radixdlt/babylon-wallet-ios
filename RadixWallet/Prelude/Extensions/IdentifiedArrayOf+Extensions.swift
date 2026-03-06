@@ -30,7 +30,9 @@ extension Collection {
 
 // MARK: - OffsetIdentified
 struct OffsetIdentified<Element>: Identifiable {
-	var id: Int { offset }
+	var id: Int {
+		offset
+	}
 
 	let offset: Int
 	let element: Element
@@ -46,5 +48,7 @@ extension OffsetIdentified: Hashable where Element: Hashable {}
 extension OffsetIdentified: Sendable where Element: Sendable {}
 
 extension OffsetIdentified where Element: Collection {
-	var isEmpty: Bool { element.isEmpty }
+	var isEmpty: Bool {
+		element.isEmpty
+	}
 }

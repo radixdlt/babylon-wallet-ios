@@ -4,7 +4,7 @@ import DependenciesAdditions
 import os
 
 // MARK: - SecurityCenterClient
-struct SecurityCenterClient: DependencyKey, Sendable {
+struct SecurityCenterClient: DependencyKey {
 	let startMonitoring: StartMonitoring
 	let problems: Problems
 	let lastManualBackup: LastManualBackup
@@ -106,7 +106,7 @@ extension SecurityProblem {
 }
 
 // MARK: - BackupStatus
-struct BackupStatus: Hashable, Codable, Sendable {
+struct BackupStatus: Hashable, Codable {
 	let result: BackupResult
 	let isCurrent: Bool
 

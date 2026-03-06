@@ -4,8 +4,8 @@ import SwiftUI
 #if DEBUG
 
 // MARK: - DebugKeychainTest
-struct DebugKeychainTest: Sendable, FeatureReducer {
-	enum Status: Sendable, Hashable {
+struct DebugKeychainTest: FeatureReducer {
+	enum Status: Hashable {
 		case new
 		case initializing
 		case initialized
@@ -16,7 +16,7 @@ struct DebugKeychainTest: Sendable, FeatureReducer {
 		case finishedSuccessfully
 	}
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var status: Status = .new
 		var containsDataForAuth: Bool = false
 		var containsDataForNoAuth: Bool = false
@@ -24,12 +24,12 @@ struct DebugKeychainTest: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case statusChanged(Status)
 		case containsResult(contains: Bool, key: KeychainClient.Key)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case testAuth
 		case testNoAuth

@@ -17,7 +17,6 @@ extension View {
 		}
 	}
 
-	@ViewBuilder
 	func loadable<T>(
 		_ loadable: Loadable<T>,
 		loadingViewHeight: CGFloat = .large1,
@@ -33,7 +32,6 @@ extension View {
 		)
 	}
 
-	@ViewBuilder
 	func shimmeringLoadingView(height: CGFloat = .large1, backgroundColor: Color = .tertiaryBackground) -> some View {
 		Spacer()
 			.background(backgroundColor)

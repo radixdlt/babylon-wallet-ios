@@ -119,7 +119,7 @@ extension UIPresentationController {
 	}
 }
 
-// basic swizzling logic. could probably be generalised to be used anywhere else where needed.
+/// basic swizzling logic. could probably be generalised to be used anywhere else where needed.
 extension UIPresentationController {
 	fileprivate static var swizzledSelectors: [Selector: Void] = [:]
 

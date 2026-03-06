@@ -155,8 +155,8 @@ extension TransactionHistoryFilters {
 			private let collapsedRowLimit: Int = 3
 			private let spacing: CGSize = .init(width: .small3, height: .small2)
 
-			// When clipping the view, the rounded corners elements (which are clipped in a Capsule) next to an edge will look trimmed.
-			// Therefore, we leave a minimum padding on each edge to avoid this unwanted effect.
+			/// When clipping the view, the rounded corners elements (which are clipped in a Capsule) next to an edge will look trimmed.
+			/// Therefore, we leave a minimum padding on each edge to avoid this unwanted effect.
 			private let clippedPadding: CGFloat = 1
 
 			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: CollapseLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
@@ -236,7 +236,7 @@ struct ItemFilterPickerView<ID: Hashable & Sendable>: SwiftUI.View {
 }
 
 // MARK: - ItemFilter
-struct ItemFilter<ID: Hashable & Sendable>: Hashable, Sendable, Identifiable {
+struct ItemFilter<ID: Hashable & Sendable>: Hashable, Identifiable {
 	let id: ID
 	let icon: ImageResource?
 	let label: String

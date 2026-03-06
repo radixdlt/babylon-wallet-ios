@@ -1,14 +1,12 @@
 import Sargon
 
 // MARK: - RadixDashboard
-struct RadixDashboard: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
+struct RadixDashboard: Hashable, Codable, Identifiable, CustomStringConvertible {
 	typealias ID = URL
 
 	let url: URL
-	var id: ID { url }
-
-	init(url: URL) {
-		self.url = url
+	var id: ID {
+		url
 	}
 }
 

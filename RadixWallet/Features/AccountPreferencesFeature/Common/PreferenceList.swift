@@ -87,7 +87,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 				if row.id == selection {
 					Image(asset: AssetResource.check)
 				} else {
-					/// Put a placeholder for unselected items.
+					// Put a placeholder for unselected items.
 					FixedSpacer(width: .medium1)
 				}
 			} else {

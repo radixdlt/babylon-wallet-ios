@@ -24,7 +24,7 @@ extension InteractionReview {
 			}
 		}
 
-		struct ViewState: Hashable, Sendable {
+		struct ViewState: Hashable {
 			let validators: [ValidatorView.ViewState]
 			var isExpanded: Bool
 
@@ -38,8 +38,11 @@ extension InteractionReview {
 	struct ValidatorView: SwiftUI.View {
 		let viewState: ViewState
 
-		struct ViewState: Hashable, Sendable, Identifiable {
-			var id: ValidatorAddress { address }
+		struct ViewState: Hashable, Identifiable {
+			var id: ValidatorAddress {
+				address
+			}
+
 			let address: ValidatorAddress
 			let name: String?
 			let thumbnail: URL?

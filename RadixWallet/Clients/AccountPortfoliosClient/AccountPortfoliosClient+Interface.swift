@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - AccountPortfoliosClient
-struct AccountPortfoliosClient: Sendable {
+struct AccountPortfoliosClient {
 	/// Fetches the account portfolios for the given addresses.
 	///
 	/// Will return the portfolios after fetch, as well will notify any subscribes through `portfolioForAccount`
@@ -60,11 +60,11 @@ extension AccountPortfoliosClient {
 					.map(\.address)
 
 				let involvedPoolAddresses = manifest.involvedPoolAddresses
-				/// Refresh the resources if an operation on resource pool is involved,
-				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
+				// Refresh the resources if an operation on resource pool is involved,
+				// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
 				if !involvedPoolAddresses.isEmpty {
-					/// A little bit too aggressive, as any other resource will also be refreshed.
-					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
+					// A little bit too aggressive, as any other resource will also be refreshed.
+					// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
 					poolAddressesToRefresh = involvedPoolAddresses
 				} else {
 					poolAddressesToRefresh = nil

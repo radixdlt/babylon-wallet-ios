@@ -39,7 +39,6 @@ extension ArculusPINInput {
 			}
 		}
 
-		@ViewBuilder
 		func pinInputView(text: String, input: String.SubSequence, isFocused: Bool) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small3) {
 				Text(text)

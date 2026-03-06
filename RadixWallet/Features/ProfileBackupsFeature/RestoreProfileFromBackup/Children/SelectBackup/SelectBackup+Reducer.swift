@@ -3,16 +3,16 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - SelectBackup
-struct SelectBackup: Sendable, FeatureReducer {
-	struct State: Hashable, Sendable {
-		enum Status: Hashable, Sendable {
+struct SelectBackup: FeatureReducer {
+	struct State: Hashable {
+		enum Status: Hashable {
 			case start
 			case migrating
 			case loading
 			case loaded
 			case failed(FailureReason)
 
-			enum FailureReason: Sendable {
+			enum FailureReason {
 				case networkUnavailable
 				case accountTemporarilyUnavailable
 				case notAuthenticated
@@ -45,13 +45,13 @@ struct SelectBackup: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.Action)
 		}
@@ -66,7 +66,7 @@ struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case selectedProfile(Profile.Header?)
 		case importFromFileInstead
@@ -77,12 +77,12 @@ struct SelectBackup: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setStatus(State.Status)
 		case loadedProfileHeadersFromCloudBackup([Profile.Header]?)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selectedProfile(Profile, containsLegacyP2PLinks: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
@@ -96,8 +96,6 @@ struct SelectBackup: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.userDefaults) var userDefaults
-
-	init() {}
 
 	var body: some ReducerOf<SelectBackup> {
 		Reduce(core)

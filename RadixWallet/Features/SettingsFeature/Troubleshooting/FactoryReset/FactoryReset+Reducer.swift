@@ -1,6 +1,6 @@
 // MARK: - FactoryReset
-struct FactoryReset: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct FactoryReset: FeatureReducer {
+	struct State: Hashable {
 		var isRecoverable = true
 
 		@PresentationState
@@ -9,26 +9,26 @@ struct FactoryReset: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstTask
 		case resetWalletButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setIsRecoverable(Bool)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case confirmReset(AlertState<Action.ConfirmReset>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Hashable {
+		enum Action: Hashable {
 			case confirmReset(ConfirmReset)
 
-			enum ConfirmReset: Sendable, Hashable {
+			enum ConfirmReset: Hashable {
 				case confirm
 			}
 		}
@@ -40,8 +40,6 @@ struct FactoryReset: Sendable, FeatureReducer {
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.resetWalletClient) var resetWalletClient
-
-	init() {}
 
 	var body: some ReducerOf<FactoryReset> {
 		Reduce(core)

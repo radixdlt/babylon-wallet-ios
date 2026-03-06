@@ -67,9 +67,9 @@ import SwiftUI
 
 // MARK: - AssetsView.State.Mode
 extension AssetsView.State {
-	enum Mode: Hashable, Sendable {
-		struct SelectedAssets: Hashable, Sendable {
-			struct NonFungibleTokensPerResource: Hashable, Sendable, Identifiable {
+	enum Mode: Hashable {
+		struct SelectedAssets: Hashable {
+			struct NonFungibleTokensPerResource: Hashable, Identifiable {
 				var id: ResourceAddress {
 					resource.resourceAddress
 				}

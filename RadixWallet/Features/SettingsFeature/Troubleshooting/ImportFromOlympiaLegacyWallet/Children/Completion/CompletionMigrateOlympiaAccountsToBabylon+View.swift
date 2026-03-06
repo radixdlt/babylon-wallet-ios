@@ -46,8 +46,11 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 		let subtitle: String
 		let accounts: [AccountToBabylon]
 
-		struct AccountToBabylon: Sendable, Hashable, Identifiable {
-			var id: AccountAddress { address }
+		struct AccountToBabylon: Hashable, Identifiable {
+			var id: AccountAddress {
+				address
+			}
+
 			let name: String?
 			let address: AccountAddress
 			let previouslyMigrated: Bool

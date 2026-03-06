@@ -2,19 +2,19 @@ import Foundation
 import Sargon
 
 // MARK: - BIP39LookupResult
-enum BIP39LookupResult: Sendable, Hashable {
+enum BIP39LookupResult: Hashable {
 	case unknown(Unknown)
 	case known(Known)
 
-	enum Unknown: Sendable, Hashable {
+	enum Unknown: Hashable {
 		/// Text was too short (possible empty)
 		case tooShort
 		/// Text is known to **not** be in the list
 		case notInList(input: NonEmptyString)
 	}
 
-	enum Known: Sendable, Hashable {
-		enum UnambiguousMatch: Sendable, Hashable {
+	enum Known: Hashable {
+		enum UnambiguousMatch: Hashable {
 			/// "zoo" **exactly** and **unambiguously** matches "zoo"
 			/// however "cat" exactly, but does **not** unambiguously, match "cat",
 			/// because "category" is another candiate.

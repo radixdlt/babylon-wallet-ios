@@ -2,14 +2,12 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Settings
-struct Settings: Sendable, FeatureReducer {
+struct Settings: FeatureReducer {
 	typealias Store = StoreOf<Self>
-
-	init() {}
 
 	// MARK: State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@PresentationState
 		var destination: Destination.State?
 
@@ -21,7 +19,7 @@ struct Settings: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case securityCenterButtonTapped
 		case personasButtonTapped
@@ -31,14 +29,14 @@ struct Settings: Sendable, FeatureReducer {
 		case debugButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setPersonas([IdentityAddress])
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case securityCenter(SecurityCenter.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case personas(PersonasCoordinator.State)
@@ -48,7 +46,7 @@ struct Settings: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case securityCenter(SecurityCenter.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case personas(PersonasCoordinator.Action)

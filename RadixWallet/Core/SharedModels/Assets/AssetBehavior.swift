@@ -1,6 +1,6 @@
 
 // MARK: - AssetBehavior
-enum AssetBehavior: Sendable, Hashable, Codable, Comparable {
+enum AssetBehavior: Hashable, Codable, Comparable {
 	case simpleAsset
 
 	case supplyIncreasable

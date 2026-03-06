@@ -107,14 +107,14 @@ final class EntitiesHidingTests: TestCase {
 		XCTAssertTrue(sut.hasSomePersona())
 	}
 
-	func test_GIVEN_hasSharedAccountsWithDapps_WHEN_accountIsHidden_THEN_accountIsRemovedFromSharedAccounts() {
+	func test_GIVEN_hasSharedAccountsWithDapps_WHEN_accountIsHidden_THEN_accountIsRemovedFromSharedAccounts() throws {
 		var sut = network
 		sut.hide(account: account0)
 
-		let authorizedDapp0 = sut.authorizedDapps.asIdentified()[id: dApp0.id]!
-		let authorizedDapp1 = sut.authorizedDapps.asIdentified()[id: dApp1.id]!
+		let authorizedDapp0 = try XCTUnwrap(sut.authorizedDapps.asIdentified()[id: dApp0.id])
+		let authorizedDapp1 = try XCTUnwrap(sut.authorizedDapps.asIdentified()[id: dApp1.id])
 
-		/// Assert that account0 is not present anymore, but account1 is still kept.
+		// Assert that account0 is not present anymore, but account1 is still kept.
 		XCTAssertEqual(authorizedDapp0.referencesToAuthorizedPersonas.asIdentified()[id: sharedPersona0.id]?.sharedAccounts?.ids, [account1.address])
 		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas.asIdentified()[id: sharedPersona0.id]?.sharedAccounts?.ids, [account1.address])
 		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas.asIdentified()[id: sharedPersona1.id]?.sharedAccounts?.ids, [account1.address])
@@ -124,7 +124,7 @@ final class EntitiesHidingTests: TestCase {
 		var sut = network
 		sut.hide(persona: persona0)
 
-		/// dApp0 references only persona0
+		// dApp0 references only persona0
 		XCTAssertNil(sut.authorizedDapps.asIdentified()[id: dApp0.id])
 	}
 
@@ -132,10 +132,10 @@ final class EntitiesHidingTests: TestCase {
 		var sut = network
 		sut.hide(persona: persona0)
 
-		/// authorizedDapp1 references persona0 and persona1
+		// authorizedDapp1 references persona0 and persona1
 		let authorizedDapp1 = try XCTUnwrap(sut.authorizedDapps.first { $0.dAppDefinitionAddress == dApp1.dAppDefinitionAddress })
 
-		/// Assert that persona0 is removed, but persona1 is still kept.
+		// Assert that persona0 is removed, but persona1 is still kept.
 		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas.map(\.identityAddress), [persona1.address])
 	}
 }

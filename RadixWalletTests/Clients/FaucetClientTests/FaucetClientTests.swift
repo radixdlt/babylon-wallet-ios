@@ -53,7 +53,7 @@ final class FaucetClientTests: TestCase {
 		)
 	}
 
-	func test__GIVEN__no_persisted_json__WHEN__isAllowedToUseFaucet_is_called__THEN__true() async throws {
+	func test__GIVEN__no_persisted_json__WHEN__isAllowedToUseFaucet_is_called__THEN__true() async {
 		let sut = FaucetClient.liveValue
 		let userDefaults = UserDefaults.Dependency.ephemeral()
 		await withDependencies {
@@ -65,7 +65,7 @@ final class FaucetClientTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_3__THEN__true() async throws {
+	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_3__THEN__true() async {
 		let sut = FaucetClient.liveValue
 
 		let userDefaults = UserDefaults.Dependency.ephemeral()
@@ -80,7 +80,7 @@ final class FaucetClientTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_4__THEN__true() async throws {
+	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_4__THEN__true() async {
 		let sut = FaucetClient.liveValue
 		let userDefaults = UserDefaults.Dependency.ephemeral()
 		var epochs = EpochForWhenLastUsedByAccountAddress(epochForAccounts: [EpochForWhenLastUsedByAccountAddress.EpochForAccount(accountAddress: acco0, epoch: 2)])
@@ -94,7 +94,7 @@ final class FaucetClientTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_2__THEN__false() async throws {
+	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_2__THEN__false() async {
 		let sut = FaucetClient.liveValue
 		let userDefaults = UserDefaults.Dependency.ephemeral()
 		var epochs = EpochForWhenLastUsedByAccountAddress(epochForAccounts: [EpochForWhenLastUsedByAccountAddress.EpochForAccount(accountAddress: acco0, epoch: 2)])

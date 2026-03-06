@@ -4,13 +4,13 @@ import SwiftUI
 let epochDurationInMinutes = 5
 
 // MARK: - SubmitTransaction
-struct SubmitTransaction: Sendable, FeatureReducer {
+struct SubmitTransaction: FeatureReducer {
 	private enum CancellableId: Hashable {
 		case transactionStatus
 	}
 
-	struct State: Sendable, Hashable {
-		enum TXStatus: Sendable, Hashable {
+	struct State: Hashable {
+		enum TXStatus: Hashable {
 			case notYetSubmitted
 			case submitting
 			case submitted
@@ -41,23 +41,23 @@ struct SubmitTransaction: Sendable, FeatureReducer {
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case submitTXResult(TaskResult<TransactionIntentHash>)
 		case statusUpdate(State.TXStatus)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case closeButtonTapped
 		case dismissTransactionAlert(PresentationAction<DismissAlertAction>)
 
-		enum DismissAlertAction: Sendable, Equatable {
+		enum DismissAlertAction: Equatable {
 			case cancel
 			case confirm
 		}
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case failedToSubmit
 		case submittedButNotCompleted(TransactionIntentHash)
 		case committedSuccessfully(TransactionIntentHash)

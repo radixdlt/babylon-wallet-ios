@@ -1,8 +1,8 @@
 // MARK: - DAppsFiltering
 @Reducer
-struct DAppsFiltering: Sendable, FeatureReducer {
+struct DAppsFiltering: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var searchBarFocused: Bool = false
 		var searchTerm: String = ""
 		var filterTags: OrderedSet<OnLedgerTag> = []
@@ -15,7 +15,7 @@ struct DAppsFiltering: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case searchTermChanged(String)
 		case focusChanged(Bool)
 		case filtersTapped
@@ -24,12 +24,12 @@ struct DAppsFiltering: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case tagSelection(DAppTagsSelection.State)
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case tagSelection(DAppTagsSelection.Action)
 		}
 

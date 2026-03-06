@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DappInteractionLoading
-struct DappInteractionLoading: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct DappInteractionLoading: FeatureReducer {
+	struct State: Hashable {
 		let interaction: DappToWalletInteraction
 		var isLoading: Bool = false
 
@@ -15,22 +15,22 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case errorAlert(PresentationAction<ErrorAlertAction>)
 		case dismissButtonTapped
 
-		enum ErrorAlertAction: Sendable, Equatable {
+		enum ErrorAlertAction: Equatable {
 			case retryButtonTapped
 			case cancelButtonTapped
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case dappMetadataLoadingResult(TaskResult<DappMetadata>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dappMetadataLoaded(DappMetadata)
 		case dismiss
 	}
@@ -83,8 +83,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 								cached.description != nil,
 								cached.thumbnail != nil
 							else {
-								/// Some of these fields were not set, fetch and see if they
-								/// have been updated since last time...
+								// Some of these fields were not set, fetch and see if they
+								// have been updated since last time...
 								return .cachedIsInvalid
 							}
 							// All relevant fields are set, the cached metadata is valid.

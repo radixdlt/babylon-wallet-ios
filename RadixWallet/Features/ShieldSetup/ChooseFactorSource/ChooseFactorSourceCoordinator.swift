@@ -1,8 +1,8 @@
 // MARK: - ChooseFactorSourceCoordinator
 @Reducer
-struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
+struct ChooseFactorSourceCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 		let context: ChooseFactorSourceContext
 		var kind: ChooseFactorSourceKind.State
@@ -22,17 +22,17 @@ struct ChooseFactorSourceCoordinator: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case kind(ChooseFactorSourceKind.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished
 	}
 
@@ -91,7 +91,7 @@ private extension ChooseFactorSourceCoordinator {
 }
 
 // MARK: - ChooseFactorSourceContext
-enum ChooseFactorSourceContext: Sendable, Hashable {
+enum ChooseFactorSourceContext: Hashable {
 	case primaryThreshold
 	case primaryOverride
 	case recovery

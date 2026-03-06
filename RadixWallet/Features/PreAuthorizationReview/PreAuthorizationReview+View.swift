@@ -195,7 +195,6 @@ extension PreAuthorizationReview {
 			.clipShape(RoundedRectangle(cornerRadius: .small1))
 		}
 
-		@ViewBuilder
 		private func expiration(_ expiration: Expiration, secondsToExpiration: Int?) -> some SwiftUI.View {
 			Group {
 				switch expiration {

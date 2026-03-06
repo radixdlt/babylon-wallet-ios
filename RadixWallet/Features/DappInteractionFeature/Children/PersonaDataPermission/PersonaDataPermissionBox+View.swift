@@ -30,8 +30,7 @@ extension PersonaDataPermissionBox.State {
 			.keys
 			.nilIfEmpty
 			.map { kinds in
-				let items = kinds.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
-				return items
+				kinds.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
 			}
 	}
 }

@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Persona
-struct PersonaFeature: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
+struct PersonaFeature: FeatureReducer {
+	struct State: Hashable, Identifiable {
 		let id: Persona.ID
 		let thumbnail: URL?
 		let displayName: String
@@ -43,12 +43,12 @@ struct PersonaFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case tapped
 		case securityProblemTapped(SecurityProblem)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case openDetails
 		case handleSecurityProblem(SecurityProblem)
 	}

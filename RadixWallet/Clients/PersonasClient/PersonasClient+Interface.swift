@@ -2,7 +2,7 @@ import IdentifiedCollections
 import Sargon
 
 // MARK: - PersonasClient
-struct PersonasClient: Sendable {
+struct PersonasClient {
 	var personas: PersonasUpdates
 	var getPersonas: GetPersonas
 	var getPersonasOnNetwork: GetPersonasOnNetwork
@@ -14,28 +14,6 @@ struct PersonasClient: Sendable {
 	var hasSomePersonaOnCurrentNetwork: HasSomePersonaOnCurrentNetwork
 
 	var personaUpdates: PersonaUpdates
-
-	init(
-		personas: @escaping PersonasUpdates,
-		getPersonas: @escaping GetPersonas,
-		getPersonasOnNetwork: @escaping GetPersonasOnNetwork,
-		getHiddenPersonasOnCurrentNetwork: @escaping GetHiddenPersonasOnCurrentNetwork,
-		updatePersona: @escaping UpdatePersona,
-		saveVirtualPersona: @escaping SaveVirtualPersona,
-		hasSomePersonaOnAnyNetwork: @escaping HasSomePersonaOnAnyNetworks,
-		hasSomePersonaOnCurrentNetwork: @escaping HasSomePersonaOnCurrentNetwork,
-		personaUpdates: @escaping PersonaUpdates
-	) {
-		self.personas = personas
-		self.getPersonas = getPersonas
-		self.getPersonasOnNetwork = getPersonasOnNetwork
-		self.getHiddenPersonasOnCurrentNetwork = getHiddenPersonasOnCurrentNetwork
-		self.updatePersona = updatePersona
-		self.saveVirtualPersona = saveVirtualPersona
-		self.hasSomePersonaOnAnyNetwork = hasSomePersonaOnAnyNetwork
-		self.hasSomePersonaOnCurrentNetwork = hasSomePersonaOnCurrentNetwork
-		self.personaUpdates = personaUpdates
-	}
 }
 
 extension PersonasClient {

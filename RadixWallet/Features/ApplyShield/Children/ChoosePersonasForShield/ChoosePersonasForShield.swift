@@ -1,24 +1,24 @@
 @Reducer
-struct ChoosePersonasForShield: Sendable, FeatureReducer {
+struct ChoosePersonasForShield: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var choosePersonas: ChoosePersonas.State
 		let canBeSkipped: Bool
 	}
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case continueButtonTapped([PersonaRow.State])
 		case skipButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case choosePersonas(ChoosePersonas.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished([IdentityAddress])
 	}
 

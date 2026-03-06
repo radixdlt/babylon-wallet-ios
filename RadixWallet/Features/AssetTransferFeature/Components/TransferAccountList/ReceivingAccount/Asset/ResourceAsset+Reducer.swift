@@ -3,10 +3,10 @@ import SwiftUI
 
 // MARK: - ResourceAsset
 // Higher order reducer composing all types of assets that can be transferred
-struct ResourceAsset: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
+struct ResourceAsset: FeatureReducer {
+	struct State: Hashable, Identifiable {
 		@CasePathable
-		enum Kind: Sendable, Hashable {
+		enum Kind: Hashable {
 			case fungibleAsset(FungibleResourceAsset.State)
 			case nonFungibleAsset(NonFungibleResourceAsset.State)
 
@@ -43,27 +43,27 @@ struct ResourceAsset: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case fungibleAsset(FungibleResourceAsset.Action)
 		case nonFungibleAsset(NonFungibleResourceAsset.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case amountChanged
 		case removed
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case removeTapped
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case loadedBalance(KnownResourceBalance, OnLedgerEntity.NonFungibleToken? = nil)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
 			case lsuDetails(LSUDetails.State)
@@ -71,7 +71,7 @@ struct ResourceAsset: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
 			case lsuDetails(LSUDetails.Action)

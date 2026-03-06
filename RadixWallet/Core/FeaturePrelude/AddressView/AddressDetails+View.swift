@@ -96,7 +96,6 @@ extension AddressDetails {
 			.animation(.easeInOut, value: store.qrImage.isSuccess)
 		}
 
-		@ViewBuilder
 		private var actions: some SwiftUI.View {
 			FlowLayout(multilineAlignment: .center, spacing: .large3) {
 				actionButton(L10n.AddressDetails.copy, image: .copyBig) {

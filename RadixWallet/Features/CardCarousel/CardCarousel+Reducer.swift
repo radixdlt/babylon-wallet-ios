@@ -2,27 +2,27 @@ import ComposableArchitecture
 
 // MARK: - CardCarousel
 @Reducer
-struct CardCarousel: FeatureReducer, Sendable {
+struct CardCarousel: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		var cards: [HomeCard] = []
 	}
 
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case task
 		case cardTapped(HomeCard)
 		case closeTapped(HomeCard)
 	}
 
 	@CasePathable
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setCards([HomeCard])
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case addConnector
 	}
 

@@ -1,8 +1,8 @@
 // MARK: - RolesSetupCoordinator
 @Reducer
-struct RolesSetupCoordinator: Sendable, FeatureReducer {
+struct RolesSetupCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var path: Path.State = .primaryRoleSetup(.init())
 
 		@Presents
@@ -18,23 +18,23 @@ struct RolesSetupCoordinator: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case path(Path.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished
 		case push(Path.State)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case chooseFactorSource(ChooseFactorSourceCoordinator.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case chooseFactorSource(ChooseFactorSourceCoordinator.Action)
 		}
 

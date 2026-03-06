@@ -25,8 +25,8 @@ struct EntitySecurityProblemsView: SwiftUI.View {
 
 // MARK: EntitySecurityProblemsView.Config
 extension EntitySecurityProblemsView {
-	struct Config: Sendable, Hashable {
-		enum Kind: Sendable, Hashable {
+	struct Config: Hashable {
+		enum Kind: Hashable {
 			case account(AccountAddress)
 			case persona(IdentityAddress)
 		}

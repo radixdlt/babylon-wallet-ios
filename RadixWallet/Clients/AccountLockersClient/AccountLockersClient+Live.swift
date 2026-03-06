@@ -275,7 +275,7 @@ extension AccountLockersClient {
 }
 
 // MARK: - DappWithLockerAddress
-private struct DappWithLockerAddress: Sendable, Hashable {
+private struct DappWithLockerAddress: Hashable {
 	let dapp: AuthorizedDapp
 	let lockerAddress: LockerAddress
 }

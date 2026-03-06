@@ -1,6 +1,6 @@
 // MARK: - OverlayWindowClient
 /// This client is the intermediary between Main Window and the Overlay Window.
-struct OverlayWindowClient: Sendable {
+struct OverlayWindowClient {
 	/// All scheduled items to be shown in Content Overlay Window.
 	var scheduledContent: ScheduledContent
 
@@ -64,16 +64,16 @@ extension OverlayWindowClient {
 
 // MARK: OverlayWindowClient.Item
 extension OverlayWindowClient {
-	enum Item: Sendable, Hashable {
+	enum Item: Hashable {
 		typealias AlertState = ComposableArchitecture.AlertState<AlertAction>
-		enum AlertAction: Sendable, Hashable {
+		enum AlertAction: Hashable {
 			case primaryButtonTapped
 			case secondaryButtonTapped
 			case dismissed
 			case emailSupport(additionalInfo: String)
 		}
 
-		struct HUD: Sendable, Hashable, Identifiable {
+		struct HUD: Hashable, Identifiable {
 			let id = UUID()
 			let text: String
 			let icon: Icon?
@@ -100,8 +100,8 @@ extension OverlayWindowClient {
 			}
 		}
 
-		struct Icon: Hashable, Sendable {
-			enum Kind: Hashable, Sendable {
+		struct Icon: Hashable {
+			enum Kind: Hashable {
 				case asset(ImageAsset)
 				case system(String)
 			}
@@ -118,12 +118,12 @@ extension OverlayWindowClient {
 			}
 		}
 
-		enum Content: Sendable, Hashable {
+		enum Content: Hashable {
 			case sheet(SheetOverlayCoordinator.State)
 			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
 
-		enum Status: Sendable, Hashable {
+		enum Status: Hashable {
 			case hud(HUD)
 			case alert(AlertState)
 		}

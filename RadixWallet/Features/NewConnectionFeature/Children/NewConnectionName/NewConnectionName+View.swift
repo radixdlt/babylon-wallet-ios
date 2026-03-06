@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - NewConnectionName.State.Field
 extension NewConnectionName.State {
-	enum Field: String, Sendable, Hashable {
+	enum Field: String, Hashable {
 		case connectionName
 	}
 }

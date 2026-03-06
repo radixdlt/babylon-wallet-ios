@@ -2,18 +2,18 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DappInteractionCompletion
-struct DappInteractionCompletion: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct DappInteractionCompletion: FeatureReducer {
+	struct State: Hashable {
 		let kind: Kind
 		let dappMetadata: DappMetadata
 		let p2pRoute: P2P.Route
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case dismissTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 	}
 
@@ -29,7 +29,7 @@ typealias DappInteractionCompletionKind = DappInteractionCompletion.State.Kind
 
 // MARK: - DappInteractionCompletion.State.Kind
 extension DappInteractionCompletion.State {
-	enum Kind: Sendable, Hashable {
+	enum Kind: Hashable {
 		/// Completion view shown after an authorized/unauthorized dApp interaction.
 		case personaData
 

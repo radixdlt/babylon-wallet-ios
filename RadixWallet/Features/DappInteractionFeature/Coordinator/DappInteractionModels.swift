@@ -8,7 +8,7 @@ enum DappInteraction {}
 /// Metadata for a dapp, either from a request or fetched from ledger.
 /// not to be confused with `DappToWalletInteractionMetadata` which is the
 /// associated value of one of the cases of this enum.
-enum DappMetadata: Sendable, Hashable {
+enum DappMetadata: Hashable {
 	/// The metadata sent with the request from the Dapp.
 	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
 	case request(DappToWalletInteractionMetadata)
@@ -21,7 +21,7 @@ enum DappMetadata: Sendable, Hashable {
 
 extension DappMetadata {
 	static let wallet: Wallet = .init()
-	struct Wallet: Sendable, Hashable {
+	struct Wallet: Hashable {
 		let origin: DappOrigin = .wallet
 		let name: NonEmptyString = "Radix Wallet"
 		let description: String? = nil
@@ -32,7 +32,7 @@ extension DappMetadata {
 // MARK: DappMetadata.Ledger
 extension DappMetadata {
 	/// A detailed DappMetaData fetched from Ledger.
-	struct Ledger: Sendable, Hashable, Codable {
+	struct Ledger: Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
 		let request: DappToWalletInteractionMetadata
@@ -115,15 +115,14 @@ extension DappMetadata {
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",
 		thumbnail: nil
-	)
-	)
+	))
 }
 #endif
 
 // MARK: - DappToWalletInteraction
 extension DappToWalletInteraction {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
-	enum AnyInteractionItem: Sendable, Hashable {
+	enum AnyInteractionItem: Hashable {
 		// requests
 		case auth(DappToWalletInteractionAuthRequestItem)
 		case oneTimeAccounts(DappToWalletInteractionAccountsRequestItem)
@@ -133,10 +132,10 @@ extension DappToWalletInteraction {
 		case personaProofOfOwnership(PersonaProofOfOwnership)
 		case accountsProofOfOwnership(AccountsProofOfOwnership)
 
-		// transactions
+		/// transactions
 		case submitTransaction(DappToWalletInteractionSendTransactionItem)
 
-		// preAuthorization
+		/// preAuthorization
 		case signSubintent(DappToWalletInteractionSubintentRequestItem)
 
 		var priority: some Comparable {
@@ -213,7 +212,7 @@ extension DappToWalletInteraction {
 }
 
 extension DappToWalletInteraction.AnyInteractionItem {
-	struct PersonaProofOfOwnership: Sendable, Hashable {
+	struct PersonaProofOfOwnership: Hashable {
 		let challenge: DappToWalletInteractionAuthChallengeNonce
 		let identityAddress: IdentityAddress
 
@@ -226,7 +225,7 @@ extension DappToWalletInteraction.AnyInteractionItem {
 		}
 	}
 
-	struct AccountsProofOfOwnership: Sendable, Hashable {
+	struct AccountsProofOfOwnership: Hashable {
 		let challenge: DappToWalletInteractionAuthChallengeNonce
 		let accountAddresses: [AccountAddress]
 
@@ -242,7 +241,7 @@ extension DappToWalletInteraction.AnyInteractionItem {
 
 // MARK: - WalletToDappInteractionSuccessResponse.AnyInteractionResponseItem
 extension WalletToDappInteractionSuccessResponse {
-	enum AnyInteractionResponseItem: Sendable, Hashable {
+	enum AnyInteractionResponseItem: Hashable {
 		// request responses
 		case auth(WalletToDappInteractionAuthRequestResponseItem)
 		case oneTimeAccounts(WalletToDappInteractionAccountsRequestResponseItem)
@@ -251,10 +250,10 @@ extension WalletToDappInteractionSuccessResponse {
 		case ongoingPersonaData(WalletToDappInteractionPersonaDataRequestResponseItem)
 		case proofOfOwnership(WalletToDappInteractionProofOfOwnershipRequestResponseItem)
 
-		// transaction responses
+		/// transaction responses
 		case send(WalletToDappInteractionSendTransactionResponseItem)
 
-		// preAuthorization responses
+		/// preAuthorization responses
 		case preAuthorization(WalletToDappInteractionPreAuthorizationResponseItems)
 	}
 

@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: InteractionReview.Kind
 extension InteractionReview {
-	enum Kind: Sendable, Hashable {
+	enum Kind: Hashable {
 		case transaction
 		case preAuthorization
 	}

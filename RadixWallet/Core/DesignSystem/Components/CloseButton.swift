@@ -2,10 +2,6 @@
 struct CloseButtonBar: View {
 	let action: () -> Void
 
-	init(action: @escaping () -> Void) {
-		self.action = action
-	}
-
 	var body: some View {
 		HStack {
 			CloseButton(action: action)
@@ -18,10 +14,6 @@ struct CloseButtonBar: View {
 // MARK: - CloseButton
 struct CloseButton: View {
 	let action: () -> Void
-
-	init(action: @escaping () -> Void) {
-		self.action = action
-	}
 
 	var body: some View {
 		Button(action: action) {

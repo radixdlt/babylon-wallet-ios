@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - EditPersonaEntries
-struct EditPersonaEntries: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct EditPersonaEntries: FeatureReducer {
+	struct State: Hashable {
 		// FIXME: Find a way to have an array of EditPersonaEntries, instead of separate properties
 		var name: EditPersonaEntry<EditPersonaName>.State?
 		var emailAddress: EditPersonaEntry<EditPersonaDynamicField>.State?
@@ -53,7 +53,7 @@ struct EditPersonaEntries: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case name(EditPersonaEntry<EditPersonaName>.Action)
 		case emailAddress(EditPersonaEntry<EditPersonaDynamicField>.Action)
 		case phoneNumber(EditPersonaEntry<EditPersonaDynamicField>.Action)

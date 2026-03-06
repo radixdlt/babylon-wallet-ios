@@ -10,8 +10,14 @@ extension AccountWithInfoHolder {
 		set { accountWithInfo.account = newValue }
 	}
 
-	var isLegacyAccount: Bool { accountWithInfo.isLegacyAccount }
-	var isLedgerAccount: Bool { accountWithInfo.isLedgerAccount }
+	var isLegacyAccount: Bool {
+		accountWithInfo.isLegacyAccount
+	}
+
+	var isLedgerAccount: Bool {
+		accountWithInfo.isLedgerAccount
+	}
+
 	var isDappDefinitionAccount: Bool {
 		get { accountWithInfo.isDappDefinitionAccount }
 		set { accountWithInfo.isDappDefinitionAccount = newValue }

@@ -80,7 +80,7 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 
 		var result: Set<AssetBehavior> = []
 
-		// Other names are checked individually, but without distinguishing between the role types
+		/// Other names are checked individually, but without distinguishing between the role types
 		func addBehavior(for rules: Set<ParsedAssignment.Explicit?>, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
 			if rules.contains(.allowAll) {
 				result.insert(ifAnyone)
@@ -101,7 +101,7 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 			addBehavior(for: moverUpdaters, ifSomeone: .movementRestrictableInFuture, ifAnyone: .movementRestrictableInFutureByAnyone)
 		}
 
-		// Other names are checked individually, but without distinguishing between the role types
+		/// Other names are checked individually, but without distinguishing between the role types
 		func addBehavior(for name: GatewayAPI.RoleKey.ParsedName, ifSomeone: AssetBehavior, ifAnyone: AssetBehavior) {
 			let performersAndUpdaters = updaters(name).union([performer(name)])
 			addBehavior(for: performersAndUpdaters, ifSomeone: ifSomeone, ifAnyone: ifAnyone)
@@ -119,7 +119,7 @@ extension GatewayAPI.ComponentEntityRoleAssignments {
 			return [.simpleAsset]
 		}
 
-		// Finally we make some simplifying substitutions
+		/// Finally we make some simplifying substitutions
 		func substitute(_ source: Set<AssetBehavior>, with target: AssetBehavior) {
 			if result.isSuperset(of: source) {
 				result.subtract(source)

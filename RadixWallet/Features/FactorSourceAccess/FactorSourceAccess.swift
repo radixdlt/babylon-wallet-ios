@@ -1,8 +1,8 @@
 // MARK: - FactorSourceAccess
 @Reducer
-struct FactorSourceAccess: Sendable, FeatureReducer {
+struct FactorSourceAccess: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let id: FactorSourceId
 		let purpose: Purpose
 		var factorSource: FactorSource?
@@ -32,26 +32,26 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case onFirstTask
 		case retryButtonTapped
 		case skipButtonTapped
 		case closeButtonTapped
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case setFactorSource(FactorSource?)
 		case hasP2PLinks(Bool)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case password(PasswordFactorSourceAccess.Action)
 		case offDeviceMnemonic(OffDeviceMnemonicFactorSourceAccess.Action)
 		case arculus(ArculusFactorSourceAccess.Action)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case perform(PrivateFactorSource)
 		case cancel
 		case skip
@@ -59,12 +59,12 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case errorAlert(AlertState<ErrorAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Hashable {
+		enum Action: Hashable {
 			case errorAlert(ErrorAlert)
 		}
 
@@ -72,7 +72,7 @@ struct FactorSourceAccess: Sendable, FeatureReducer {
 			EmptyReducer()
 		}
 
-		enum ErrorAlert: Sendable, Hashable {
+		enum ErrorAlert: Hashable {
 			case okTapped
 		}
 	}

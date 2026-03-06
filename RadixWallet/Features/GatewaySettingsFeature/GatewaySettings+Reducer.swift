@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - GatewaySettings
-struct GatewaySettings: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct GatewaySettings: FeatureReducer {
+	struct State: Hashable {
 		var gatewayList: GatewayList.State
 		var currentGateway: Gateway?
 		var validatedNewGatewayToSwitchTo: Gateway?
@@ -21,12 +21,12 @@ struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case addGatewayButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case savedGatewaysLoadedResult(TaskResult<SavedGateways>)
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
@@ -34,25 +34,25 @@ struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case gatewayList(GatewayList.Action)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case removeGateway(AlertState<Action.RemoveGatewayAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
 			case removeGateway(RemoveGatewayAlert)
 
-			enum RemoveGatewayAlert: Sendable, Hashable {
+			enum RemoveGatewayAlert: Hashable {
 				case removeButtonTapped(GatewayRow.State)
 				case cancelButtonTapped
 			}
@@ -68,7 +68,7 @@ struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	enum Error: String, LocalizedError, Sendable, Hashable {
+	enum Error: String, LocalizedError, Hashable {
 		case errorRemovingGateway
 		var errorDescription: String? {
 			switch self {

@@ -24,16 +24,16 @@ protocol PeerConnectionDelegate: Sendable {
 }
 
 // MARK: - ICEConnectionState
-enum ICEConnectionState: String, Sendable {
+enum ICEConnectionState: String {
 	case new, checking, connected, completed, failed, disconnected, closed
 }
 
 // MARK: - SignalingState
-enum SignalingState: String, Sendable, Hashable, Codable {
+enum SignalingState: String, Hashable, Codable {
 	case closed, stable, haveLocalOffer, haveLocalPrAnswer, haveRemoteOffer, haveRemotePrAnswer
 }
 
 // MARK: - DataChannelReadyState
-enum DataChannelReadyState: String, Sendable {
+enum DataChannelReadyState: String {
 	case closed, closing, connecting, connected
 }

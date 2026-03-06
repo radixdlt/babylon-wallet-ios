@@ -2,9 +2,9 @@
 extension Discover {
 	// MARK: - LearnAbout
 	@Reducer
-	struct LearnAbout: Sendable, FeatureReducer {
+	struct LearnAbout: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			var learnItemsList: LearnItemsList.State = .withAllItems()
 
 			var searchBarFocused: Bool = false
@@ -14,13 +14,13 @@ extension Discover {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case searchTermChanged(String)
 			case focusChanged(Bool)
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case learnItemsList(LearnItemsList.Action)
 		}
 

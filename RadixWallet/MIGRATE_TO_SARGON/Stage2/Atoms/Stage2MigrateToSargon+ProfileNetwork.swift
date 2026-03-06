@@ -106,10 +106,10 @@ extension ProfileNetwork {
 		var identifiedPersonas = personas.asIdentified()
 		var identifiedAuthorizedDapps = authorizedDapps.asIdentified()
 
-		/// Hide the persona themself
+		// Hide the persona themself
 		identifiedPersonas[id: id]?.hide()
 
-		/// Remove the persona reference on any authorized dapp
+		// Remove the persona reference on any authorized dapp
 		identifiedAuthorizedDapps.mutateAll { dapp in
 			var referencesToAuthorizedPersonas = dapp.referencesToAuthorizedPersonas.asIdentified()
 			referencesToAuthorizedPersonas.remove(id: id)
@@ -117,7 +117,7 @@ extension ProfileNetwork {
 		}
 		self.personas = identifiedPersonas.elements
 
-		/// Filter out dapps that do not reference any persona
+		// Filter out dapps that do not reference any persona
 		identifiedAuthorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
 		self.authorizedDapps = identifiedAuthorizedDapps.elements
 	}
@@ -169,7 +169,7 @@ extension ProfileNetworks {
 
 	enum Error:
 		Swift.Error,
-		Sendable,
+
 		Hashable
 	{
 		case unknownNetworkWithID(NetworkID)

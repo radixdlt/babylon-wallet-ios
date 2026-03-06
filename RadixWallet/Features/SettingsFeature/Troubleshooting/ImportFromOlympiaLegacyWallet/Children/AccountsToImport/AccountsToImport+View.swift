@@ -54,10 +54,6 @@ struct AccountView: View {
 
 	let viewState: ViewState
 
-	init(viewState: ViewState) {
-		self.viewState = viewState
-	}
-
 	var body: some View {
 		HStack(spacing: 0) {
 			VStack(alignment: .leading, spacing: .small1) {

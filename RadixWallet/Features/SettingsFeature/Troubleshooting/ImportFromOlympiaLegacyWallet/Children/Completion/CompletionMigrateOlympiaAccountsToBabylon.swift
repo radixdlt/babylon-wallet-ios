@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon
-struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct CompletionMigrateOlympiaAccountsToBabylon: FeatureReducer {
+	struct State: Hashable {
 		let previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount]
 		let migrated: IdentifiedArrayOf<Account>
 
@@ -16,12 +16,12 @@ struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case accountListButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finishedMigration(gotoAccountList: Bool)
 	}
 

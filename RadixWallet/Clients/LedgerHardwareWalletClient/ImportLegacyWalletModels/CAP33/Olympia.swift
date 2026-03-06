@@ -3,7 +3,7 @@ enum Olympia {}
 
 // MARK: Olympia.AccountType
 extension Olympia {
-	enum AccountType: String, Sendable, Hashable, CustomStringConvertible {
+	enum AccountType: String, Hashable, CustomStringConvertible {
 		case software = "S"
 		case hardware = "H"
 		var description: String {

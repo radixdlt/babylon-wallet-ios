@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentReducer: FeatureReducer & EmptyInitializable {
-	struct State: Sendable, Hashable {
+struct EditPersonaEntry<ContentReducer: FeatureReducer & EmptyInitializable>: FeatureReducer {
+	struct State: Hashable {
 		typealias ID = EntryKind
 		let kind: EntryKind
 		let isRequestedByDapp: Bool
@@ -10,15 +10,15 @@ struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentReducer: Fe
 		var content: ContentReducer.State
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case content(ContentReducer.Action)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case deleteButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case delete
 	}
 

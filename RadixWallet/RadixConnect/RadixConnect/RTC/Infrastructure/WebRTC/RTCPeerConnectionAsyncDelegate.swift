@@ -59,7 +59,7 @@ extension RTCPeerConnectionAsyncDelegate: RTCPeerConnectionDelegate {
 		onGeneratedICECandidateContinuation.yield(.init(from: candidate))
 	}
 
-	// IGNORED - below events are ignored
+	/// IGNORED - below events are ignored
 	func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
 		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
 	}

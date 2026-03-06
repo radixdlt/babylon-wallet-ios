@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - VerifyMnemonic
-struct VerifyMnemonic: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct VerifyMnemonic: FeatureReducer {
+	struct State: Hashable {
 		static let numberOfRandomWordsToConfirm = 3
 
 		let mnemonic: Mnemonic
@@ -34,7 +34,7 @@ struct VerifyMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case wordChanged(OffsetIdentified<String>)
 		case wordSubmitted
 		case textFieldFocused(Int?)
@@ -44,7 +44,7 @@ struct VerifyMnemonic: Sendable, FeatureReducer {
 		#endif
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case mnemonicVerified
 	}
 

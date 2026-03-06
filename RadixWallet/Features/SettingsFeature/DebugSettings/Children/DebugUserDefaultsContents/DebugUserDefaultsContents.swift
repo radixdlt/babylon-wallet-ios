@@ -4,9 +4,9 @@ import SwiftUI
 private let stringValuesTestKey = "stringValuesTestKey"
 
 // MARK: - DebugUserDefaultsContents
-struct DebugUserDefaultsContents: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		struct KeyValues: Sendable, Hashable, Identifiable {
+struct DebugUserDefaultsContents: FeatureReducer {
+	struct State: Hashable {
+		struct KeyValues: Hashable, Identifiable {
 			var id: String {
 				key.rawValue
 			}
@@ -24,12 +24,12 @@ struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case removeAllButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case removedAll
 		case gotStringValue(String)
 	}

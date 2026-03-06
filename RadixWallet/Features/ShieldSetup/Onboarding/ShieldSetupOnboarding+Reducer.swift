@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct ShieldSetupOnboarding: FeatureReducer, Sendable {
+struct ShieldSetupOnboarding: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		var steps: [ShieldSetupOnboardingStep] = ShieldSetupOnboardingStep.allCases
 		var selectedStepIndex = 0
 
@@ -16,12 +16,12 @@ struct ShieldSetupOnboarding: FeatureReducer, Sendable {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case selectedStepIndexChanged(Int)
 		case nextButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished
 	}
 

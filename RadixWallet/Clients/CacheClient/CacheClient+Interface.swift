@@ -1,26 +1,12 @@
 import Sargon
 
 // MARK: - CacheClient
-struct CacheClient: Sendable {
+struct CacheClient {
 	var save: Save
 	var load: Load
 	var removeFile: RemoveFile
 	var removeFolder: RemoveFolder
 	var removeAll: RemoveAll
-
-	init(
-		save: @escaping Save,
-		load: @escaping Load,
-		removeFile: @escaping RemoveFile,
-		removeFolder: @escaping RemoveFolder,
-		removeAll: @escaping RemoveAll
-	) {
-		self.save = save
-		self.load = load
-		self.removeFile = removeFile
-		self.removeFolder = removeFolder
-		self.removeAll = removeAll
-	}
 }
 
 extension CacheClient {
@@ -132,12 +118,11 @@ extension CacheClient {
 			var filesystemFilePath: String {
 				switch self {
 				case let .address(address):
-					return address.filesystemFilePath(folderPath: filesystemFolderPath)
+					address.filesystemFilePath(folderPath: filesystemFolderPath)
 				case let .nonFungibleData(nonFungibleGlobalId):
-					return nonFungibleGlobalId.description
+					nonFungibleGlobalId.description
 				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
-					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
-					return file
+					"nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
 				}
 			}
 

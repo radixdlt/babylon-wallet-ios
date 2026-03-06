@@ -3,9 +3,12 @@ import Sargon
 
 // MARK: - Signer
 // FIXME: move elsewhere. not really part of Profile... but.. where? We need some kind of shared target for higher level models that can depend on Profile. We lack such a package right now.
-struct Signer: Sendable, Hashable, Identifiable {
+struct Signer: Hashable, Identifiable {
 	typealias ID = AccountOrPersona
-	var id: ID { entity }
+	var id: ID {
+		entity
+	}
+
 	let entity: AccountOrPersona
 
 	let factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>

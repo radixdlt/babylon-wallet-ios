@@ -13,8 +13,8 @@ struct PersonaDetailsPreviewApp: App {
 				.. PresentationAction<PersonaDetails.Destination.Action>.presented
 				.. PersonaDetails.Destination.Action.editPersona
 				.. EditPersona.Action.delegate
-				.. EditPersona.DelegateAction.personaSaved
-			).extract(from: $0) else {
+				.. EditPersona.DelegateAction.personaSaved).extract(from: $0)
+			else {
 				return nil
 			}
 

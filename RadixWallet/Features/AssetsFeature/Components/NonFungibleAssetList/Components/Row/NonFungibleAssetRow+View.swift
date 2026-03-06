@@ -76,19 +76,20 @@ extension NonFungibleAssetList.Row.View {
 		}
 	}
 
-	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
+	private var headerHeight: CGFloat {
+		HitTargetSize.small.frame.height + 2 * .medium1
+	}
 }
 
 // MARK: - Private Computed Properties
 extension NonFungibleAssetList.Row.View {
-	@ViewBuilder
 	fileprivate func componentView(
 		with viewStore: ViewStoreOf<NonFungibleAssetList.Row>,
 		asset: Loadable<OnLedgerEntity.NonFungibleToken>,
 		index: Int
 	) -> some View {
 		loadable(asset) {
-			/// Placeholder Loading view
+			// Placeholder Loading view
 			VStack(spacing: .medium3) {
 				shimmeringLoadingView(height: .imagePlaceholderHeight)
 				shimmeringLoadingView(height: .medium1)

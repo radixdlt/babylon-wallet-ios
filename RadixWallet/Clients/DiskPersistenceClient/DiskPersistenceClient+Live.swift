@@ -31,8 +31,7 @@ extension DiskPersistenceClient: DependencyKey {
 					throw Error.noCachesDirectoryFound
 				}
 				let data = try Data(contentsOf: url)
-				let value = try JSONDecoder().decode(decodable, from: data)
-				return value
+				return try JSONDecoder().decode(decodable, from: data)
 			}, remove: { path in
 				guard let url = cachesDirectoryURL?.appendingPathComponent(path) else {
 					throw Error.noCachesDirectoryFound

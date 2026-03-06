@@ -36,9 +36,7 @@ protocol EmptyObjectDecodable {
 }
 
 extension KeyedDecodingContainer {
-	func decodeIfPresent<T>(_ type: T.Type, forKey key: Key) throws -> T?
-		where T: Decodable & EmptyObjectDecodable
-	{
+	func decodeIfPresent<T: Decodable & EmptyObjectDecodable>(_ type: T.Type, forKey key: Key) throws -> T? {
 		guard contains(key) else { return nil }
 		let container = try nestedContainer(keyedBy: type.CodingKeyType.self, forKey: key)
 		return container.allKeys.isEmpty ? nil : try decode(T.self, forKey: key)

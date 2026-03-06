@@ -82,7 +82,7 @@ extension ShimmerModifier.Config {
 
 extension View {
 	/// Adds a basic shimmering animation to the view
-	@ViewBuilder func shimmer(active: Bool, config: ShimmerModifier.Config) -> some View {
+	func shimmer(active: Bool, config: ShimmerModifier.Config) -> some View {
 		modifier(ShimmerModifier(isActive: active, config: config))
 	}
 }

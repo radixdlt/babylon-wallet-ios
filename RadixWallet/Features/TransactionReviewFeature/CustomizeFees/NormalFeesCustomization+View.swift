@@ -10,7 +10,7 @@ extension NormalFeesCustomization.State {
 }
 
 extension NormalFeesCustomization {
-	struct ViewState: Equatable, Sendable {
+	struct ViewState: Equatable {
 		let feesViewState: FeesView.ViewState
 	}
 

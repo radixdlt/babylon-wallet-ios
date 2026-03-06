@@ -1,34 +1,34 @@
 // MARK: - RecoverWalletWithoutProfileStart
-struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct RecoverWalletWithoutProfileStart: FeatureReducer {
+	struct State: Hashable {
 		@PresentationState
 		var destination: Destination.State? = nil
 
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case recoverWithBDFSTapped
 		case ledgerOnlyTapped
 		case olympiaOnlyTapped
 		case closeTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 		case backToStartOfOnboarding
 		case recoverWithBDFSOnly
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case alert(AlertState<Action.AlertAction>)
 		}
 
-		enum Action: Sendable, Hashable {
+		enum Action: Hashable {
 			case alert(AlertAction)
 
-			enum AlertAction: Sendable {
+			enum AlertAction {
 				case cancelTapped
 				case continueTapped
 			}

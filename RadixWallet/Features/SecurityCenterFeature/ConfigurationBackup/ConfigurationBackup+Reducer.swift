@@ -2,13 +2,13 @@ import CloudKit
 import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
-struct ConfigurationBackup: Sendable, FeatureReducer {
-	struct Exportable: Sendable, Hashable {
+struct ConfigurationBackup: FeatureReducer {
+	struct Exportable: Hashable {
 		let profile: Profile
 		let file: ExportableProfileFile
 	}
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var cloudBackupsEnabled: Bool = true
 		var lastManualBackup: Date? = nil
 		var lastCloudBackup: BackupStatus? = nil
@@ -37,14 +37,14 @@ struct ConfigurationBackup: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum Item: Sendable, Hashable, CaseIterable {
+	enum Item: Hashable, CaseIterable {
 		case accounts
 		case personas
 		case securityFactors
 		case walletSettings
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case didAppear
 		case cloudBackupsToggled(Bool)
 		case exportTapped
@@ -53,7 +53,7 @@ struct ConfigurationBackup: Sendable, FeatureReducer {
 		case profileExportResult(Result<URL, NSError>, Profile?)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setCloudBackupEnabled(Bool)
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
@@ -63,17 +63,17 @@ struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case encryptionPassword(EncryptOrDecryptProfile.State)
 			case encryptProfileOrNot(AlertState<Action.EncryptProfileOrNot>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case encryptionPassword(EncryptOrDecryptProfile.Action)
 			case encryptProfileOrNot(EncryptProfileOrNot)
 
-			enum EncryptProfileOrNot: Sendable, Hashable {
+			enum EncryptProfileOrNot: Hashable {
 				case encrypt
 				case doNotEncrypt
 			}

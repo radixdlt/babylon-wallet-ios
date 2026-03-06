@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - PoolUnitDetails
 @Reducer
-struct PoolUnitDetails: Sendable, FeatureReducer {
+struct PoolUnitDetails: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		var hideResource: HideResource.State
 
@@ -19,12 +19,12 @@ struct PoolUnitDetails: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case hideResource(HideResource.Action)
 	}
 

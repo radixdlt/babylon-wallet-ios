@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct Main: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct Main: FeatureReducer {
+	struct State: Hashable {
 		// MARK: - Components
 		var home: Home.State
 		var dAppsDirectory: DAppsDirectory.State
@@ -17,12 +17,12 @@ struct Main: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case home(Home.Action)
 		case dAppsDirectory(DAppsDirectory.Action)
 		case discover(Discover.Action)
@@ -30,7 +30,7 @@ struct Main: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case currentGatewayChanged(to: Gateway)
 	}
 

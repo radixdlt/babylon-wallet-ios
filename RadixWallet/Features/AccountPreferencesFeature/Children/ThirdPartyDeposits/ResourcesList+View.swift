@@ -76,7 +76,6 @@ extension ResourcesList {
 }
 
 extension ResourcesList.View {
-	@ViewBuilder
 	func headerView(
 		_ viewStore: ViewStore<ResourcesList.State, ResourcesList.Action>
 	) -> some SwiftUI.View {

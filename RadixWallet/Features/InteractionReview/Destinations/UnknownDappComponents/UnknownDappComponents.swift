@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 extension InteractionReview {
 	@Reducer
-	struct UnknownDappComponents: FeatureReducer, Sendable {
+	struct UnknownDappComponents: FeatureReducer {
 		@ObservableState
-		struct State: Hashable, Sendable {
+		struct State: Hashable {
 			let title: String
 			let rowHeading: String
 			let addresses: [LedgerIdentifiable.Address]
@@ -12,7 +12,7 @@ extension InteractionReview {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable {
+		enum ViewAction {
 			case closeButtonTapped
 		}
 

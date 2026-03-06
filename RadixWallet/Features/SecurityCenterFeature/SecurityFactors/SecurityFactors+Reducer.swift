@@ -1,7 +1,7 @@
 // MARK: - SecurityFactors
 
-struct SecurityFactors: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct SecurityFactors: FeatureReducer {
+	struct State: Hashable {
 		var securityProblems: [SecurityProblem] = []
 
 		@PresentationState
@@ -10,23 +10,23 @@ struct SecurityFactors: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case factorSourceRowTapped(FactorSourceKind)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setSecurityProblems([SecurityProblem])
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case factorSourcesList(FactorSourcesList.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case factorSourcesList(FactorSourcesList.Action)
 		}
 
@@ -39,8 +39,6 @@ struct SecurityFactors: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

@@ -1,8 +1,8 @@
 // MARK: - ShieldSetupCoordinator
 @Reducer
-struct ShieldSetupCoordinator: Sendable, FeatureReducer {
+struct ShieldSetupCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var onboarding: ShieldSetupOnboarding.State = .init()
@@ -19,18 +19,18 @@ struct ShieldSetupCoordinator: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case addShieldBuilderSeedingFactors
 		case pickShieldBuilderSeedingFactors
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case onboarding(ShieldSetupOnboarding.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case finished(SecurityStructureOfFactorSources)
 	}
 

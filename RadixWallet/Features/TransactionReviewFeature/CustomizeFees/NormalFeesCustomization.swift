@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct NormalFeesCustomization: FeatureReducer {
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		let fees: TransactionFee.NormalFeeCustomization
 
 		init(
@@ -12,5 +12,5 @@ struct NormalFeesCustomization: FeatureReducer {
 		}
 	}
 
-	/// For now no logic here, but normal mode in the future will allow users to select from predefined Tip fees.
+	// For now no logic here, but normal mode in the future will allow users to select from predefined Tip fees.
 }

@@ -26,20 +26,8 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 	let viewState: DetailsContainerWithHeaderViewState
 	let closeButtonAction: () -> Void
 
-	let thumbnailView: ThumbnailView
-	let detailsView: DetailsView
-
-	init(
-		viewState: DetailsContainerWithHeaderViewState,
-		closeButtonAction: @escaping () -> Void,
-		@ViewBuilder thumbnailView: () -> ThumbnailView,
-		@ViewBuilder detailsView: () -> DetailsView
-	) {
-		self.viewState = viewState
-		self.closeButtonAction = closeButtonAction
-		self.thumbnailView = thumbnailView()
-		self.detailsView = detailsView()
-	}
+	@ViewBuilder let thumbnailView: ThumbnailView
+	@ViewBuilder let detailsView: DetailsView
 
 	var body: some View {
 		DetailsContainer(title: viewState.title, closeButtonAction: closeButtonAction) {
@@ -53,7 +41,6 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 		.background(.red)
 	}
 
-	@ViewBuilder
 	private func header(
 		with viewState: DetailsContainerWithHeaderViewState
 	) -> some View {
@@ -76,17 +63,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 struct DetailsContainer<Contents: View>: View {
 	let title: Loadable<String?>
 	let closeButtonAction: () -> Void
-	let contents: Contents
-
-	init(
-		title: Loadable<String?>,
-		closeButtonAction: @escaping () -> Void,
-		@ViewBuilder contents: () -> Contents
-	) {
-		self.title = title
-		self.closeButtonAction = closeButtonAction
-		self.contents = contents()
-	}
+	@ViewBuilder let contents: Contents
 
 	var body: some View {
 		NavigationStack {

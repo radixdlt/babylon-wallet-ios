@@ -1,8 +1,8 @@
 // MARK: - StakeUnitList
-struct StakeUnitList: Sendable, FeatureReducer {
+struct StakeUnitList: FeatureReducer {
 	typealias SelectedStakeClaimTokens = [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let account: OnLedgerEntity.OnLedgerAccount
 		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake> {
 			account.poolUnitResources.radixNetworkStakes
@@ -113,7 +113,7 @@ struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
 		case didTapStakeClaimNFT(OnLedgerEntitiesClient.StakeClaim)
@@ -121,10 +121,10 @@ struct StakeUnitList: Sendable, FeatureReducer {
 		case didTapClaimAllStakes
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selected(Selection)
 
-		enum Selection: Sendable, Equatable {
+		enum Selection: Equatable {
 			case unit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
 			case claim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
 		}

@@ -56,7 +56,7 @@ extension InteractionReview {
 
 // MARK: - InteractionReview.ShieldView.ViewState
 extension InteractionReview.ShieldView {
-	struct ViewState: Sendable, Hashable {
+	struct ViewState: Hashable {
 		let entity: AccountOrPersona
 		let shield: SecurityStructureOfFactorSources
 	}

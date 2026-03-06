@@ -1,8 +1,8 @@
 // MARK: - SelectFactorSource
 @Reducer
-struct SelectFactorSource: Sendable, FeatureReducer {
+struct SelectFactorSource: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		enum Context: Hashable {
 			case createAccount
 			case createPersona
@@ -38,7 +38,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case addSecurityFactorTapped
 		case rowTapped(FactorSourcesList.Row?)
@@ -46,19 +46,19 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		case continueButtonTapped(FactorSourcesList.Row)
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
 		case hasAConnectorExtension(Bool)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case selectedFactorSource(FactorSource, context: State.Context)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case addSecurityFactor(AddFactorSource.Coordinator.State)
 			case addNewP2PLink(NewConnection.State)
 			case displayMnemonic(DisplayMnemonic.State)
@@ -66,7 +66,7 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case addSecurityFactor(AddFactorSource.Coordinator.Action)
 			case addNewP2PLink(NewConnection.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
@@ -98,8 +98,6 @@ struct SelectFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

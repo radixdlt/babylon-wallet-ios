@@ -1,8 +1,8 @@
 // MARK: - EditSecurityShieldCoordinator
 @Reducer
-struct EditSecurityShieldCoordinator: Sendable, FeatureReducer {
+struct EditSecurityShieldCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var rolesSetup: RolesSetupCoordinator.State = .init()
@@ -16,17 +16,17 @@ struct EditSecurityShieldCoordinator: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case rolesSetup(RolesSetupCoordinator.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case updated
 		case cancelled
 	}

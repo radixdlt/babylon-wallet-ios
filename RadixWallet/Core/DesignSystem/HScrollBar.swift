@@ -50,5 +50,7 @@ struct HScrollBar<Item: ScrollBarItem>: View {
 		}
 	}
 
-	private static var coordSpace: String { "HScrollBar.HStack" }
+	private static var coordSpace: String {
+		"HScrollBar.HStack"
+	}
 }

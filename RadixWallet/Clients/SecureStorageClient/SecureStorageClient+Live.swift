@@ -338,7 +338,7 @@ extension SecureStorageClient: DependencyKey {
 
 		let deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs = {
 			profileID,
-				requestedToKeepInIcloud in
+			requestedToKeepInIcloud in
 			guard
 				let profileSnapshotData = try loadProfileSnapshotData(profileID)
 			else {

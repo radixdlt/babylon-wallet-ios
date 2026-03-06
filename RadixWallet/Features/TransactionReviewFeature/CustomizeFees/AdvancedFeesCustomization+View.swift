@@ -25,7 +25,7 @@ extension AdvancedFeesCustomization.State {
 }
 
 extension AdvancedFeesCustomization {
-	struct ViewState: Equatable, Sendable {
+	struct ViewState: Equatable {
 		let feesViewState: FeesView.ViewState
 
 		let paddingAmount: String

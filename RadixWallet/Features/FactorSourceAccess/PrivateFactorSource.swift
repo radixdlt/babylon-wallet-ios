@@ -5,7 +5,7 @@ import Foundation
 ///
 /// This becomes handy to unify factor sources that can be used directly (`device`, `ledger` & `arculusCard`) and those
 /// that require user input to retrieve the associated `MnemonicWithPassphrase` (`offDeviceMnemonic` & `password`).
-enum PrivateFactorSource: Sendable, Hashable {
+enum PrivateFactorSource: Hashable {
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
 	case arculusCard(ArculusCardFactorSource, _ pin: String)

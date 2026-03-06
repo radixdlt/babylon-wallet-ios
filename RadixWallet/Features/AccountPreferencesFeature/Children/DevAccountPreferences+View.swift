@@ -116,7 +116,6 @@ private extension View {
 }
 
 extension DevAccountPreferences.View {
-	@ViewBuilder
 	private func turnIntoDappDefinitionAccountTypeButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {
 		Button("Turn into dApp Definition account type") {
 			viewStore.send(.turnIntoDappDefinitionAccountTypeButtonTapped)

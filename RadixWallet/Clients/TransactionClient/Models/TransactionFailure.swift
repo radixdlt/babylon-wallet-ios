@@ -1,5 +1,5 @@
 // MARK: - TransactionFailure
-enum TransactionFailure: Sendable, LocalizedError, Equatable {
+enum TransactionFailure: LocalizedError, Equatable {
 	case failedToPrepareTXReview(FailedToPreviewTXReview)
 	case failedToPrepareForTXSigning(FailedToPrepareForTXSigning)
 	case failedToCompileOrSign(CompileOrSignFailure)
@@ -75,7 +75,7 @@ extension TransactionFailure {
 
 // MARK: TransactionFailure.FailedToPreviewTXReview
 extension TransactionFailure {
-	enum FailedToPreviewTXReview: Sendable, LocalizedError, Equatable {
+	enum FailedToPreviewTXReview: LocalizedError, Equatable {
 		case failedSigning(FailedToPrepareForTXSigning)
 		case abortedTXReview(Error)
 		case failedTXPreview(String)
@@ -104,7 +104,7 @@ extension TransactionFailure {
 
 // MARK: TransactionFailure.FailedToPrepareForTXSigning
 extension TransactionFailure {
-	enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
+	enum FailedToPrepareForTXSigning: LocalizedError, Equatable {
 		case failedToParseTXItIsProbablyInvalid
 		case failedToGetEpoch
 		case failedToLoadNotaryAndSigners
@@ -130,7 +130,7 @@ extension TransactionFailure {
 
 // MARK: TransactionFailure.CompileOrSignFailure
 extension TransactionFailure {
-	enum CompileOrSignFailure: Sendable, LocalizedError, Equatable {
+	enum CompileOrSignFailure: LocalizedError, Equatable {
 		case failedToLoadFactorSourceForSigning
 		case failedToCompileTXIntent
 		case failedToGenerateTXId

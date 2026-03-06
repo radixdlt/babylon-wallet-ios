@@ -1,20 +1,20 @@
 // MARK: - SelectInactiveAccountsToAdd
 
-struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct SelectInactiveAccountsToAdd: FeatureReducer {
+	struct State: Hashable {
 		let active: IdentifiedArrayOf<Account>
 		let deleted: IdentifiedArrayOf<Account>
 		let inactive: IdentifiedArrayOf<Account>
 		var selectedInactive: IdentifiedArrayOf<Account> = []
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case backButtonTapped
 		case doneTapped
 		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case goBack
 		case finished(
 			selectedInactive: IdentifiedArrayOf<Account>,

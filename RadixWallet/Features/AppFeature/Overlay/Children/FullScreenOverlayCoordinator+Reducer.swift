@@ -1,5 +1,5 @@
-struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
+struct FullScreenOverlayCoordinator: FeatureReducer {
+	struct State: Hashable, Identifiable {
 		let id: UUID = .init()
 		var root: Root.State
 
@@ -9,23 +9,23 @@ struct FullScreenOverlayCoordinator: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Root.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case claimWallet(ClaimWallet.DelegateAction)
 		case dismiss
 	}
 
-	struct Root: Sendable, Hashable, Reducer {
+	struct Root: Hashable, Reducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case claimWallet(ClaimWallet.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case claimWallet(ClaimWallet.Action)
 		}
 

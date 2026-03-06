@@ -2,14 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 extension ChooseTransferRecipient.State {
-	enum ManualRecipientValidation: Sendable, Hashable {
+	enum ManualRecipientValidation: Hashable {
 		case valid(ManualTransferRecipient)
 		case wrongNetwork(AccountAddress, incorrectNetwork: UInt8)
 		case invalidAccountAddress
 		case invalidRnsDomain
 	}
 
-	enum ManualTransferRecipient: Sendable, Hashable {
+	enum ManualTransferRecipient: Hashable {
 		case accountAddress(AccountAddress)
 		case rnsDomain(RnsDomain)
 	}

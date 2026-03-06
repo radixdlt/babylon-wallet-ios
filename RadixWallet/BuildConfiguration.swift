@@ -1,5 +1,5 @@
 
-enum BuildConfiguration: Int, Sendable, Hashable, Comparable, CustomStringConvertible {
+enum BuildConfiguration: Int, Hashable, Comparable, CustomStringConvertible {
 	case dev = 1
 	case alpha = 2
 	case preAlpha = 3

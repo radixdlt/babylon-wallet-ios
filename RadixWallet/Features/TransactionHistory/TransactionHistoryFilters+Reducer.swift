@@ -1,11 +1,11 @@
 import ComposableArchitecture
 
 // MARK: - TransactionHistoryFilters
-struct TransactionHistoryFilters: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct TransactionHistoryFilters: FeatureReducer {
+	struct State: Hashable {
 		private(set) var filters: Filters
 
-		struct Filters: Hashable, Sendable {
+		struct Filters: Hashable {
 			var transferTypes: IdentifiedArrayOf<Filter>
 			var fungibles: IdentifiedArrayOf<Filter>
 			var nonFungibles: IdentifiedArrayOf<Filter>
@@ -32,14 +32,14 @@ struct TransactionHistoryFilters: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case filterTapped(TransactionFilter)
 		case clearAllTapped
 		case showResultsTapped
 		case closeTapped
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case updateActiveFilters(IdentifiedArrayOf<State.Filter>)
 	}
 

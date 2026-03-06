@@ -1,21 +1,21 @@
 // MARK: - SigningConfirmShieldTimedRecovery
 @Reducer
-struct SigningConfirmShieldTimedRecovery: Sendable, FeatureReducer {
+struct SigningConfirmShieldTimedRecovery: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let periodUntilAutoConfirm: TimePeriod
 		let notarizedTimedRecovery: NotarizeTransactionResponse
 	}
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case fallbackInfoButtonTapped
 		case useEmergencyFallbackButtonTapped
 		case restartSigningButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case useEmergencyFallback(NotarizeTransactionResponse)
 		case restartSigning(TransactionIntent)
 	}

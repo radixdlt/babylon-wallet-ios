@@ -1,8 +1,8 @@
 import ComposableArchitecture
 
 // MARK: - ImportOlympiaNameLedger
-struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct ImportOlympiaNameLedger: FeatureReducer {
+	struct State: Hashable {
 		var nameLedger: NameLedgerFactorSource.State
 
 		init(deviceInfo: LedgerDeviceInfo) {
@@ -10,16 +10,16 @@ struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case nameLedger(NameLedgerFactorSource.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case savedNewLedger(LedgerHardwareWalletFactorSource)
 		case failedToSaveNewLedger
 	}

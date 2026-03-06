@@ -3,10 +3,10 @@ import Sargon
 import SwiftUI
 
 // MARK: - DeleteAccountCoordinator
-struct DeleteAccountCoordinator: Sendable, FeatureReducer {
+struct DeleteAccountCoordinator: FeatureReducer {
 	// MARK: - State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var account: Account
 		var deleteConfirmation: DeleteAccountConfirmation.State
 
@@ -22,24 +22,24 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 	// MARK: - Action
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case goHomeButtonTapped
 	}
 
 	@CasePathable
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case accountDeletedSuccessfully
 		case accountDeletionFailed
 		case accountDeletionFailedDueToManyAssets
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case deleteConfirmation(DeleteAccountConfirmation.Action)
 	}
 
 	@CasePathable
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case goHomeAfterAccountDeleted
 	}
 
@@ -47,13 +47,13 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case chooseReceivingAccount(ChooseReceivingAccountOnDelete.State)
 			case accountDeleted
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case chooseReceivingAccount(ChooseReceivingAccountOnDelete.Action)
 			case accountDeleted
 		}
@@ -178,12 +178,12 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 					recipientAccountAddress: recipientAccountAddress
 				)
 
-				/// Check for non-transferable resources
+				// Check for non-transferable resources
 				if !manifestOutcome.nonTransferableResources.isEmpty {
 					let action = await overlayWindowClient.scheduleAlert(.nonTransferableAssets)
 					switch action {
 					case .primaryButtonTapped:
-						/// Continue account deletion
+						// Continue account deletion
 						break
 					default:
 						await send(.internal(.accountDeletionFailed))
@@ -191,7 +191,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 					}
 				}
 
-				/// Wait for user to complete the interaction with Transaction Review
+				// Wait for user to complete the interaction with Transaction Review
 				let result = await dappInteractionClient.addWalletInteraction(
 					.transaction(.init(send: .init(transactionManifest: manifestOutcome.manifest))),
 					.accountDelete
@@ -200,7 +200,7 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 				switch result.p2pResponse {
 				case let .dapp(.success(success)):
 					if case let .transaction(tx) = success.items {
-						/// Wait for the transaction to be committed
+						// Wait for the transaction to be committed
 						let txID = tx.send.transactionIntentHash
 						if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 							try await SargonOs.shared.markAccountAsTombstoned(accountAddress: accountAddress)
@@ -211,8 +211,8 @@ struct DeleteAccountCoordinator: Sendable, FeatureReducer {
 
 					assertionFailure("Not a transaction Response?")
 				case .dapp(.failure):
-					/// Either user did dismiss the TransctionReview, or there was a failure.
-					/// Any failure message will be displayed in Transaction Review
+					// Either user did dismiss the TransctionReview, or there was a failure.
+					// Any failure message will be displayed in Transaction Review
 					await send(.internal(.accountDeletionFailed))
 				}
 			} catch {

@@ -5,21 +5,21 @@ public typealias Instances = [FactorSourceIDFromHash: [[FactorInstanceForDebugPu
 
 // MARK: - DebugFactorInstancesCacheContents
 @Reducer
-struct DebugFactorInstancesCacheContents: Sendable, FeatureReducer {
+struct DebugFactorInstancesCacheContents: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var factorInstances: Loadable<Instances> = .idle
 		init() {}
 	}
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case deleteButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadedInstances(Instances)
 		case failedToDelete(String)
 	}

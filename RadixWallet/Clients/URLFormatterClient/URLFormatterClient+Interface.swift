@@ -1,15 +1,7 @@
 // MARK: - URLFormatterClient
-struct URLFormatterClient: Sendable {
+struct URLFormatterClient {
 	var fixedSizeImage: FixedSizeImage
 	var generalImage: GeneralImage
-
-	init(
-		fixedSizeImage: @escaping FixedSizeImage,
-		generalImage: @escaping GeneralImage
-	) {
-		self.fixedSizeImage = fixedSizeImage
-		self.generalImage = generalImage
-	}
 }
 
 // MARK: URLFormatterClient.FixedSizeImage

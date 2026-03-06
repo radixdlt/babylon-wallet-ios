@@ -10,7 +10,7 @@ protocol VersionedEncryption {
 }
 
 // MARK: - EncryptionScheme
-enum EncryptionScheme: Sendable, Hashable, VersionedAlgorithm {
+enum EncryptionScheme: Hashable, VersionedAlgorithm {
 	case version1
 }
 
@@ -48,7 +48,7 @@ extension EncryptionScheme {
 
 // MARK: EncryptionScheme.Version
 extension EncryptionScheme {
-	enum Version: Int, Sendable, Hashable, Codable {
+	enum Version: Int, Hashable, Codable {
 		case version1 = 1
 	}
 }

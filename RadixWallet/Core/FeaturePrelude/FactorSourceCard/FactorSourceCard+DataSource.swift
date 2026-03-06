@@ -10,14 +10,16 @@ struct FactorSourceCardDataSource {
 
 // MARK: FactorSourceCardDataSource.Message
 extension FactorSourceCardDataSource {
-	struct Message: Identifiable, Sendable, Hashable {
-		var id: String { text }
+	struct Message: Identifiable, Hashable {
+		var id: String {
+			text
+		}
 
 		let text: String
 		let type: StatusMessageView.ViewType
 	}
 
-	struct LinkedEntities: Sendable, Hashable {
+	struct LinkedEntities: Hashable {
 		let accounts: [Account]
 		let personas: [Persona]
 		let hasHiddenEntities: Bool

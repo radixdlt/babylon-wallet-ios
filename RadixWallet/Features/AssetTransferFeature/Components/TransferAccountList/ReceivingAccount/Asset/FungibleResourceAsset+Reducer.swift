@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - FungibleResourceAsset
-struct FungibleResourceAsset: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
+struct FungibleResourceAsset: FeatureReducer {
+	struct State: Hashable, Identifiable {
 		typealias ID = String
 		static let defaultFee: Decimal192 = 1
 
@@ -31,7 +31,7 @@ struct FungibleResourceAsset: Sendable, FeatureReducer {
 		var transferAmountStr: String = ""
 		var transferAmount: Decimal192? = nil
 
-		// Total transfer sum for the transferred resource
+		/// Total transfer sum for the transferred resource
 		var totalTransferSum: Decimal192
 
 		var focused: Bool = false
@@ -47,35 +47,35 @@ struct FungibleResourceAsset: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case amountChanged(String)
 		case maxAmountTapped
 		case focusChanged(Bool)
 		case resourceTapped
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case amountChanged
 		case resourceTapped
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case chooseXRDAmount(AlertState<Action.ChooseXRDAmount>)
 			case needsToPayFeeFromOtherAccount(AlertState<Action.NeedsToPayFeeFromOtherAccount>)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case chooseXRDAmount(ChooseXRDAmount)
 			case needsToPayFeeFromOtherAccount(NeedsToPayFeeFromOtherAccount)
 
-			enum ChooseXRDAmount: Hashable, Sendable {
+			enum ChooseXRDAmount: Hashable {
 				case deductFee(Decimal192)
 				case sendAll(Decimal192)
 				case cancel
 			}
 
-			enum NeedsToPayFeeFromOtherAccount: Hashable, Sendable {
+			enum NeedsToPayFeeFromOtherAccount: Hashable {
 				case confirm(Decimal192)
 				case cancel
 			}
@@ -85,8 +85,6 @@ struct FungibleResourceAsset: Sendable, FeatureReducer {
 			EmptyReducer()
 		}
 	}
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

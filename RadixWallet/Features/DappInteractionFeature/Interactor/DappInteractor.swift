@@ -13,8 +13,8 @@ extension RequestEnvelope: Identifiable {
 }
 
 // MARK: - DappInteractor
-struct DappInteractor: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct DappInteractor: FeatureReducer {
+	struct State: Hashable {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		var dappInteraction: DappInteractionCoordinator.State?
@@ -23,7 +23,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		var destination: Destination.State?
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case moveToBackground
 		case moveToForeground
@@ -31,11 +31,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case dappInteraction(DappInteractionCoordinator.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
 		case sentResponseToDapp(
@@ -58,9 +58,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		)
 	}
 
-	struct Destination: Sendable, DestinationReducer {
+	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case dappInteractionCompletion(DappInteractionCompletion.State)
 			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
@@ -68,18 +68,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case dappInteractionCompletion(DappInteractionCompletion.Action)
 			case pollPreAuthorizationStatus(PollPreAuthorizationStatus.Action)
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
 
-			enum ResponseFailure: Sendable, Hashable {
+			enum ResponseFailure: Hashable {
 				case cancelButtonTapped(RequestEnvelope)
 				case retryButtonTapped(WalletToDappInteractionResponse, for: RequestEnvelope, DappMetadata)
 			}
 
-			enum InvalidRequest: Sendable, Hashable {
+			enum InvalidRequest: Hashable {
 				case ok(P2P.RTCOutgoingMessage.Response, origin: P2P.Route)
 			}
 		}

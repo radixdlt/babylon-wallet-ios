@@ -4,13 +4,15 @@ typealias DepositStatus = DepositStatusPerResource.DepositStatus
 typealias DepositStatusPerResources = IdentifiedArrayOf<DepositStatusPerResource>
 
 // MARK: - DepositStatusPerResource
-struct DepositStatusPerResource: Sendable, Hashable, Identifiable {
+struct DepositStatusPerResource: Hashable, Identifiable {
 	let resourceAddress: ResourceAddress
 	let depositStatus: DepositStatus
 
-	var id: ResourceAddress { resourceAddress }
+	var id: ResourceAddress {
+		resourceAddress
+	}
 
-	enum DepositStatus: Sendable, Hashable {
+	enum DepositStatus: Hashable {
 		/// The deposit of this asset is allowed.
 		case allowed
 

@@ -5,5 +5,7 @@ protocol Asset: Sendable, Hashable, Identifiable {
 }
 
 extension Asset {
-	var id: ResourceAddress { resourceAddress }
+	var id: ResourceAddress {
+		resourceAddress
+	}
 }

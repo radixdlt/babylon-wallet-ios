@@ -9,7 +9,7 @@ extension CreatePersonaCoordinator.State {
 
 // MARK: - CreatePersonaCoordinator.View
 extension CreatePersonaCoordinator {
-	struct ViewState: Sendable, Equatable {
+	struct ViewState: Equatable {
 		let shouldDisplayNavBar: Bool
 	}
 

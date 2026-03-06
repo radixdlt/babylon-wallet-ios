@@ -1,5 +1,5 @@
 
 // MARK: - UserDefaults.Dependency
-struct CameraPermissionClient: Sendable {
+struct CameraPermissionClient {
 	var getCameraAccess: @Sendable () async -> Bool
 }

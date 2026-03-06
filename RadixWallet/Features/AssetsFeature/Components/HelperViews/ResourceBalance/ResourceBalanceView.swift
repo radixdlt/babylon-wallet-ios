@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - ResourceBalance.ViewState
 extension ResourceBalance {
 	// MARK: - ViewState
-	enum ViewState: Sendable, Hashable {
+	enum ViewState: Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 		case liquidStakeUnit(LiquidStakeUnit)
@@ -12,14 +12,14 @@ extension ResourceBalance {
 		case stakeClaimNFT(StakeClaimNFT)
 		case unknown
 
-		struct Fungible: Sendable, Hashable {
+		struct Fungible: Hashable {
 			let address: ResourceAddress
 			let icon: Thumbnail.FungibleContent
 			let title: String?
 			let amount: ResourceAmount?
 		}
 
-		struct NonFungible: Sendable, Hashable {
+		struct NonFungible: Hashable {
 			let id: NonFungibleGlobalId?
 			let resourceImage: URL?
 			let resourceName: String?
@@ -28,7 +28,7 @@ extension ResourceBalance {
 			let isPredicted: Bool
 		}
 
-		struct LiquidStakeUnit: Sendable, Hashable {
+		struct LiquidStakeUnit: Hashable {
 			let address: ResourceAddress
 			let icon: URL?
 			let title: String?
@@ -37,7 +37,7 @@ extension ResourceBalance {
 			var validatorName: String? = nil
 		}
 
-		struct PoolUnit: Sendable, Hashable {
+		struct PoolUnit: Hashable {
 			let resourcePoolAddress: PoolAddress
 			let poolUnitAddress: ResourceAddress
 			let poolIcon: URL?
@@ -144,7 +144,7 @@ struct ResourceBalanceView: View {
 	let isSelected: Bool?
 	let action: (() -> Void)?
 
-	enum Appearance: Sendable, Equatable {
+	enum Appearance: Equatable {
 		case standard
 		case compact
 	}
@@ -417,7 +417,6 @@ extension ResourceBalanceView {
 				}
 			}
 
-			@ViewBuilder
 			func sectionView(
 				_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>,
 				kind: SectionKind
@@ -629,7 +628,7 @@ extension ResourceBalanceView {
 		let appearance: Appearance
 		let symbol: Loadable<String?>?
 
-		enum Appearance: Sendable, Equatable {
+		enum Appearance: Equatable {
 			case standard
 			case compact
 			case large

@@ -8,7 +8,7 @@
 /// Base64 encode/decode. An alternative is of course to create a variant of this type but `Base64Codable`,
 /// which overrides the data coding strategy of the encoder.
 struct HexCodable:
-	Sendable,
+
 	Hashable,
 	Codable,
 	Identifiable,
@@ -17,10 +17,6 @@ struct HexCodable:
 {
 	/// The underlying `Data` that is always hex coded.
 	let data: Data
-
-	init(data: Data) {
-		self.data = data
-	}
 }
 
 // MARK: Hex

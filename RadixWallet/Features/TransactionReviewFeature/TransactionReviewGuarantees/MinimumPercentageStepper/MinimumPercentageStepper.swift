@@ -9,7 +9,7 @@ extension MinimumPercentageStepper.State {
 
 // MARK: - MinimumPercentageStepper
 struct MinimumPercentageStepper: FeatureReducer {
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var value: Decimal192?
 		var string: String
 
@@ -21,17 +21,15 @@ struct MinimumPercentageStepper: FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case increaseTapped
 		case decreaseTapped
 		case stringEntered(String)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case valueChanged
 	}
-
-	init() {}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

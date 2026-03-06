@@ -1,6 +1,6 @@
 struct DappInteractionOriginVerification: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable, Equatable {
+	struct State: Hashable, Equatable {
 		let dAppMetadata: DappMetadata
 
 		init(dAppMetadata: DappMetadata) {
@@ -8,12 +8,12 @@ struct DappInteractionOriginVerification: FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case continueTapped
 		case cancel
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case continueFlow(DappMetadata)
 		case cancel
 	}

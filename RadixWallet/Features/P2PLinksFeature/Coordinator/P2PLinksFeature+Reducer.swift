@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - P2PLinksFeature
-struct P2PLinksFeature: Sendable, FeatureReducer {
+struct P2PLinksFeature: FeatureReducer {
 	// MARK: State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var links: IdentifiedArrayOf<P2PLink>
 
 		@PresentationState
@@ -22,14 +22,14 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case addNewConnectionButtonTapped
 		case removeButtonTapped(P2PLink)
 		case editButtonTapped(P2PLink)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadLinksResult(TaskResult<OrderedSet<P2PLink>>)
 		case deleteConnectionResult(TaskResult<P2PLink>)
 	}
@@ -38,19 +38,19 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
 			case updateName(RenameLabel.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case newConnection(NewConnection.Action)
 			case removeConnection(RemoveConnection)
 			case updateName(RenameLabel.Action)
 
-			enum RemoveConnection: Sendable, Hashable {
+			enum RemoveConnection: Hashable {
 				case removeTapped(P2PLink)
 			}
 		}
@@ -69,8 +69,6 @@ struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

@@ -3,7 +3,7 @@ import WebRTC
 // MARK: - SignalingClient.ClientMessage
 extension SignalingClient {
 	/// Describes the DTO exchanged between clients during WebRTC negotiation
-	struct ClientMessage: Sendable, Equatable {
+	struct ClientMessage: Equatable {
 		let requestId: RequestID
 		/// The ID of the client to whom to send the message
 		let targetClientId: RemoteClientID
@@ -16,7 +16,7 @@ extension SignalingClient {
 extension SignalingClient.ClientMessage {
 	typealias RequestID = Tagged<Self, String>
 
-	enum Method: String, Sendable, Codable, Equatable {
+	enum Method: String, Codable, Equatable {
 		case offer
 		case answer
 		case iceCandidate

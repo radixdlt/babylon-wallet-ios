@@ -1,8 +1,8 @@
 // MARK: - PollPreAuthorizationStatus
-struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
+struct PollPreAuthorizationStatus: FeatureReducer {
 	typealias Expiration = DappToWalletInteractionSubintentExpiration
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let dAppMetadata: DappMetadata
 		let subintentHash: SubintentHash
 		let expirationTimestamp: Instant
@@ -27,18 +27,18 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstTask
 		case closeButtonTapped
 		case onDissapear
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setStatus(PreAuthorizationStatus)
 		case updateSecondsToExpiration
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss(RequestEnvelope)
 	}
 
@@ -96,7 +96,7 @@ struct PollPreAuthorizationStatus: Sendable, FeatureReducer {
 }
 
 extension PollPreAuthorizationStatus {
-	enum Status: Sendable, Hashable {
+	enum Status: Hashable {
 		/// The Pre-Authorization hasn't been submitted within a Transaction yet. We are still polling until we get a final status (success or expired).
 		case unknown
 

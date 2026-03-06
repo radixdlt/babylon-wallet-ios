@@ -1,6 +1,6 @@
 // MARK: - Hint
 struct Hint: View, Equatable {
-	struct ViewState: Sendable, Equatable {
+	struct ViewState: Equatable {
 		let kind: Kind
 		let text: AttributedString?
 
@@ -35,7 +35,7 @@ struct Hint: View, Equatable {
 		}
 	}
 
-	enum Kind: Sendable, Equatable {
+	enum Kind: Equatable {
 		case info
 		case error(imageSize: HitTargetSize)
 		case warning
@@ -43,10 +43,6 @@ struct Hint: View, Equatable {
 	}
 
 	let viewState: ViewState
-
-	init(viewState: ViewState) {
-		self.viewState = viewState
-	}
 
 	var body: some View {
 		if let text = viewState.text {

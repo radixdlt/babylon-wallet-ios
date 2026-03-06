@@ -1,14 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct DebugSettingsCoordinator: Sendable, FeatureReducer {
+struct DebugSettingsCoordinator: FeatureReducer {
 	typealias Store = StoreOf<Self>
-
-	init() {}
 
 	// MARK: State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@PresentationState
 		var destination: Destination.State?
 
@@ -17,7 +15,7 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
 		case debugUserDefaultsContentsButtonTapped
@@ -26,13 +24,13 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugFactorInstancesCacheContentsButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case profileToDebugLoaded(Profile)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(DebugManageFactorSources.State)
@@ -44,7 +42,7 @@ struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			#if DEBUG

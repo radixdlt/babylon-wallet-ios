@@ -8,13 +8,13 @@ extension DAppsDirectoryClient {
 }
 
 extension DAppsDirectoryClient {
-	struct CategorizedDApps: Codable, Sendable {
+	struct CategorizedDApps: Codable {
 		let highlighted: DApps
 		let others: DApps
 	}
 
 	typealias DApps = IdentifiedArrayOf<DApp>
-	struct DApp: Sendable, Hashable, Identifiable {
+	struct DApp: Hashable, Identifiable {
 		var id: DappDefinitionAddress {
 			address
 		}

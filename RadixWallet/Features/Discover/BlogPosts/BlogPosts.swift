@@ -2,23 +2,23 @@
 
 extension Discover {
 	@Reducer
-	struct AllBlogPosts: Sendable, FeatureReducer {
+	struct AllBlogPosts: FeatureReducer {
 		static let allBlogPostsURL = URL(string: "https://www.radixdlt.com/all-recent-posts")!
 
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			var posts: Loadable<BlogPosts> = .idle
 		}
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case task
 			case viewAllBlogPostsTapped
 			case pullToRefreshStarted
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case loadPostsResult(TaskResult<BlogPosts>)
 		}
 

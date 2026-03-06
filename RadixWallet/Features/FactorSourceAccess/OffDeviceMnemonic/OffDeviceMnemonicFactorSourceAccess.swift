@@ -1,8 +1,8 @@
 // MARK: - OffDeviceMnemonicFactorSourceAccess
 @Reducer
-struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
+struct OffDeviceMnemonicFactorSourceAccess: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let factorSource: OffDeviceMnemonicFactorSource
 		var grid: ImportMnemonicGrid.State
 
@@ -28,16 +28,16 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case confirmButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case grid(ImportMnemonicGrid.Action)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case perform(PrivateFactorSource)
 	}
 
@@ -77,7 +77,7 @@ struct OffDeviceMnemonicFactorSourceAccess: Sendable, FeatureReducer {
 
 extension OffDeviceMnemonicFactorSourceAccess.State {
 	/// An enum describing the different errors that can take place from user's input.
-	enum Status: Sendable, Hashable {
+	enum Status: Hashable {
 		/// User hasn't entered every word yet.
 		case incomplete
 

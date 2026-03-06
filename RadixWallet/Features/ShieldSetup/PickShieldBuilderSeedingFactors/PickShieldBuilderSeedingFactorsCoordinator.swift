@@ -8,9 +8,9 @@ extension PickShieldBuilderSeedingFactorsCoordinator.Path.Action: Equatable {}
 
 // MARK: - PickShieldBuilderSeedingFactorsCoordinator
 @Reducer
-struct PickShieldBuilderSeedingFactorsCoordinator: Sendable, FeatureReducer {
+struct PickShieldBuilderSeedingFactorsCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var path: Path.State
 	}
 
@@ -22,11 +22,11 @@ struct PickShieldBuilderSeedingFactorsCoordinator: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case path(Path.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished
 		case push(Path.State)
 	}

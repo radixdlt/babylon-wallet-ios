@@ -1,15 +1,7 @@
 // MARK: - HomeCardsClient
-struct HomeCardsClient: Sendable {
+struct HomeCardsClient {
 	var cards: Cards
 	var removeCard: RemoveCard
-
-	init(
-		cards: @escaping Cards,
-		removeCard: @escaping RemoveCard
-	) {
-		self.cards = cards
-		self.removeCard = removeCard
-	}
 }
 
 extension HomeCardsClient {

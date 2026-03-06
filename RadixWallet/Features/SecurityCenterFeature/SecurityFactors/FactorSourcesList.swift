@@ -1,8 +1,8 @@
 // MARK: - FactorSourcesList
 @Reducer
-struct FactorSourcesList: Sendable, FeatureReducer {
+struct FactorSourcesList: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@SharedReader(.shieldBuilder) var shieldBuilder
 		let context: Context
 		let kind: FactorSourceKind
@@ -26,12 +26,12 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ActionRequiringP2P: Sendable, Hashable {
+	enum ActionRequiringP2P: Hashable {
 		case addLedger
 		case continueWithFactorsource(FactorSource)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case rowTapped(Row)
 		case rowMessageTapped(Row)
@@ -40,19 +40,19 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		case closeEnterMnemonicButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setSecurityProblems([SecurityProblem])
 		case setEntities([EntitiesLinkedToFactorSource])
 		case hasAConnectorExtension(Bool)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selectedFactorSource(FactorSource)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case detail(FactorSourceDetail.State)
 			case displayMnemonic(DisplayMnemonic.State)
 			case enterMnemonic(ImportMnemonicForFactorSource.State)
@@ -62,7 +62,7 @@ struct FactorSourcesList: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case detail(FactorSourceDetail.Action)
 			case displayMnemonic(DisplayMnemonic.Action)
 			case enterMnemonic(ImportMnemonicForFactorSource.Action)
@@ -351,14 +351,14 @@ private extension FactorSourcesList {
 
 // MARK: - FactorSourcesList.State.Context
 extension FactorSourcesList.State {
-	enum Context: Sendable, Hashable {
+	enum Context: Hashable {
 		case display
 		case selection(ChooseFactorSourceContext)
 	}
 }
 
 extension FactorSourcesList {
-	struct Row: Sendable, Hashable, Identifiable {
+	struct Row: Hashable, Identifiable {
 		let integrity: FactorSourceIntegrity
 		let linkedEntities: FactorSourceCardDataSource.LinkedEntities
 		let status: Status?
@@ -414,7 +414,7 @@ extension FactorSourcesList.Row.Status {
 }
 
 extension FactorSourcesList.Row {
-	enum Status: Sendable, Hashable {
+	enum Status: Hashable {
 		/// User has lost access to the given factor source (`SecurityProblem.problem9`).
 		/// We will show an error message.
 		case lostFactorSource
@@ -432,7 +432,7 @@ extension FactorSourcesList.Row {
 		case notBackedUp
 	}
 
-	enum Selectability: Sendable, Hashable {
+	enum Selectability: Hashable {
 		/// The row can be selected.
 		case selectable
 

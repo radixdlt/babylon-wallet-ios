@@ -422,7 +422,7 @@ extension OnLedgerEntitiesClient {
 		unstakeData: [NonFungibleGlobalId: UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> [OnLedgerEntitiesClient.StakeClaim] {
-		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
+		if unstakeData.isEmpty {
 			try tokens.map { token in
 				guard token.id.resourceAddress == resource.resourceAddress else {
 					throw InvalidStakeClaimToken()
@@ -454,8 +454,6 @@ extension OnLedgerEntitiesClient {
 				)
 			}
 		}
-
-		return stakeClaimTokens
 	}
 }
 

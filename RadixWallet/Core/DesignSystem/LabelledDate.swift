@@ -3,11 +3,6 @@ struct LabelledDate: View {
 	let label: String
 	let date: Date
 
-	init(label: String, date: Date) {
-		self.label = label
-		self.date = date
-	}
-
 	var body: some View {
 		HStack(spacing: .small3) {
 			Text(label)

@@ -1,10 +1,10 @@
 // MARK: - SubmitTransactionFailure
-enum SubmitTransactionFailure: Sendable, LocalizedError {
+enum SubmitTransactionFailure: LocalizedError {
 	case failedToSubmit
 }
 
 // MARK: - SubmitTransactionClient
-struct SubmitTransactionClient: Sendable {
+struct SubmitTransactionClient {
 	var submitTransaction: SubmitTransaction
 	var pollTransactionStatus: PollTransactionStatus
 }

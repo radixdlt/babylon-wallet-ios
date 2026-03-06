@@ -1,9 +1,9 @@
 // MARK: - DerivePublicKeys
 @Reducer
-struct DerivePublicKeys: Sendable, FeatureReducer {
+struct DerivePublicKeys: FeatureReducer {
 	@Dependency(\.arculusCardClient) var arculusCardClient
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let input: KeyDerivationRequestPerFactorSource
 		var factorSourceAccess: FactorSourceAccess.State
 
@@ -16,16 +16,16 @@ struct DerivePublicKeys: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case cancelled
 		case finished([HierarchicalDeterministicFactorInstance])
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case handleFactorInstances([HierarchicalDeterministicFactorInstance])
 	}
 

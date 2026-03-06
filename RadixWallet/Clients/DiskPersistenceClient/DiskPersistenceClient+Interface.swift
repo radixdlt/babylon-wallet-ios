@@ -1,21 +1,9 @@
 // MARK: - DiskPersistenceClient
-struct DiskPersistenceClient: Sendable {
+struct DiskPersistenceClient {
 	var save: Save
 	var load: Load
 	var remove: Remove
 	var removeAll: RemoveAll
-
-	init(
-		save: @escaping Save,
-		load: @escaping Load,
-		remove: @escaping Remove,
-		removeAll: @escaping RemoveAll
-	) {
-		self.save = save
-		self.load = load
-		self.remove = remove
-		self.removeAll = removeAll
-	}
 }
 
 extension DiskPersistenceClient {

@@ -1,6 +1,6 @@
 
 extension P2P {
-	enum Route: Sendable, Hashable {
+	enum Route: Hashable {
 		case wallet
 		case rtc(RTCRoute)
 		case deepLink(SessionId)
@@ -14,11 +14,14 @@ extension P2P {
 	}
 
 	/// Recipient of sender of an RTC message
-	struct RTCRoute: Sendable, Hashable {
+	struct RTCRoute: Hashable {
 		/// The PerPeerPairConnection
 		let p2pLink: P2PLink
 		/// The PerPeerPairConnection password.
-		var connectionId: RadixConnectPassword { p2pLink.connectionPassword }
+		var connectionId: RadixConnectPassword {
+			p2pLink.connectionPassword
+		}
+
 		/// ID to a specific peer **connection** for some PerPeerPairConnection.
 		let peerConnectionId: PeerConnectionID
 
@@ -41,7 +44,7 @@ extension P2P {
 	/// An incoming message over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a
 	/// `result` and not an `P2P.RTCMessageFromPeer` directly.
-	struct RTCIncomingMessageContainer<Success: Sendable & Hashable>: Sendable, Hashable {
+	struct RTCIncomingMessageContainer<Success: Sendable & Hashable>: Hashable {
 		let result: Result<Success, Error>
 		let route: Route
 		let originRequiresValidation: Bool

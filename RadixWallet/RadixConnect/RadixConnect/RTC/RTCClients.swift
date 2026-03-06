@@ -3,7 +3,7 @@ import WebRTC
 
 // MARK: - P2P.ClientConnectionsUpdate
 extension P2P {
-	struct ClientConnectionsUpdate: Sendable, Hashable {
+	struct ClientConnectionsUpdate: Hashable {
 		let clientID: Hash
 		fileprivate(set) var idsOfConnectedPeerConnections: [PeerConnectionID]
 	}

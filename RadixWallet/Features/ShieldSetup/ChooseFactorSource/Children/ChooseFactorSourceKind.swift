@@ -1,20 +1,20 @@
 // MARK: - ChooseFactorSourceKind
 @Reducer
-struct ChooseFactorSourceKind: Sendable, FeatureReducer {
+struct ChooseFactorSourceKind: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let context: ChooseFactorSourceContext
 		@SharedReader(.shieldBuilder) var shieldBuilder
 	}
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case kindTapped(FactorSourceKind)
 		case disabledKindTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case chosenKind(FactorSourceKind)
 	}
 

@@ -34,8 +34,7 @@ extension ROLAClient {
 					}
 
 					do {
-						let response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
-						return response
+						return try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
 					} catch {
 						throw ROLAFailure.radixJsonUnknownFileFormat
 					}

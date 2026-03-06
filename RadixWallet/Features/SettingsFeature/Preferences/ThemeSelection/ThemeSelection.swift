@@ -1,8 +1,8 @@
 // MARK: - ThemeSelection
 @Reducer
-struct ThemeSelection: Sendable, FeatureReducer {
+struct ThemeSelection: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var appTheme: AppTheme = .system
 
 		init() {}
@@ -11,7 +11,7 @@ struct ThemeSelection: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case themeChanged(AppTheme)
 		case closeButtonTapped

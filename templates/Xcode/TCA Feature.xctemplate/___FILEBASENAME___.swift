@@ -1,9 +1,9 @@
 // MARK: - ___VARIABLE_featureName___
 
-struct ___VARIABLE_featureName___: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {}
+struct ___VARIABLE_featureName___: FeatureReducer {
+	struct State: Hashable {}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 	}
 

@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - RecoveryRoleSetup
 @Reducer
-struct RecoveryRoleSetup: FeatureReducer, Sendable {
+struct RecoveryRoleSetup: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var factorSourcesFromProfile: [FactorSource] = []
@@ -16,7 +16,7 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case task
 		case continueButtonTapped
 		case addFactorSourceButtonTapped(ChooseFactorSourceContext)
@@ -27,28 +27,28 @@ struct RecoveryRoleSetup: FeatureReducer, Sendable {
 		case fallbackInfoButtonTapped
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setFactorSources([FactorSource])
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case chooseFactorSource(ChooseFactorSourceContext)
 		case finished
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case selectEmergencyFallbackPeriod
 			case confirmUnsafeShield(AlertState<Action.ConfirmUnsafeShield>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case selectEmergencyFallbackPeriod(SelectEmergencyFallbackPeriodView.Action)
 			case confirmUnsafeShield(ConfirmUnsafeShield)
 
-			enum ConfirmUnsafeShield: Sendable, Hashable {
+			enum ConfirmUnsafeShield: Hashable {
 				case cancel
 				case confirm
 			}

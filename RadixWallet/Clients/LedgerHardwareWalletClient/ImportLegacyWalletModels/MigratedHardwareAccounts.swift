@@ -1,5 +1,5 @@
 // MARK: - MigratedHardwareAccounts
-struct MigratedHardwareAccounts: Sendable, Hashable {
+struct MigratedHardwareAccounts: Hashable {
 	let networkID: NetworkID
 	let ledgerID: LedgerHardwareWalletFactorSource.ID
 

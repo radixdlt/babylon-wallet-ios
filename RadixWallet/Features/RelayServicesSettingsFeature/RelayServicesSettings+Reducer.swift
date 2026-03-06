@@ -3,10 +3,10 @@ import Sargon
 import SwiftUI
 
 // MARK: - RelayServicesSettings
-struct RelayServicesSettings: Sendable, FeatureReducer {
+struct RelayServicesSettings: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
-		struct Row: Sendable, Hashable, Identifiable {
+	struct State: Hashable {
+		struct Row: Hashable, Identifiable {
 			typealias ID = URL
 			var id: URL {
 				service.url
@@ -25,14 +25,14 @@ struct RelayServicesSettings: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case addServiceButtonTapped
 		case rowTapped(URL)
 		case rowRemoveTapped(URL)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case servicesLoaded(SavedRelayServices)
 		case changeServiceResult(TaskResult<EqVoid>)
 		case removeServiceResult(TaskResult<EqVoid>)
@@ -40,17 +40,17 @@ struct RelayServicesSettings: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case addNewService(AddNewRelayService.State)
 			case removeService(AlertState<Action.RemoveServiceAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case addNewService(AddNewRelayService.Action)
 			case removeService(RemoveServiceAlert)
 
-			enum RemoveServiceAlert: Sendable, Hashable {
+			enum RemoveServiceAlert: Hashable {
 				case removeButtonTapped(URL)
 				case cancelButtonTapped
 			}
@@ -224,10 +224,10 @@ extension AlertState<RelayServicesSettings.Destination.Action.RemoveServiceAlert
 
 // MARK: - AddNewRelayService
 @Reducer
-struct AddNewRelayService: Sendable, FeatureReducer {
+struct AddNewRelayService: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
-		enum Field: String, Sendable, Hashable {
+	struct State: Hashable {
+		enum Field: String, Hashable {
 			case name
 			case relayURL
 		}
@@ -243,7 +243,7 @@ struct AddNewRelayService: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case textFieldFocused(State.Field?)
 		case nameChanged(String)
@@ -251,7 +251,7 @@ struct AddNewRelayService: Sendable, FeatureReducer {
 		case addButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case focusTextField(State.Field?)
 		case addServiceResult(TaskResult<EqVoid>)
 		case showDuplicateURLError

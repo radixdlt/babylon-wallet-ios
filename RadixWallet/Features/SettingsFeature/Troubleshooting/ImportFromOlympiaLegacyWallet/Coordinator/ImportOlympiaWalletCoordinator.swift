@@ -3,13 +3,13 @@ import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaWalletCoordinator
-struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
+struct ImportOlympiaWalletCoordinator: FeatureReducer {
 	typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	typealias MigratedAccounts = IdentifiedArrayOf<Account>
 
 	// MARK: State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var scanQR: ScanMultipleOlympiaQRCodes.State = .init()
 		var path: StackState<Path.State> = .init()
 
@@ -18,7 +18,7 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	struct MigratableAccount: Sendable, Hashable, Identifiable {
+	struct MigratableAccount: Hashable, Identifiable {
 		let id: Secp256k1PublicKey
 		let accountName: String?
 		let olympiaAddress: LegacyOlympiaAccountAddress
@@ -29,7 +29,7 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	// MARK: Progress
 
-	enum Progress: Sendable, Hashable {
+	enum Progress: Hashable {
 		case start
 		case scannedQR(ScannedQR)
 		case foundAlreadyImported(FoundAlreadyImported)
@@ -57,24 +57,24 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 		}
 
-		struct ScannedQR: Sendable, Hashable {
+		struct ScannedQR: Hashable {
 			let expectedMnemonicWordCount: BIP39WordCount
 			let scannedAccounts: AccountsToMigrate
 		}
 
-		struct FoundAlreadyImported: Sendable, Hashable {
+		struct FoundAlreadyImported: Hashable {
 			let previous: ScannedQR
 			let accountsToMigrate: AccountsToMigrate?
 			let networkID: NetworkID
 			let previouslyImported: [MigratableAccount]
 		}
 
-		struct CheckedIfOlympiaFactorSourceAlreadyExists: Sendable, Hashable {
+		struct CheckedIfOlympiaFactorSourceAlreadyExists: Hashable {
 			let previous: FoundAlreadyImported
 			let softwareAccountsToMigrate: AccountsToMigrate
 		}
 
-		struct MigratedSoftwareAccounts: Sendable, Hashable {
+		struct MigratedSoftwareAccounts: Hashable {
 			let previous: FoundAlreadyImported
 			let migratedSoftwareAccounts: MigratedAccounts
 		}
@@ -82,16 +82,16 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case scanQR(ScanMultipleOlympiaQRCodes.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case foundAlreadyImportedOlympiaSoftwareAccounts(
 			NetworkID,
 			Set<OlympiaAccountToMigrate.ID>,
@@ -107,21 +107,21 @@ struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case createdOlympiaPrivateHDForAccounts(PrivateHierarchicalDeterministicFactorSource, AccountsToMigrate)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finishedMigration(gotoAccountList: Bool)
 	}
 
 	// MARK: Path
 
-	struct Path: Sendable, Reducer {
-		enum State: Sendable, Hashable {
+	struct Path: Reducer {
+		enum State: Hashable {
 			case accountsToImport(AccountsToImport.State)
 			case importMnemonic(ImportMnemonic.State)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case accountsToImport(AccountsToImport.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)

@@ -5,11 +5,11 @@ import SwiftUI
 
 extension Olympia {
 	enum Export {}
-	struct Parsed: Sendable, Hashable {
+	struct Parsed: Hashable {
 		let mnemonicWordCount: BIP39WordCount
 		let accounts: NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>
 
-		struct ParsedAccount: Sendable, Hashable {
+		struct ParsedAccount: Hashable {
 			let accountType: Olympia.AccountType
 			let publicKey: Secp256k1PublicKey
 			let displayName: NonEmptyString?
@@ -22,7 +22,7 @@ extension Olympia.Export {
 	static let accountNameForbiddenCharReplacement = "_"
 	static let accountNameMaxLength = Account.nameMaxLength
 
-	enum Separator: Sendable, Hashable, CaseIterable {
+	enum Separator: Hashable, CaseIterable {
 		static let inter = "~"
 		static let intra = "^"
 		static let headerEnd = "]"
@@ -42,17 +42,17 @@ extension Olympia.Export {
 		}
 	}
 
-	struct Payload: Sendable, Hashable {
+	struct Payload: Hashable {
 		let header: Header
 		let contents: Contents
 
-		struct Header: Sendable, Hashable {
+		struct Header: Hashable {
 			let payloadCount: Int
 			let payloadIndex: Int
 			let mnemonicWordCount: Int
 		}
 
-		struct Contents: Sendable, Hashable {
+		struct Contents: Hashable {
 			let accounts: OrderedSet<Olympia.Parsed.ParsedAccount>
 			let rest: NonEmptyString?
 		}
@@ -305,7 +305,7 @@ extension CAP33 {
 
 // MARK: CAP33.ParseFailure
 extension CAP33 {
-	enum ParseFailure: String, Swift.Error, Sendable, Hashable {
+	enum ParseFailure: String, Swift.Error, Hashable {
 		case headerDoesNotContainEndSeparator
 		case payloadDidNotContainHeaderAndContent
 		case anyAccount

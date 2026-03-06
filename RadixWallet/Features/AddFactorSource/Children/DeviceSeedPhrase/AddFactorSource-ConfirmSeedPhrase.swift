@@ -3,9 +3,9 @@ import Sargon
 
 extension AddFactorSource {
 	@Reducer
-	struct ConfirmSeedPhrase: Sendable, FeatureReducer {
+	struct ConfirmSeedPhrase: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			@Shared(.mnemonicBuilder) var mnemonicBuilder
 			let factorSourceKind: FactorSourceKind
 			var confirmationWords: OrderedDictionary<UInt16, String> = [:]
@@ -30,7 +30,7 @@ extension AddFactorSource {
 		}
 
 		@CasePathable
-		enum ViewAction: Sendable, Hashable {
+		enum ViewAction: Hashable {
 			case confirmButtonTapped
 			case wordChanged(index: UInt16, word: String)
 			case focusChanged(UInt16?)
@@ -39,7 +39,7 @@ extension AddFactorSource {
 			#endif
 		}
 
-		enum DelegateAction: Sendable, Hashable {
+		enum DelegateAction: Hashable {
 			case validated
 		}
 
@@ -61,6 +61,7 @@ extension AddFactorSource {
 					state.wrongWordIndices = Set(indicesInMnemonic)
 					return .none
 				}
+
 			case let .focusChanged(idx):
 				state.focusField = idx
 				return .none

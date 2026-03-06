@@ -1,20 +1,20 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct NonFungibleAssetList: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct NonFungibleAssetList: FeatureReducer {
+	struct State: Hashable {
 		var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case asset(NonFungibleAssetList.Row.State.ID, NonFungibleAssetList.Row.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case refreshRows([ResourceAddress])
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selected(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
 	}
 

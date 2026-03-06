@@ -3,26 +3,26 @@ import Sargon
 import SwiftUI
 
 // MARK: - DeleteAccountConfirmation
-struct DeleteAccountConfirmation: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct DeleteAccountConfirmation: FeatureReducer {
+	struct State: Hashable {
 		let account: Account
 		var footerButtonState: ControlState = .enabled
 	}
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case continueButtonTapped
 	}
 
 	@CasePathable
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case fetchAccountPortfolioResult(TaskResult<AccountPortfoliosClient.AccountPortfolio>)
 		case fetchReceivingAccounts
 		case fetchReceivingAccountsResult(TaskResult<[State.ReceivingAccountCandidate]>)
 	}
 
 	@CasePathable
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case chooseReceivingAccount(accounts: [State.ReceivingAccountCandidate], disabledAccounts: [AccountAddress])
 		case deleteAccount
 	}
@@ -96,7 +96,7 @@ struct DeleteAccountConfirmation: Sendable, FeatureReducer {
 
 // MARK: - DeleteAccountConfirmation.State.ReceivingAccountCandidate
 extension DeleteAccountConfirmation.State {
-	struct ReceivingAccountCandidate: Sendable, Hashable {
+	struct ReceivingAccountCandidate: Hashable {
 		let account: Account
 		let hasEnoughXRD: Bool
 	}

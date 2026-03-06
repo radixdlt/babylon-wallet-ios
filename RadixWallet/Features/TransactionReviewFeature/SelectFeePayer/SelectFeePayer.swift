@@ -2,17 +2,20 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ValidatedFeePayerCandidate
-struct ValidatedFeePayerCandidate: Sendable, Hashable, Identifiable {
-	var id: FeePayerCandidate.ID { candidate.id }
+struct ValidatedFeePayerCandidate: Hashable, Identifiable {
+	var id: FeePayerCandidate.ID {
+		candidate.id
+	}
+
 	let candidate: FeePayerCandidate
 	let outcome: FeePayerValidationOutcome
 }
 
 // MARK: - SelectFeePayer
-struct SelectFeePayer: Sendable, FeatureReducer {
+struct SelectFeePayer: FeatureReducer {
 	typealias FeePayerCandidates = IdentifiedArrayOf<FeePayerCandidate>
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let reviewedTransaction: ReviewedTransaction
 		var selectedFeePayer: ValidatedFeePayerCandidate?
 		let transactionFee: TransactionFee
@@ -29,7 +32,7 @@ struct SelectFeePayer: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case selectedFeePayer(ValidatedFeePayerCandidate?)
 		case confirmedFeePayer(FeePayerCandidate)
@@ -37,11 +40,11 @@ struct SelectFeePayer: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selected(FeePayerCandidate)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case feePayerCandidatesLoaded(TaskResult<FeePayerCandidates>)
 	}
 

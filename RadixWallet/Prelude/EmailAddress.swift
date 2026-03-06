@@ -2,7 +2,7 @@ import Foundation
 import NonEmpty
 
 // MARK: - EmailAddress
-struct EmailAddress: Sendable, Hashable, Codable {
+struct EmailAddress: Hashable, Codable {
 	let email: NonEmptyString
 	init(validating email: NonEmptyString) throws {
 		guard email.rawValue.isEmailAddress else {

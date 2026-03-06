@@ -43,7 +43,7 @@ extension DappToWalletInteractionSendTransactionItem {
 
 // MARK: - DappToWalletInteraction.RequestValidation
 extension DappToWalletInteraction {
-	struct RequestValidation: Sendable, Hashable {
+	struct RequestValidation: Hashable {
 		var missingEntries: [PersonaData.Entry.Kind: MissingEntry] = [:]
 		var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
 
@@ -59,17 +59,17 @@ extension DappToWalletInteraction {
 }
 
 private extension [PersonaData.Entry.Kind: [PersonaData.Entry]] {
-	func extract<F>(_ kind: PersonaData.Entry.Kind, as: F.Type = F.self) throws -> F? where F: PersonaDataEntryProtocol {
+	func extract<F: PersonaDataEntryProtocol>(_ kind: PersonaData.Entry.Kind, as: F.Type = F.self) throws -> F? {
 		try self[kind]?.first.map { try $0.extract(as: F.self) }
 	}
 
-	func extract<F>(_ kind: PersonaData.Entry.Kind, as: F.Type = F.self) throws -> OrderedSet<F>? where F: PersonaDataEntryProtocol {
+	func extract<F: PersonaDataEntryProtocol>(_ kind: PersonaData.Entry.Kind, as: F.Type = F.self) throws -> OrderedSet<F>? {
 		try self[kind].map { try $0.extract() }
 	}
 }
 
 private extension [PersonaData.Entry] {
-	func extract<F>(as _: F.Type = F.self) throws -> OrderedSet<F> where F: PersonaDataEntryProtocol {
+	func extract<F: PersonaDataEntryProtocol>(as _: F.Type = F.self) throws -> OrderedSet<F> {
 		try .init(validating: map { try $0.extract() })
 	}
 }

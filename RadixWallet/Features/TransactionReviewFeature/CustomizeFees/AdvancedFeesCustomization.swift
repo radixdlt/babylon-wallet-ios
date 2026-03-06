@@ -3,8 +3,8 @@ import SwiftUI
 
 // MARK: - AdvancedFeesCustomization
 struct AdvancedFeesCustomization: FeatureReducer {
-	struct State: Hashable, Sendable {
-		enum FocusField: Hashable, Sendable {
+	struct State: Hashable {
+		enum FocusField: Hashable {
 			case padding
 			case tipPercentage
 		}
@@ -25,13 +25,13 @@ struct AdvancedFeesCustomization: FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case paddingAmountChanged(String)
 		case tipPercentageChanged(String)
 		case focusChanged(State.FocusField?)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case updated(TransactionFee.AdvancedFeeCustomization)
 	}
 

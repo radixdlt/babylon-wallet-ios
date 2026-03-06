@@ -48,11 +48,14 @@ extension InteractionReview {
 
 // MARK: - InteractionReview.DepositSettingView.ViewState
 extension InteractionReview.DepositSettingView {
-	struct ViewState: Sendable, Hashable {
+	struct ViewState: Hashable {
 		let changes: IdentifiedArrayOf<Change>
 
-		struct Change: Sendable, Identifiable, Hashable {
-			var id: AccountAddress.ID { account.address.id }
+		struct Change: Identifiable, Hashable {
+			var id: AccountAddress.ID {
+				account.address.id
+			}
+
 			let account: Account
 			let ruleChange: AccountDefaultDepositRule
 		}

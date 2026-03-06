@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - AssetTransfer
-struct AssetTransfer: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct AssetTransfer: FeatureReducer {
+	struct State: Hashable {
 		var accounts: TransferAccountList.State
 		var message: AssetTransferMessage.State?
 		let isMainnetAccount: Bool
@@ -25,7 +25,7 @@ struct AssetTransfer: Sendable, FeatureReducer {
 
 	init() {}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case addMessageTapped
 		case backgroundTapped
@@ -33,12 +33,12 @@ struct AssetTransfer: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Equatable, Sendable {
+	enum ChildAction: Equatable {
 		case message(AssetTransferMessage.Action)
 		case accounts(TransferAccountList.Action)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case dismissed
 	}
 
@@ -286,8 +286,7 @@ func needsSignatureForDepositting(
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		let hasResource = await (try? onLedgerEntitiesClient
 			.getAccount(receivingAccount.address)
-			.hasResource(resourceAddress)
-		) ?? false
+			.hasResource(resourceAddress)) ?? false
 
 		return !hasResource
 	case (.acceptKnown, .deny):
@@ -307,12 +306,11 @@ extension AssetTransfer {
 		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
 	) async throws -> IdentifiedArrayOf<InvolvedFungibleResource> {
 		let allResourceAddresses: [ResourceAddress] = try receivingAccounts.flatMap {
-			let addresses = try $0.assets.fungibleAssets.map {
+			try $0.assets.fungibleAssets.map {
 				try ResourceAddress(validatingAddress: $0.id)
 			}
-			return addresses
 		}
-		/// Fetch additional information, for now only resource divisibility is used
+		// Fetch additional information, for now only resource divisibility is used
 		let onLedgerResources: [OnLedgerEntity.Resource] = try await onLedgerEntitiesClient.getResources(allResourceAddresses)
 
 		var resources: IdentifiedArrayOf<InvolvedFungibleResource> = []

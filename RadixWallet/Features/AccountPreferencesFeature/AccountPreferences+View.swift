@@ -94,7 +94,6 @@ extension AccountPreferences {
 }
 
 extension AccountPreferences.View {
-	@ViewBuilder
 	private func header(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		VStack(alignment: .leading) {
 			AccountCard(account: viewStore.account)
@@ -139,7 +138,6 @@ extension AccountPreferences.View {
 		}
 	}
 
-	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		VStack {
 			if !viewStore.isOnMainnet {
@@ -279,35 +277,35 @@ private extension View {
 
 // MARK: - AccountPreferences.Section
 extension AccountPreferences {
-	enum Section: Hashable, Sendable {
+	enum Section: Hashable {
 		case securifiedWith
 		case personalize
 		case onLedgerBehaviour
 		case development
 
-		enum SectionRow: Hashable, Sendable {
+		enum SectionRow: Hashable {
 			case securifiedWith(SecurifiedWithRow)
 			case personalize(PersonalizeRow)
 			case onLedger(OnLedgerBehaviourRow)
 			case dev(DevelopmentRow)
 		}
 
-		enum SecurifiedWithRow: Hashable, Sendable {
+		enum SecurifiedWithRow: Hashable {
 			case shield
 		}
 
-		enum PersonalizeRow: Hashable, Sendable {
+		enum PersonalizeRow: Hashable {
 			case accountLabel
 			case accountColor
 			case tags
 		}
 
-		enum OnLedgerBehaviourRow: Hashable, Sendable {
+		enum OnLedgerBehaviourRow: Hashable {
 			case accountSecurity
 			case thirdPartyDeposits
 		}
 
-		enum DevelopmentRow: Hashable, Sendable {
+		enum DevelopmentRow: Hashable {
 			case devPreferences
 		}
 	}

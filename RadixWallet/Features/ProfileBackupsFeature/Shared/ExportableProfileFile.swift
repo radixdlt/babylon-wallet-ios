@@ -15,7 +15,7 @@ struct FileContentIsNotProfile: LocalizedError {
 
 // MARK: - ExportableProfileFile
 /// An exportable (and thus importable) Profile file, either encrypted or plaintext.
-enum ExportableProfileFile: FileDocument, Sendable, Hashable {
+enum ExportableProfileFile: FileDocument, Hashable {
 	case plaintext(Profile)
 	case encrypted(EncryptedProfileJSONData)
 }

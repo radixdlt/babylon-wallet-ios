@@ -321,8 +321,7 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.OnLedgerAccount.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		let poolUnitResources = OnLedgerEntity.OnLedgerAccount.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentified(), poolUnits: poolUnits.sorted())
-		return poolUnitResources
+		return OnLedgerEntity.OnLedgerAccount.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentified(), poolUnits: poolUnits.sorted())
 	}
 
 	static func extractOwnedFungibleResources(
@@ -552,32 +551,32 @@ extension OnLedgerEntity.OnLedgerAccount {
 }
 
 extension OnLedgerEntitiesClient {
-	struct OwnedStakeDetails: Hashable, Sendable {
+	struct OwnedStakeDetails: Hashable {
 		let validator: OnLedgerEntity.Validator
 		var stakeUnitResource: ResourceWithVaultAmount?
 		var stakeClaimTokens: NonFungibleResourceWithTokens?
 		let currentEpoch: Epoch
 	}
 
-	struct OwnedResourcePoolDetails: Hashable, Sendable {
+	struct OwnedResourcePoolDetails: Hashable {
 		let address: PoolAddress
 		let dAppName: String?
 		var poolUnitResource: ResourceWithVaultAmount
 		var xrdResource: ResourceWithRedemptionValue?
 		var nonXrdResources: [ResourceWithRedemptionValue]
 
-		struct ResourceWithRedemptionValue: Hashable, Sendable {
+		struct ResourceWithRedemptionValue: Hashable {
 			let resource: OnLedgerEntity.Resource
 			var redemptionValue: ResourceAmount?
 		}
 	}
 
-	struct ResourceWithVaultAmount: Hashable, Sendable {
+	struct ResourceWithVaultAmount: Hashable {
 		let resource: OnLedgerEntity.Resource
 		var amount: ResourceAmount
 	}
 
-	struct StakeClaim: Hashable, Sendable, Identifiable {
+	struct StakeClaim: Hashable, Identifiable {
 		var id: NonFungibleGlobalId {
 			token.id
 		}
@@ -602,12 +601,12 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	struct NonFungibleResourceWithTokens: Hashable, Sendable {
+	struct NonFungibleResourceWithTokens: Hashable {
 		let resource: OnLedgerEntity.Resource
 		var stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
 
-	struct OwnedNonFungibleId: Hashable, Sendable {
+	struct OwnedNonFungibleId: Hashable {
 		let id: NonFungibleGlobalID
 		var fiatWorth: FiatWorth?
 	}

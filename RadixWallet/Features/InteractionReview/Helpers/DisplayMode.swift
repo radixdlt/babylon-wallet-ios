@@ -1,7 +1,7 @@
 import Foundation
 
 extension InteractionReview {
-	enum DisplayMode: Sendable, Hashable {
+	enum DisplayMode: Hashable {
 		case detailed
 		case raw(manifest: String)
 

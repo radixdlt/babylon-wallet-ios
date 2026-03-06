@@ -114,13 +114,11 @@ extension ImportLegacyWalletClient: DependencyKey {
 					factorSouceID: request.olympiaFactorSouceID
 				)
 
-				let migratedAccounts = try MigratedSoftwareAccounts(
+				return try MigratedSoftwareAccounts(
 					networkID: networkID,
 					accounts: accounts,
 					factorSourceToSave: factorSource
 				)
-
-				return migratedAccounts
 			},
 			migrateOlympiaHardwareAccountsToBabylon: { request in
 				let (accounts, networkID) = try await migrate(
@@ -128,13 +126,11 @@ extension ImportLegacyWalletClient: DependencyKey {
 					factorSouceID: request.ledgerFactorSourceID
 				)
 
-				let migratedAccounts = try MigratedHardwareAccounts(
+				return try MigratedHardwareAccounts(
 					networkID: networkID,
 					ledgerID: request.ledgerFactorSourceID,
 					accounts: accounts
 				)
-
-				return migratedAccounts
 			},
 			findAlreadyImportedIfAny: { scannedAccounts in
 				do {

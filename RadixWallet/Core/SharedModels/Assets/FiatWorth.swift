@@ -12,8 +12,8 @@ extension FiatCurrency {
 }
 
 // MARK: - FiatWorth
-struct FiatWorth: Sendable, Hashable {
-	enum Worth: Sendable, Hashable {
+struct FiatWorth: Hashable {
+	enum Worth: Hashable {
 		case known(Decimal192)
 		case unknown
 	}

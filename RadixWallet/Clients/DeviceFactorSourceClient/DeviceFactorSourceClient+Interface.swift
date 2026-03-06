@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - DeviceFactorSourceClient
-struct DeviceFactorSourceClient: Sendable {
+struct DeviceFactorSourceClient {
 	/// The entities (`Accounts` & `Personas`) that are in bad state. This is, that either:
 	/// - their mnmemonic is missing (entity was imported but seed phrase never entered), or
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
@@ -105,7 +105,8 @@ extension MnemonicWithPassphrase {
 						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
 						signature: $0.signatureWithPublicKey
 					)
-				})
+				}
+			)
 		}
 
 		return Array(signatures)
@@ -132,7 +133,8 @@ extension MnemonicWithPassphrase {
 						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
 						signature: $0.signatureWithPublicKey
 					)
-				})
+				}
+			)
 		}
 
 		return Array(signatures)
@@ -160,7 +162,8 @@ extension MnemonicWithPassphrase {
 						input: .init(payloadId: payloadId, ownedFactorInstance: $0.ownedFactorInstance),
 						signature: $0.signatureWithPublicKey
 					)
-				})
+				}
+			)
 		}
 
 		return Array(signatures)

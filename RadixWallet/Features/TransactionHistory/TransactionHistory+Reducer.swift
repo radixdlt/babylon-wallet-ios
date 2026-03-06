@@ -3,7 +3,7 @@ import Sargon
 
 // MARK: - Triggering
 // Triggers a View update, even if the value wasn't changed
-struct Triggering<T: Hashable & Sendable>: Hashable, Sendable {
+struct Triggering<T: Hashable & Sendable>: Hashable {
 	let created: Date = .now
 	let value: T
 
@@ -17,20 +17,20 @@ struct Triggering<T: Hashable & Sendable>: Hashable, Sendable {
 }
 
 // MARK: - TransactionHistory
-struct TransactionHistory: Sendable, FeatureReducer {
-	enum Direction: Sendable {
+struct TransactionHistory: FeatureReducer {
+	enum Direction {
 		case up
 		case down
 	}
 
-	enum ScrollTarget: Hashable, Sendable {
+	enum ScrollTarget: Hashable {
 		case transaction(TransactionIntentHash)
 		// The latest transaction before the given date
 		case beforeDate(Date)
 		case latestTransaction
 	}
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var fullPeriod: Range<Date> = .now ..< .now
 
 		var availableMonths: IdentifiedArrayOf<DateRangeItem> = []
@@ -56,7 +56,7 @@ struct TransactionHistory: Sendable, FeatureReducer {
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
-		struct Loading: Hashable, Sendable {
+		struct Loading: Hashable {
 			let pivotDate: Date? // nil means "now"
 			let filters: [TransactionFilter]
 
@@ -64,7 +64,7 @@ struct TransactionHistory: Sendable, FeatureReducer {
 			var upCursor: Cursor = .initialRequest
 			var downCursor: Cursor = .initialRequest
 
-			enum Cursor: Hashable, Sendable {
+			enum Cursor: Hashable {
 				case initialRequest
 				case next(String)
 				case loadedAll
@@ -88,8 +88,11 @@ struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	struct TransactionSection: Sendable, Hashable, Identifiable {
-		var id: Tagged<Self, Date> { .init(day) }
+	struct TransactionSection: Hashable, Identifiable {
+		var id: Tagged<Self, Date> {
+			.init(day)
+		}
+
 		/// The day, in the form of a `Date` with all time components set to 0
 		let day: Date
 		/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
@@ -97,7 +100,7 @@ struct TransactionHistory: Sendable, FeatureReducer {
 		var transactions: IdentifiedArrayOf<TransactionHistoryItem>
 	}
 
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case onAppear
 		case selectedMonth(DateRangeItem.ID)
 		case filtersTapped
@@ -106,7 +109,7 @@ struct TransactionHistory: Sendable, FeatureReducer {
 		case closeTapped
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case loadedFirstTransactionDate(Date?)
 		case loadedHistory(
 			TransactionHistoryResponse,
@@ -117,12 +120,12 @@ struct TransactionHistory: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case filters(TransactionHistoryFilters.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case filters(TransactionHistoryFilters.Action)
 		}
 
@@ -139,8 +142,6 @@ struct TransactionHistory: Sendable, FeatureReducer {
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

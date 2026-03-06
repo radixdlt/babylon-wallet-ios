@@ -3,14 +3,14 @@ import Sargon
 import SwiftUI
 
 // MARK: - ProfileSelection
-struct ProfileSelection: Sendable, Hashable {
+struct ProfileSelection: Hashable {
 	let profile: Profile
 	let containsP2PLinks: Bool
 }
 
 // MARK: - RestoreProfileFromBackupCoordinator
-struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct RestoreProfileFromBackupCoordinator: FeatureReducer {
+	struct State: Hashable {
 		var selectBackup = SelectBackup.State()
 		var profileSelection: ProfileSelection?
 
@@ -20,12 +20,12 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case importMnemonicsFlow(ImportMnemonicsFlowCoordinator.Action)
 		}
 
@@ -36,16 +36,16 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case startImportMnemonicsFlow(Profile)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case selectBackup(SelectBackup.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case profileImported
 		case failedToImportProfileDueToMnemonics
 		case backToStartOfOnboarding
@@ -57,8 +57,6 @@ struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.selectBackup, action: \.child.selectBackup) {

@@ -14,7 +14,10 @@ protocol PersonaDataCollectionProtocol<Element> {
 }
 
 extension PersonaDataCollectionProtocol {
-	var first: Element? { collection.first }
+	var first: Element? {
+		collection.first
+	}
+
 	var values: [Element.Value] {
 		collection.map(\.value)
 	}

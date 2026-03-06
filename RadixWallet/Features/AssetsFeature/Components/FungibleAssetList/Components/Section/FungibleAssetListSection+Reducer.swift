@@ -4,8 +4,8 @@ import SwiftUI
 // MARK: - FungibleAssetList.Section
 extension FungibleAssetList {
 	struct Section: FeatureReducer {
-		struct State: Sendable, Hashable, Identifiable {
-			enum ID: Sendable, Hashable {
+		struct State: Hashable, Identifiable {
+			enum ID: Hashable {
 				case xrd
 				case nonXrd
 			}
@@ -23,11 +23,11 @@ extension FungibleAssetList {
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case row(Row.State.ID, Row.Action)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case selected(OnLedgerEntity.OwnedFungibleResource)
 		}
 

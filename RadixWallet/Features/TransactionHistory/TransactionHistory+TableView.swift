@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - TransactionHistory.TableView
 extension TransactionHistory {
 	struct TableView: UIViewRepresentable {
-		enum Action: Hashable, Sendable {
+		enum Action: Hashable {
 			case transactionTapped(TransactionIntentHash)
 			case reachedTop
 			case pulledDown

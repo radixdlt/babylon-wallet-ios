@@ -2,17 +2,17 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - FungibleAssetList
-struct FungibleAssetList: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct FungibleAssetList: FeatureReducer {
+	struct State: Hashable {
 		var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case section(FungibleAssetList.Section.State.ID, FungibleAssetList.Section.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selected(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 	}
 

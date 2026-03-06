@@ -4,9 +4,9 @@ import SwiftUI
 // MARK: - InteractionReview.Accounts
 extension InteractionReview {
 	@Reducer
-	struct Accounts: Sendable, FeatureReducer {
+	struct Accounts: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			init(accounts: IdentifiedArrayOf<InteractionReview.Account.State>, enableCustomizeGuarantees: Bool) {
 				self.accounts = accounts
 				self.enableCustomizeGuarantees = enableCustomizeGuarantees
@@ -18,16 +18,16 @@ extension InteractionReview {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case customizeGuaranteesTapped
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case account(id: AccountAddress, action: InteractionReview.Account.Action)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case showCustomizeGuarantees
 			case showAsset(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 		}
@@ -60,10 +60,12 @@ extension InteractionReview {
 // MARK: - InteractionReview.Account
 extension InteractionReview {
 	@Reducer
-	struct Account: Sendable, FeatureReducer {
+	struct Account: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Identifiable, Hashable {
-			var id: AccountAddress { account.address }
+		struct State: Identifiable, Hashable {
+			var id: AccountAddress {
+				account.address
+			}
 
 			let account: InteractionReview.ReviewAccount
 			var transfers: IdentifiedArrayOf<InteractionReview.Transfer>
@@ -72,12 +74,12 @@ extension InteractionReview {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case appeared
 			case transferTapped(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case showAsset(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 			case showStakeClaim(OnLedgerEntitiesClient.StakeClaim)
 		}
@@ -107,12 +109,12 @@ extension InteractionReview.Account {
 	}
 }
 
-// Neccessary so that ReviewAccount.user has a proper Account associated (and not the InteractionReview.Account reducer)
+/// Neccessary so that ReviewAccount.user has a proper Account associated (and not the InteractionReview.Account reducer)
 typealias RadixAccount = Account
 
 // MARK: - InteractionReview.ReviewAccount
 extension InteractionReview {
-	enum ReviewAccount: Sendable, Hashable {
+	enum ReviewAccount: Hashable {
 		case user(RadixAccount)
 		case external(AccountAddress, approved: Bool)
 

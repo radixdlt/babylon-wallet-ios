@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - EditPersonaName
 struct EditPersonaName: FeatureReducer, EmptyInitializable {
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let id: PersonaDataEntryID
 		var family: EditPersonaDynamicField.State
 		var given: EditPersonaDynamicField.State
@@ -43,11 +43,11 @@ struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case variantPick(PersonaDataEntryName.Variant)
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case family(EditPersonaDynamicField.Action)
 		case given(EditPersonaDynamicField.Action)
 		case nickname(EditPersonaDynamicField.Action)

@@ -76,7 +76,6 @@ extension AccountDetails {
 			.destinations(with: store)
 		}
 
-		@ViewBuilder
 		func header(with viewStore: ViewStore<AccountDetails.ViewState, AccountDetails.ViewAction>) -> some SwiftUI.View {
 			VStack(spacing: .medium1) {
 				AddressView(.address(.account(viewStore.accountAddress)))

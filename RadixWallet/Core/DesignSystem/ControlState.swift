@@ -1,5 +1,5 @@
 // MARK: - ControlState
-enum ControlState: Sendable, Hashable {
+enum ControlState: Hashable {
 	case enabled
 	case loading(LoadingContext)
 	case disabled
@@ -19,7 +19,7 @@ enum ControlState: Sendable, Hashable {
 }
 
 // MARK: - LoadingContext
-enum LoadingContext: Sendable, Hashable {
+enum LoadingContext: Hashable {
 	case local
 	case global(text: String?)
 }

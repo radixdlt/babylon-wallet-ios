@@ -1,8 +1,8 @@
 // MARK: - DAppsDirectory
 @Reducer
-struct DAppsDirectory: Sendable, FeatureReducer {
+struct DAppsDirectory: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var allDapps: AllDapps.State = .init()
 		var approvedDapps: AuthorizedDappsFeature.State = .init()
 	}
@@ -10,14 +10,14 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case didSelectDapp(DApp.ID)
 		case pullToRefreshStarted
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case allDapps(AllDapps.Action)
 		case approvedDapps(AuthorizedDappsFeature.Action)
 	}
@@ -38,7 +38,7 @@ struct DAppsDirectory: Sendable, FeatureReducer {
 extension DAppsDirectory {
 	typealias DApps = IdentifiedArrayOf<DApp>
 	typealias DAppsCategories = IdentifiedArrayOf<DAppsCategory>
-	struct DApp: Sendable, Hashable, Identifiable {
+	struct DApp: Hashable, Identifiable {
 		var id: DappDefinitionAddress {
 			dAppDefinitionAddress
 		}

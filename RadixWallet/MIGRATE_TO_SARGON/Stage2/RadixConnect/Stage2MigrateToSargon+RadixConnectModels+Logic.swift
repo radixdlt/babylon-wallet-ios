@@ -71,12 +71,12 @@ extension DappWalletInteractionPersona {
 }
 
 extension DappToWalletInteraction {
-	enum MissingEntry: Sendable, Hashable {
+	enum MissingEntry: Hashable {
 		case missingEntry
 		case missing(Int)
 	}
 
-	enum KindRequest: Sendable, Hashable {
+	enum KindRequest: Hashable {
 		case entry
 		case number(RequestedQuantity)
 	}
@@ -109,13 +109,16 @@ extension WalletToDappInteractionResponse {
 		}
 	}
 
-	enum Accounts: Sendable, Hashable {
+	enum Accounts: Hashable {
 		case withoutProofOfOwnership(IdentifiedArrayOf<Account>)
 		case withProofOfOwnership(challenge: DappToWalletInteractionAuthChallengeNonce, IdentifiedArrayOf<WithProof>)
 
-		struct WithProof: Sendable, Hashable, Identifiable {
+		struct WithProof: Hashable, Identifiable {
 			typealias ID = WalletInteractionWalletAccount
-			var id: ID { account }
+			var id: ID {
+				account
+			}
+
 			let account: WalletInteractionWalletAccount
 
 			let proof: WalletToDappInteractionAuthProof

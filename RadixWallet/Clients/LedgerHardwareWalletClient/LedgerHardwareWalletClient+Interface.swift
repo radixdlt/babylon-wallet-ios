@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - LedgerHardwareWalletClient
-struct LedgerHardwareWalletClient: Sendable {
+struct LedgerHardwareWalletClient {
 	var hasAnyLinkedConnector: HasAnyLinkedConnector
 	var getDeviceInfo: GetDeviceInfo
 	var derivePublicKeys: DerivePublicKeys
@@ -25,30 +25,30 @@ extension LedgerHardwareWalletClient {
 
 // MARK: LedgerHardwareWalletClient.NewSignTransactionRequest
 extension LedgerHardwareWalletClient {
-	struct DerivePublicKeysRequest: Sendable, Hashable {
+	struct DerivePublicKeysRequest: Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: KeyDerivationRequestPerFactorSource
 	}
 
-	struct SignTransactionRequest: Sendable, Hashable {
+	struct SignTransactionRequest: Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: TransactionSignRequestInputOfTransactionIntent
 	}
 
-	struct SignSubintentRequest: Sendable, Hashable {
+	struct SignSubintentRequest: Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: TransactionSignRequestInputOfSubintent
 	}
 
-	struct SignAuthRequest: Sendable, Hashable {
+	struct SignAuthRequest: Hashable {
 		let ledger: LedgerHardwareWalletFactorSource
 		let input: TransactionSignRequestInputOfAuthIntent
 	}
 }
 
 // MARK: - VerifyAddressOutcome
-enum VerifyAddressOutcome: Sendable, Hashable {
-	enum Mismatch: Sendable, Hashable {
+enum VerifyAddressOutcome: Hashable {
+	enum Mismatch: Hashable {
 		case publicKeyMismatch
 		case addressMismatch
 	}

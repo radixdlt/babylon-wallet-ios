@@ -3,8 +3,8 @@ import SwiftUI
 
 // MARK: - ChooseAccountsRow
 enum ChooseAccountsRow {
-	struct State: Sendable, Hashable {
-		enum Mode: Sendable, Hashable {
+	struct State: Hashable {
+		enum Mode: Hashable {
 			case checkmark
 			case radioButton
 		}
