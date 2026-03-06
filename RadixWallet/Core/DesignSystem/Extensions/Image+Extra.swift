@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - ImageSource
-enum ImageSource: Hashable, Equatable, Sendable {
+enum ImageSource: Hashable, Equatable {
 	case imageResource(ImageResource)
 	case systemImage(String)
 }

@@ -56,7 +56,7 @@ final class ROLAClientTests: TestCase {
 		try await super.tearDown()
 	}
 
-	struct TestVector: Sendable, Hashable, Codable {
+	struct TestVector: Hashable, Codable {
 		let origin: String
 		let challenge: String
 		let dAppDefinitionAddress: String
@@ -96,7 +96,7 @@ final class ROLAClientTests: TestCase {
 		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
-					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
+					// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
 					let challenge = (Data((origin + dAppDefinitionAddress.address).utf8) + [seed]).hash()
 					let payload = ROLAClient.payloadToHash(
 						challenge: challenge.bytes,
@@ -143,7 +143,7 @@ final class ROLAClientTests: TestCase {
 		let origin = "https://origin.com"
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
-		let expectedURL = URL(string: "https://origin.com/.well-known/radix.json")!
+		let expectedURL = try XCTUnwrap(URL(string: "https://origin.com/.well-known/radix.json"))
 
 		MockURLProtocol.requestHandler = { request in
 			guard let url = request.url, url == expectedURL else {
@@ -190,7 +190,7 @@ final class ROLAClientTests: TestCase {
 		}
 	}
 
-	func testUnhappyPath_whenAccountTypeIsWrong_thenWrongAccountTypeErrorIsThrown() async throws {
+	func testUnhappyPath_whenAccountTypeIsWrong_thenWrongAccountTypeErrorIsThrown() async {
 		// given
 		let origin = "https://origin.com"
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
@@ -216,7 +216,7 @@ final class ROLAClientTests: TestCase {
 		}
 	}
 
-	func testUnhappyPath_whenOriginIsUnknown_thenUnknownWebsiteErrorIsThrown() async throws {
+	func testUnhappyPath_whenOriginIsUnknown_thenUnknownWebsiteErrorIsThrown() async {
 		// given
 		let origin = "https://origin.com"
 		let originFromDapp = "https://someotherorigin.com"
@@ -249,7 +249,7 @@ final class ROLAClientTests: TestCase {
 		let origin = "https://origin.com"
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json: JSON = []
-		let expectedURL = URL(string: "/.well-known/radix.json")!
+		let expectedURL = try XCTUnwrap(URL(string: "/.well-known/radix.json"))
 
 		MockURLProtocol.requestHandler = { _ in
 			let response = HTTPURLResponse(
@@ -281,10 +281,10 @@ final class ROLAClientTests: TestCase {
 	func testUnhappyPath_whenDappDefinitionAddressIsUnknown_thenUnknownDappDefinitionAddressErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let unknownDappDefinitionAddress = try! DappDefinitionAddress(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q") // TODO: use another valid DappDefinitionAddress
+		let unknownDappDefinitionAddress = try DappDefinitionAddress(validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q") // TODO: use another valid DappDefinitionAddress
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: unknownDappDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
-		let expectedURL = URL(string: "/.well-known/radix.json")!
+		let expectedURL = try XCTUnwrap(URL(string: "/.well-known/radix.json"))
 
 		MockURLProtocol.requestHandler = { _ in
 			let response = HTTPURLResponse(

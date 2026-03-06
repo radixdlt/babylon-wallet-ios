@@ -1,8 +1,12 @@
+import Sargon
 import WebRTC
 
 // MARK: - PeerConnectionFactory
 protocol PeerConnectionFactory: Sendable {
-	func makePeerConnectionClient(for clientId: RemoteClientID) throws -> PeerConnectionClient
+	func makePeerConnectionClient(
+		for clientId: RemoteClientID,
+		using transportProfile: P2PTransportProfile
+	) throws -> PeerConnectionClient
 }
 
 // MARK: - PeerConnectionNegotiator
@@ -34,6 +38,7 @@ struct PeerConnectionNegotiator {
 
 	init(
 		p2pLink: P2PLink,
+		p2pTransportProfile: P2PTransportProfile,
 		isNewConnection: Bool,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
@@ -47,6 +52,7 @@ struct PeerConnectionNegotiator {
 		self.negotiationResultsContinuation = negotiationResultsContinuation
 		self.negotiationTask = Self.listenForNegotiationTriggers(
 			p2pLink: p2pLink,
+			p2pTransportProfile: p2pTransportProfile,
 			isNewConnection: isNewConnection,
 			signalingClient: signalingClient,
 			factory: factory,
@@ -65,6 +71,7 @@ extension PeerConnectionNegotiator {
 
 	private static func listenForNegotiationTriggers(
 		p2pLink: P2PLink,
+		p2pTransportProfile: P2PTransportProfile,
 		isNewConnection: Bool,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
@@ -76,6 +83,7 @@ extension PeerConnectionNegotiator {
 				let peerConnection = try await negotiatePeerConnection(
 					trigger,
 					p2pLink: p2pLink,
+					p2pTransportProfile: p2pTransportProfile,
 					isNewConnection: isNewConnection,
 					signalingServerClient: signalingClient,
 					factory: factory
@@ -120,6 +128,7 @@ extension PeerConnectionNegotiator {
 	private static func negotiatePeerConnection(
 		_ trigger: NegotiationTrigger,
 		p2pLink: P2PLink,
+		p2pTransportProfile: P2PTransportProfile,
 		isNewConnection: Bool,
 		signalingServerClient: SignalingClient,
 		factory: PeerConnectionFactory
@@ -128,7 +137,10 @@ extension PeerConnectionNegotiator {
 		let log = tracePeerConnectionNegotiation(clientID)
 
 		log("Triggered")
-		let peerConnectionClient = try factory.makePeerConnectionClient(for: clientID)
+		let peerConnectionClient = try factory.makePeerConnectionClient(
+			for: clientID,
+			using: p2pTransportProfile
+		)
 
 		let onLocalIceCandidate = peerConnectionClient
 			.onGeneratedICECandidate
@@ -152,14 +164,14 @@ extension PeerConnectionNegotiator {
 		let onConnectionEstablished = peerConnectionClient
 			.iceConnectionStates
 			.filter {
-				$0 == .connected
+				$0 == ICEConnectionState.connected
 			}
 			.prefix(1)
 
 		let onDataChannelReady = peerConnectionClient
 			.dataChannelReadyStates
 			.filter {
-				$0 == .connected
+				$0 == DataChannelReadyState.connected
 			}
 			.prefix(1)
 

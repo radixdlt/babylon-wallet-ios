@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - HiddenEntities
 @Reducer
-struct HiddenEntities: Sendable, FeatureReducer {
+struct HiddenEntities: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var personas: Personas = []
 		var accounts: Accounts = []
 
@@ -15,13 +15,13 @@ struct HiddenEntities: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case unhidePersonaTapped(Persona.ID)
 		case unhideAccountTapped(Account.ID)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setEntities(EntitiesVisibilityClient.HiddenEntities)
 		case didUnhidePersona(Persona.ID)
 		case didUnhideAccount(Account.ID)
@@ -29,15 +29,15 @@ struct HiddenEntities: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case unhideAlert(AlertState<Action.UnhideAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case unhideAlert(UnhideAlert)
 
-			enum UnhideAlert: Hashable, Sendable {
+			enum UnhideAlert: Hashable {
 				case confirmPersonaTapped(Persona.ID)
 				case confirmAccountTapped(Account.ID)
 				case cancelTapped

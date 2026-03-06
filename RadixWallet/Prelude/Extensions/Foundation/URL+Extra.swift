@@ -36,5 +36,7 @@ extension URL {
 
 // MARK: - URL + Identifiable
 extension URL: Identifiable {
-	public var id: URL { self.absoluteURL }
+	public var id: URL {
+		self.absoluteURL
+	}
 }

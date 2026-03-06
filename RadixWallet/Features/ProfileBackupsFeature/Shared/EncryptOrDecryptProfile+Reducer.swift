@@ -5,9 +5,9 @@ typealias EncryptionPassword = String
 typealias EncryptedProfileJSONData = Data
 
 // MARK: - EncryptOrDecryptProfile
-struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Mode: Sendable, Hashable {
+struct EncryptOrDecryptProfile: FeatureReducer {
+	struct State: Hashable {
+		enum Mode: Hashable {
 			case decrypt(EncryptedProfileJSONData)
 
 			case loadThenEncrypt
@@ -24,7 +24,7 @@ struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 		}
 
-		enum Field: String, Sendable, Hashable {
+		enum Field: String, Hashable {
 			case encryptionPassword
 			case confirmPassword
 		}
@@ -49,7 +49,7 @@ struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case closeButtonTapped
 		case textFieldFocused(State.Field?)
@@ -58,7 +58,7 @@ struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case confirmedEncryptionPassword
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case focusTextField(State.Field?)
 
 		case loadProfileSnapshotToEncryptResult(
@@ -66,7 +66,7 @@ struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Profile, containsP2PLinks: Bool)
 		case successfullyEncrypted(plaintext: Profile, encrypted: EncryptedProfileJSONData)
@@ -75,14 +75,14 @@ struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	// MARK: - Destination
 
 	struct Destination: DestinationReducer {
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
 		}
 
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case incorrectPasswordAlert(IncorrectPasswordAlert)
 
-			enum IncorrectPasswordAlert: Sendable, Hashable {
+			enum IncorrectPasswordAlert: Hashable {
 				case okTapped
 			}
 		}

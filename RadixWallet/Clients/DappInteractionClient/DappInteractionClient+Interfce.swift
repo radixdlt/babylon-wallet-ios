@@ -1,32 +1,23 @@
 // MARK: - DappInteractionClient
-struct DappInteractionClient: Sendable {
+struct DappInteractionClient {
 	let interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>
 	let addWalletInteraction: AddWalletInteraction
 	let completeInteraction: CompleteInteraction
-
-	init(
-		interactions: AnyAsyncSequence<Result<ValidatedDappRequest, Error>>,
-		addWalletInteraction: @escaping AddWalletInteraction,
-		completeInteraction: @escaping CompleteInteraction
-	) {
-		self.interactions = interactions
-		self.addWalletInteraction = addWalletInteraction
-		self.completeInteraction = completeInteraction
-	}
 }
 
 extension DappInteractionClient {
-	enum WalletInteraction: String, Sendable, Hashable {
+	enum WalletInteraction: String, Hashable {
 		case accountDepositSettings
 		case accountTransfer
 		case accountLockerClaim
 		case accountDelete
 		case shieldUpdate
+		case rawManifestTransaction
 	}
 
 	/// Result of a wallet interaction containing both P2P response (for external dApps)
 	/// and internal data (for wallet-initiated interactions)
-	struct WalletInteractionResult: Sendable, Hashable {
+	struct WalletInteractionResult: Hashable {
 		/// The P2P response sent to external dApps
 		let p2pResponse: P2P.RTCOutgoingMessage.Response
 		/// The notarized transaction (populated for transaction interactions)
@@ -70,17 +61,22 @@ extension WalletInteractionId {
 		hasPrefix(DappInteractionClient.WalletInteraction.shieldUpdate.rawValue)
 	}
 
+	var isWalletRawManifestTransactionInteraction: Bool {
+		hasPrefix(DappInteractionClient.WalletInteraction.rawManifestTransaction.rawValue)
+	}
+
 	var isWalletInteraction: Bool {
 		isWalletAccountTransferInteraction
 			|| isWalletAccountDepositSettingsInteraction
 			|| isWalletAccountLockerClaimInteraction
 			|| isWalletAccountDeleteInteraction
 			|| isWalletShieldUpdateInteraction
+			|| isWalletRawManifestTransactionInteraction
 	}
 }
 
 extension DappInteractionClient {
-	struct RequestEnvelope: Sendable, Hashable {
+	struct RequestEnvelope: Hashable {
 		let route: P2P.Route
 		let interaction: DappToWalletInteraction
 		let requiresOriginValidation: Bool
@@ -92,7 +88,7 @@ extension DappInteractionClient {
 		}
 	}
 
-	struct ValidatedDappRequest: Sendable, Hashable {
+	struct ValidatedDappRequest: Hashable {
 		let route: P2P.Route
 		let request: Request
 		let requiresOriginVerification: Bool
@@ -103,12 +99,12 @@ extension DappInteractionClient {
 			self.requiresOriginVerification = requiresOriginVerification
 		}
 
-		enum Request: Sendable, Hashable {
+		enum Request: Hashable {
 			case valid(DappToWalletInteraction)
 			case invalid(request: DappToWalletInteractionUnvalidated, reason: InvalidRequestReason)
 		}
 
-		enum InvalidRequestReason: Sendable, Hashable {
+		enum InvalidRequestReason: Hashable {
 			case incompatibleVersion(connectorExtensionSent: WalletInteractionVersion, walletUses: WalletInteractionVersion)
 			case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 			case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
@@ -118,11 +114,11 @@ extension DappInteractionClient {
 			case invalidPersonaOrAccounts
 			case invalidPreAuthorization(InvalidPreAuthorization)
 
-			enum BadContent: Sendable, Hashable {
+			enum BadContent: Hashable {
 				case numberOfAccountsInvalid
 			}
 
-			enum InvalidPreAuthorization: Sendable, Hashable {
+			enum InvalidPreAuthorization: Hashable {
 				case expirationTooClose
 				case expired
 			}

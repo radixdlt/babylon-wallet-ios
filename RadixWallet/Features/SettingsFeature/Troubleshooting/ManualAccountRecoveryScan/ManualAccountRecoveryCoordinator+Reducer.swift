@@ -3,11 +3,11 @@ import SwiftUI
 
 // MARK: - ManualAccountRecoveryCoordinator
 @Reducer
-struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
+struct ManualAccountRecoveryCoordinator: FeatureReducer {
 	typealias Store = StoreOf<Self>
 
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var path: StackState<Path.State> = .init()
 		var isMainnet: Bool = false
 
@@ -25,7 +25,7 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		case recoveryComplete(RecoverWalletControlWithBDFSComplete)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case closeButtonTapped
 		case recoverBabylonAccountsTapped
@@ -33,15 +33,15 @@ struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case path(StackActionOf<Path>)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case isMainnet(Bool)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case completed
 	}
 

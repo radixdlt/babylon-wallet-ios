@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CustomizeFees
-struct CustomizeFees: FeatureReducer, Sendable {
-	struct State: Hashable, Sendable {
+struct CustomizeFees: FeatureReducer {
+	struct State: Hashable {
 		@CasePathable
-		enum CustomizationModeState: Hashable, Sendable {
+		enum CustomizationModeState: Hashable {
 			case normal(NormalFeesCustomization.State)
 			case advanced(AdvancedFeesCustomization.State)
 		}
@@ -46,34 +46,34 @@ struct CustomizeFees: FeatureReducer, Sendable {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case changeFeePayerTapped
 		case toggleMode
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Equatable, Sendable {
+	enum ChildAction: Equatable {
 		case normalFeesCustomization(NormalFeesCustomization.Action)
 		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case updated(ReviewedTransaction)
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case selectFeePayer(SelectFeePayer.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case selectFeePayer(SelectFeePayer.Action)
 		}
 
@@ -165,7 +165,7 @@ struct CustomizeFees: FeatureReducer, Sendable {
 					var reviewedTransaction = reviewedTransaction
 					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty())
 
-					/// Remove the previous Fee Payer Signature if it is not required
+					// Remove the previous Fee Payer Signature if it is not required
 					if let previousFeePayer, !manifestSummary.addressesOfAccountsRequiringAuth.contains(where: { $0 == previousFeePayer.account.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
@@ -202,7 +202,7 @@ struct CustomizeFees: FeatureReducer, Sendable {
 						reviewedTransaction.signingFactors = factors
 						reviewedTransaction.feePayer = .success(selection)
 						if previousFeePayer == nil, reviewedTransaction.transactionFee.totalFee.max == .zero {
-							/// The case when no FeePayer is required, but users chooses to add a FeePayer.
+							// The case when no FeePayer is required, but users chooses to add a FeePayer.
 							reviewedTransaction.transactionFee.addLockFeeCost()
 							reviewedTransaction.transactionFee.updateNotarizingCost(notaryIsSignatory: false)
 						}

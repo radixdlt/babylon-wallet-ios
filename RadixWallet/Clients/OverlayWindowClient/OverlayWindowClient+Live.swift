@@ -11,6 +11,7 @@ extension OverlayWindowClient: DependencyKey {
 
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.pasteboardClient) var pasteBoardClient
+		@Dependency(\.contactSupportClient) var contactSupportClient
 
 		errorQueue.errors().map { error in
 			if let sargonError = error as? SargonError {
@@ -40,7 +41,10 @@ extension OverlayWindowClient: DependencyKey {
 						ButtonState(role: .cancel, action: .dismissed) {
 							TextState(L10n.Common.cancel)
 						}
-						ButtonState(action: .emailSupport(additionalInfo: error.localizedDescription)) { TextState(L10n.Error.emailSupportButtonTitle)
+						if contactSupportClient.isEmailSupportAvailable() {
+							ButtonState(action: .emailSupport(additionalInfo: error.localizedDescription)) {
+								TextState(L10n.Error.emailSupportButtonTitle)
+							}
 						}
 					},
 					message: { TextState(message) }

@@ -1,9 +1,9 @@
 // MARK: - Signing
 @Reducer
-struct Signing: Sendable, FeatureReducer {
+struct Signing: FeatureReducer {
 	@Dependency(\.arculusCardClient) var arculusCardClient
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let purpose: Purpose
 		var factorSourceAccess: FactorSourceAccess.State
 
@@ -26,15 +26,15 @@ struct Signing: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case handleSignatures(PrivateFactorSource, Signatures)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case skipped
 		case cancelled
 		case finished(Signatures)
@@ -197,7 +197,7 @@ private extension Signing {
 
 // MARK: - Signing.State.Purpose
 extension Signing.State {
-	enum Purpose: Sendable, Hashable {
+	enum Purpose: Hashable {
 		case transaction(PerFactorSourceInputOfTransactionIntent)
 		case subintent(PerFactorSourceInputOfSubintent)
 		case auth(PerFactorSourceInputOfAuthIntent)
@@ -206,7 +206,7 @@ extension Signing.State {
 
 // MARK: - Signing.Signatures
 extension Signing {
-	enum Signatures: Sendable, Hashable {
+	enum Signatures: Hashable {
 		case transaction([HdSignatureOfTransactionIntentHash])
 		case subintent([HdSignatureOfSubintentHash])
 		case auth([HdSignatureOfAuthIntentHash])

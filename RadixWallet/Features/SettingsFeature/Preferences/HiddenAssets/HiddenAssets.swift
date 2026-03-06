@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - HiddenAssets
 @Reducer
-struct HiddenAssets: Sendable, FeatureReducer {
+struct HiddenAssets: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var fungible: [OnLedgerEntity.Resource] = []
 		var nonFungible: [OnLedgerEntity.Resource] = []
 		var poolUnit: [State.PoolUnitDetails] = []
@@ -12,7 +12,7 @@ struct HiddenAssets: Sendable, FeatureReducer {
 		@Presents
 		var destination: Destination.State? = nil
 
-		struct PoolUnitDetails: Sendable, Hashable {
+		struct PoolUnitDetails: Hashable {
 			let resource: OnLedgerEntity.Resource
 			let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		}
@@ -21,12 +21,12 @@ struct HiddenAssets: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case unhideTapped(ResourceIdentifier)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadResources([ResourceIdentifier])
 		case setFungible([OnLedgerEntity.Resource])
 		case setNonFungible([OnLedgerEntity.Resource])
@@ -36,15 +36,15 @@ struct HiddenAssets: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case unhideAlert(AlertState<Action.UnhideAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case unhideAlert(UnhideAlert)
 
-			enum UnhideAlert: Hashable, Sendable {
+			enum UnhideAlert: Hashable {
 				case confirmTapped(ResourceIdentifier)
 				case cancelTapped
 			}

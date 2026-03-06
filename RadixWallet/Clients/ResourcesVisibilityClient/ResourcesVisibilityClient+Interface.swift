@@ -1,6 +1,6 @@
 // MARK: - ResourcesVisibilityClient
 /// Controls the visibility of resources in the Wallet
-struct ResourcesVisibilityClient: Sendable {
+struct ResourcesVisibilityClient {
 	var hide: Hide
 	var getHidden: GetHidden
 	var hiddenValues: HiddenValues

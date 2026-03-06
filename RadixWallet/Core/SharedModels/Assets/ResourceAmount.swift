@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - ResourceAmount
-enum ResourceAmount: Sendable, Hashable, Codable {
+enum ResourceAmount: Hashable, Codable {
 	case exact(ExactResourceAmount)
 	case atLeast(ExactResourceAmount)
 	case between(minimum: ExactResourceAmount, maximum: ExactResourceAmount)
@@ -121,7 +121,7 @@ extension ResourceAmount: CustomDebugStringConvertible {
 }
 
 // MARK: - ExactResourceAmount
-struct ExactResourceAmount: Sendable, Hashable, Codable {
+struct ExactResourceAmount: Hashable, Codable {
 	let nominalAmount: Decimal192
 	var fiatWorth: FiatWorth?
 

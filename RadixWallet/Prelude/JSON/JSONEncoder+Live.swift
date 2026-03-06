@@ -8,8 +8,13 @@ extension JSONEncoder: @retroactive DependencyKey {
 		return encoder
 	}
 
-	public static var previewValue: Value { liveValue }
-	public static var testValue: Value { liveValue }
+	public static var previewValue: Value {
+		liveValue
+	}
+
+	public static var testValue: Value {
+		liveValue
+	}
 }
 
 extension DependencyValues {

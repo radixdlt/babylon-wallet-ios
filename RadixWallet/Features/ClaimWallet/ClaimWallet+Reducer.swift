@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - ClaimWallet
 @Reducer
-struct ClaimWallet: Sendable, FeatureReducer {
+struct ClaimWallet: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var isLoading: Bool = false
 		var screenState: ControlState {
 			isLoading ? .loading(.global(text: nil)) : .enabled
@@ -20,27 +20,27 @@ struct ClaimWallet: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case clearWalletButtonTapped
 		case transferBackButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case didClearWallet
 		case transferBack
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case confirmReset(AlertState<Action.ConfirmReset>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Hashable {
+		enum Action: Hashable {
 			case confirmReset(ConfirmReset)
 
-			enum ConfirmReset: Sendable, Hashable {
+			enum ConfirmReset: Hashable {
 				case confirm
 			}
 		}
@@ -51,8 +51,6 @@ struct ClaimWallet: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.resetWalletClient) var resetWalletClient
-
-	init() {}
 
 	var body: some ReducerOf<ClaimWallet> {
 		Reduce(core)

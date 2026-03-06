@@ -1,8 +1,8 @@
 // MARK: - ArculusCreatePIN
 @Reducer
-struct ArculusCreatePIN: Sendable, FeatureReducer {
+struct ArculusCreatePIN: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var pinInput: ArculusPINInput.State = .init(shouldConfirmPIN: true)
 
 		init() {}
@@ -10,16 +10,16 @@ struct ArculusCreatePIN: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case pinAdded(String)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case pinInput(ArculusPINInput.Action)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case pinAdded(String)
 	}
 

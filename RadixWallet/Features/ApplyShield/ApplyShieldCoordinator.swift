@@ -3,9 +3,9 @@ import Sargon
 // MARK: - ApplyShield.Coordinator
 extension ApplyShield {
 	@Reducer
-	struct Coordinator: Sendable, FeatureReducer {
+	struct Coordinator: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let securityStructure: SecurityStructureOfFactorSources
 			var entityAddress: AddressOfAccountOrPersona?
 
@@ -33,17 +33,17 @@ extension ApplyShield {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case applyButtonTapped
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case root(Path.Action)
 			case path(StackActionOf<Path>)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case skipped
 			case finished
 		}
@@ -79,7 +79,7 @@ extension ApplyShield {
 						switch result.p2pResponse {
 						case let .dapp(.success(success)):
 							if case let .transaction(tx) = success.items {
-								/// Wait for the transaction to be committed
+								// Wait for the transaction to be committed
 								let txID = tx.send.transactionIntentHash
 								if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 									if let signedIntent = result.notarizedTransaction, !isAccessControllerTimedRecoveryManifest(manifest: signedIntent.signedIntent.intent.manifest) {

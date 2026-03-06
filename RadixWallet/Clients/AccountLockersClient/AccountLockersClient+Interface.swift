@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - AccountLockersClient
-struct AccountLockersClient: DependencyKey, Sendable {
+struct AccountLockersClient: DependencyKey {
 	/// Start monitoring the account locker claims.
 	let startMonitoring: StartMonitoring
 

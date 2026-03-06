@@ -4,21 +4,21 @@ import SwiftUI
 // MARK: - InteractionReview.Proofs
 extension InteractionReview {
 	@Reducer
-	struct Proofs: Sendable, FeatureReducer {
+	struct Proofs: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let kind: InteractionReview.Kind
 			let proofs: IdentifiedArrayOf<ProofEntity>
 		}
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case infoTapped
 			case proofTapped(ProofEntity)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case showAsset(ProofEntity)
 		}
 
@@ -39,8 +39,11 @@ extension InteractionReview {
 
 // MARK: - InteractionReview.ProofEntity
 extension InteractionReview {
-	struct ProofEntity: Sendable, Identifiable, Hashable {
-		var id: KnownResourceBalance { resourceBalance }
+	struct ProofEntity: Identifiable, Hashable {
+		var id: KnownResourceBalance {
+			resourceBalance
+		}
+
 		let resourceBalance: KnownResourceBalance
 	}
 }

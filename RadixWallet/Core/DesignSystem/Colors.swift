@@ -6,29 +6,49 @@ extension Color {
 
 extension ShapeStyle where Self == Color {
 	/// Namespace only
-	static var app: Color.App { Color.app }
+	static var app: Color.App {
+		Color.app
+	}
 }
 
 extension Color.App {
-	// green
-	var green1: Color { .init(hex: .green1) }
-	var green2: Color { .init(hex: .green2) }
-	var green3: Color { .init(hex: .green3) }
+	/// green
+	var green1: Color {
+		.init(hex: .green1)
+	}
+
+	var green2: Color {
+		.init(hex: .green2)
+	}
+
+	var green3: Color {
+		.init(hex: .green3)
+	}
 
 	/// white with 0.8 opacity
-	var whiteTransparent: Color { .white.opacity(0.8) }
+	var whiteTransparent: Color {
+		.white.opacity(0.8)
+	}
 
-	// orange
-	var orange2: Color { .init(hex: .orange2) }
+	/// orange
+	var orange2: Color {
+		.init(hex: .orange2)
+	}
 
-	// alert
-	var lightError: Color { .init(hex: .lightError) }
+	/// alert
+	var lightError: Color {
+		.init(hex: .lightError)
+	}
 
-	var shadowBlack: Color { .black.opacity(0.08) }
+	var shadowBlack: Color {
+		.black.opacity(0.08)
+	}
 
 	// Approval gradient
 
-	var gradientPurple: Color { .init(hex: 0xFF07E6) }
+	var gradientPurple: Color {
+		.init(hex: 0xFF07E6)
+	}
 }
 
 // MARK: - Color.Hex
@@ -39,7 +59,7 @@ extension Color {
 		case green2 = 0x00C389
 		case green3 = 0x21FFBE
 
-		// orange
+		/// orange
 		case orange2 = 0xEC633E
 
 		case lightError = 0xFCEBEB

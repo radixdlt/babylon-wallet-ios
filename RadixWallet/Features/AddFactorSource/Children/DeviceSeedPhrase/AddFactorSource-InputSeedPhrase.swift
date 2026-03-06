@@ -4,9 +4,9 @@ import Sargon
 // MARK: - AddFactorSource.InputSeedPhrase
 extension AddFactorSource {
 	@Reducer
-	struct InputSeedPhrase: Sendable, FeatureReducer {
+	struct InputSeedPhrase: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			@Shared(.mnemonicBuilder) var mnemonicBuilder
 
 			var grid: ImportMnemonicGrid.State!
@@ -53,7 +53,7 @@ extension AddFactorSource {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ViewAction: Sendable, Hashable {
+		enum ViewAction: Hashable {
 			case confirmButtonTapped
 			case enterCustomSeedPhraseButtonTapped
 			case passphraseChanged(String)
@@ -61,29 +61,29 @@ extension AddFactorSource {
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Hashable {
+		enum ChildAction: Hashable {
 			case grid(ImportMnemonicGrid.Action)
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case factorAlreadyInUse(FactorSource)
 		}
 
-		enum DelegateAction: Sendable, Hashable {
+		enum DelegateAction: Hashable {
 			case completed(withCustomSeedPhrase: Bool)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case factorAlreadyInUseAlert(AlertState<Action.FactorAlreadyInUseAlert>)
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Equatable {
 				case factorAlreadyInUseAlert(FactorAlreadyInUseAlert)
 
-				enum FactorAlreadyInUseAlert: Sendable, Hashable {
+				enum FactorAlreadyInUseAlert: Hashable {
 					case close
 				}
 			}

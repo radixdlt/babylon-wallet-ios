@@ -7,7 +7,7 @@ extension P2P {
 // MARK: - P2P.ConnectorExtension.Request
 extension P2P.ConnectorExtension {
 	/// A request we send to connector extension
-	enum Request: Sendable, Hashable, Encodable {
+	enum Request: Hashable, Encodable {
 		/// Messages sent to Connector Extension for interaction with
 		/// Ledger hardware wallets by LedgerHQ, e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
@@ -30,7 +30,7 @@ extension P2P.ConnectorExtension {
 extension P2P.ConnectorExtension.Request {
 	/// Message sent to Connector Extension for interaction with
 	/// Ledger hardware wallets by LedgerHQ, e.g. Ledger Nano S
-	struct LedgerHardwareWallet: Sendable, Hashable, Encodable {
+	struct LedgerHardwareWallet: Hashable, Encodable {
 		let interactionID: P2P.LedgerHardwareWallet.InteractionId
 		let request: Request
 
@@ -39,7 +39,7 @@ extension P2P.ConnectorExtension.Request {
 			self.request = request
 		}
 
-		enum Request: Sendable, Hashable, Encodable {
+		enum Request: Hashable, Encodable {
 			case getDeviceInfo
 			case derivePublicKeys(DerivePublicKeys)
 			case signTransaction(SignTransaction)
@@ -58,7 +58,7 @@ extension P2P.ConnectorExtension.Request {
 				}
 			}
 
-			struct DerivePublicKeys: Sendable, Hashable, Encodable {
+			struct DerivePublicKeys: Hashable, Encodable {
 				let keysParameters: [P2P.LedgerHardwareWallet.KeyParameters]
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 
@@ -71,7 +71,7 @@ extension P2P.ConnectorExtension.Request {
 				}
 			}
 
-			struct SignTransaction: Sendable, Hashable, Encodable {
+			struct SignTransaction: Hashable, Encodable {
 				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				let compiledTransactionIntent: HexCodable
@@ -79,13 +79,13 @@ extension P2P.ConnectorExtension.Request {
 				let mode: String = "summary"
 			}
 
-			struct SignSubintentHash: Sendable, Hashable, Encodable {
+			struct SignSubintentHash: Hashable, Encodable {
 				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				let subintentHash: HexCodable
 			}
 
-			struct SignAuthChallenge: Sendable, Hashable, Encodable {
+			struct SignAuthChallenge: Hashable, Encodable {
 				let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				let challenge: DappToWalletInteractionAuthChallengeNonce
@@ -93,7 +93,7 @@ extension P2P.ConnectorExtension.Request {
 				let dAppDefinitionAddress: AccountAddress
 			}
 
-			struct DeriveAndDisplayAddress: Sendable, Hashable, Encodable {
+			struct DeriveAndDisplayAddress: Hashable, Encodable {
 				let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
 				let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				init(
@@ -130,8 +130,8 @@ extension P2P.ConnectorExtension.Request {
 		}
 	}
 
-	struct LinkClientInteractionResponse: Sendable, Hashable, Encodable {
-		enum Discriminator: String, Sendable, Hashable, Encodable {
+	struct LinkClientInteractionResponse: Hashable, Encodable {
+		enum Discriminator: String, Hashable, Encodable {
 			case linkClient
 		}
 
@@ -140,8 +140,8 @@ extension P2P.ConnectorExtension.Request {
 		let signature: Ed25519Signature
 	}
 
-	struct AccountListMessage: Sendable, Hashable, Encodable {
-		enum Discriminator: String, Sendable, Hashable, Encodable {
+	struct AccountListMessage: Hashable, Encodable {
+		enum Discriminator: String, Hashable, Encodable {
 			case accountList
 		}
 

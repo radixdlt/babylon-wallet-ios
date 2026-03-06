@@ -20,7 +20,6 @@ extension InteractionReview.UnknownDappComponents {
 			}
 		}
 
-		@ViewBuilder
 		private func row(_ address: LedgerIdentifiable.Address, heading: String) -> some SwiftUI.View {
 			HStack(spacing: .medium3) {
 				Thumbnail(.dapp, url: nil)

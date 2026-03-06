@@ -1,22 +1,10 @@
 // MARK: - LocalAuthenticationClient
 /// A client for querying if passcode and biometrics are set up.
-struct LocalAuthenticationClient: Sendable {
+struct LocalAuthenticationClient {
 	var queryConfig: QueryConfig
 	var authenticateWithBiometrics: AuthenticateWithBiometrics
 	var setAuthenticatedSuccessfully: SetAuthenticatedSuccessfully
 	var authenticatedSuccessfully: AuthenticatedSuccessfully
-
-	init(
-		queryConfig: @escaping QueryConfig,
-		authenticateWithBiometrics: @escaping AuthenticateWithBiometrics,
-		setAuthenticatedSuccessfully: @escaping SetAuthenticatedSuccessfully,
-		authenticatedSuccessfully: @escaping AuthenticatedSuccessfully
-	) {
-		self.queryConfig = queryConfig
-		self.authenticateWithBiometrics = authenticateWithBiometrics
-		self.setAuthenticatedSuccessfully = setAuthenticatedSuccessfully
-		self.authenticatedSuccessfully = authenticatedSuccessfully
-	}
 }
 
 extension LocalAuthenticationClient {

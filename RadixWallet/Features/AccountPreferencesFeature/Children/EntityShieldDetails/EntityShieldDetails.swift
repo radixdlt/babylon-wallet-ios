@@ -1,8 +1,8 @@
 // MARK: - EntityShieldDetails
 @Reducer
-struct EntityShieldDetails: Sendable, FeatureReducer {
+struct EntityShieldDetails: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let entityAddress: AddressOfAccountOrPersona
 		let accessControllerAddress: AccessControllerAddress
 
@@ -64,14 +64,14 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case editFactorsTapped
 		case onFactorSourceTapped(FactorSource)
 		case timedRecoveryBannerTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case secStructureUpdated(SecurityStructureOfFactorSources)
 		case factorSourceIntegrityLoaded(FactorSourceIntegrity)
 		case accessControllerStateDetailsUpdated(AccessControllerStateDetails?)
@@ -79,7 +79,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case editShieldFactors(EditSecurityShieldCoordinator.State)
 			case factorSourceDetails(FactorSourceDetail.State)
 			case applyShield(ApplyShield.Coordinator.State)
@@ -87,7 +87,7 @@ struct EntityShieldDetails: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case editShieldFactors(EditSecurityShieldCoordinator.Action)
 			case factorSourceDetails(FactorSourceDetail.Action)
 			case applyShield(ApplyShield.Coordinator.Action)

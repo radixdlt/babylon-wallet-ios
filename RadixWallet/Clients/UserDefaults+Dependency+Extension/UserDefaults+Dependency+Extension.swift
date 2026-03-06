@@ -3,7 +3,7 @@ import DependenciesAdditions
 import Sargon
 
 // MARK: - UserDefaultsKey
-enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
+enum UserDefaultsKey: String, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
 	case epochForWhenLastUsedByAccountAddress
 	case transactionsCompletedCounter
@@ -273,7 +273,7 @@ extension UserDefaults.Dependency {
 }
 
 // MARK: - BackupResult
-struct BackupResult: Hashable, Codable, Sendable {
+struct BackupResult: Hashable, Codable {
 	private static let timeoutInterval: TimeInterval = 5 * 60
 
 	let date: Date
@@ -303,12 +303,12 @@ struct BackupResult: Hashable, Codable, Sendable {
 		}
 	}
 
-	enum Result: Hashable, Codable, Sendable {
+	enum Result: Hashable, Codable {
 		case started(Date)
 		case success
 		case failure(Failure)
 
-		enum Failure: Hashable, Codable, Sendable {
+		enum Failure: Hashable, Codable {
 			case temporarilyUnavailable
 			case notAuthenticated
 			case other

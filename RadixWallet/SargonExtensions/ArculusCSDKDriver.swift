@@ -46,7 +46,7 @@ func cApduSequenceToData(buf: UnsafePointer<ArculusCSDKAPDUSequence>) -> [Data] 
 final class ArculusCSDKDriver: SargonUniFFI.ArculusCsdkDriver {
 	func seedPhraseFromMnemonicSentence(wallet: SargonUniFFI.ArculusWalletPointer, mnemonicSentence: Data, passphrase: Data?) -> Data? {
 		buildCommand { len in
-			let sentence = ArculusCSDK.seedPhraseFromMnemonicSentence(
+			ArculusCSDK.seedPhraseFromMnemonicSentence(
 				walletPointer: wallet.toOpaquePointer(),
 				mnemonicSentence: mnemonicSentence.toArray,
 				mnemonicSentenceLength: mnemonicSentence.toArray.count,
@@ -54,7 +54,6 @@ final class ArculusCSDKDriver: SargonUniFFI.ArculusCsdkDriver {
 				passphraseLength: passphrase?.toArray.count ?? 0,
 				seedLength: &len
 			)
-			return sentence
 		}
 	}
 
@@ -108,8 +107,7 @@ final class ArculusCSDKDriver: SargonUniFFI.ArculusCsdkDriver {
 		}
 
 		let len = size_t(min(10, pointer.pointee.ApplicationAIDLength))
-		let dat = cBufToData(buf: pointer.pointee.ApplicationAID, len: len)
-		return dat
+		return cBufToData(buf: pointer.pointee.ApplicationAID, len: len)
 	}
 
 	func createWalletSeedRequest(wallet: SargonUniFFI.ArculusWalletPointer, wordCount: Int64) -> Data? {

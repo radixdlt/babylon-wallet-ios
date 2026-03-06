@@ -1,6 +1,6 @@
 // MARK: - EntitiesVisibilityClient
 /// Controls the visibility of the entities in the Wallet
-struct EntitiesVisibilityClient: Sendable {
+struct EntitiesVisibilityClient {
 	var hideAccount: HideAccount
 	var hidePersona: HidePersona
 	var unhideAccount: UnhideAccount
@@ -9,7 +9,7 @@ struct EntitiesVisibilityClient: Sendable {
 }
 
 extension EntitiesVisibilityClient {
-	struct HiddenEntities: Hashable, Sendable {
+	struct HiddenEntities: Hashable {
 		let accounts: Accounts
 		let personas: Personas
 	}

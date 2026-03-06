@@ -1,5 +1,5 @@
 // MARK: - BootstrapClient
-struct BootstrapClient: Sendable {
+struct BootstrapClient {
 	var bootstrap: Bootstrap
 }
 

@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - EditPersona.Output
 extension EditPersona {
-	struct Output: Sendable, Hashable {
+	struct Output: Hashable {
 		let personaLabel: NonEmptyString
 
 		let name: EditPersonaName.State?
@@ -54,15 +54,15 @@ extension EditPersona {
 }
 
 // MARK: - EditPersona
-struct EditPersona: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Mode: Sendable, Hashable {
+struct EditPersona: FeatureReducer {
+	struct State: Hashable {
+		enum Mode: Hashable {
 			case create
 			case edit(Persona)
 			case dapp(persona: Persona, requiredEntries: Set<EntryKind>)
 		}
 
-		enum StaticFieldID: Sendable, Hashable, Comparable {
+		enum StaticFieldID: Hashable, Comparable {
 			case personaLabel
 		}
 
@@ -91,24 +91,24 @@ struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case saveButtonTapped(Output)
 		case addAFieldButtonTapped
 
-		enum CloseConfirmationDialogAction: Sendable, Hashable {
+		enum CloseConfirmationDialogAction: Hashable {
 			case discardChanges
 			case keepEditing
 		}
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case entries(EditPersonaEntries.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case personaInfoSet(
 			personaName: NonEmptyString,
 			personaData: PersonaData
@@ -118,13 +118,13 @@ struct EditPersona: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddEntryKinds.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
 			case addFields(EditPersonaAddEntryKinds.Action)
 		}
@@ -135,8 +135,6 @@ struct EditPersona: Sendable, FeatureReducer {
 			}
 		}
 	}
-
-	init() {}
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient

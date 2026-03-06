@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DebugManageFactorSources
-struct DebugManageFactorSources: Sendable, FeatureReducer {
+struct DebugManageFactorSources: FeatureReducer {
 	// MARK: State
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var factorSources: FactorSources?
 
 		@PresentationState
@@ -14,12 +14,12 @@ struct DebugManageFactorSources: Sendable, FeatureReducer {
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case importMnemonic(ImportMnemonic.Action)
 			case addLedger(AddLedgerFactorSource.Action)
 		}
@@ -35,20 +35,18 @@ struct DebugManageFactorSources: Sendable, FeatureReducer {
 	}
 
 	// MARK: Action
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case importOlympiaMnemonicButtonTapped
 		case addLedgerButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadFactorSourcesResult(TaskResult<FactorSources>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

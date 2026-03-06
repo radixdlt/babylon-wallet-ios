@@ -1,5 +1,5 @@
 // MARK: - MyEntitiesInvolvedInTransaction
-struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
+struct MyEntitiesInvolvedInTransaction: Hashable {
 	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
 	var entitiesRequiringAuth: OrderedSet<AccountOrPersona> {
 		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
@@ -13,18 +13,6 @@ struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 
 	/// A set of all MY accounts in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
 	let accountsDepositedInto: OrderedSet<Account>
-
-	init(
-		identitiesRequiringAuth: OrderedSet<Persona>,
-		accountsRequiringAuth: OrderedSet<Account>,
-		accountsWithdrawnFrom: OrderedSet<Account>,
-		accountsDepositedInto: OrderedSet<Account>
-	) {
-		self.identitiesRequiringAuth = identitiesRequiringAuth
-		self.accountsRequiringAuth = accountsRequiringAuth
-		self.accountsWithdrawnFrom = accountsWithdrawnFrom
-		self.accountsDepositedInto = accountsDepositedInto
-	}
 }
 
 extension MyEntitiesInvolvedInTransaction {
@@ -112,7 +100,9 @@ extension MyEntitiesInvolvedInTransaction {
 
 extension TransactionClient {
 	struct NoFeePayerCandidate: LocalizedError {
-		var errorDescription: String? { "No account containing XRD found" }
+		var errorDescription: String? {
+			"No account containing XRD found"
+		}
 	}
 
 	static var liveValue: Self {
@@ -255,14 +245,14 @@ extension TransactionClient {
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			/// Get all transaction signers.
+			// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
 				executionSummary: preview.executionSummary,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
-			/// Get all of the expected signing factors.
+			// Get all of the expected signing factors.
 			let signingFactors = try await {
 				if let nonEmpty = NonEmpty<Set<AccountOrPersona>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
 					return try await factorSourcesClient.getSigningFactors(.init(
@@ -274,7 +264,7 @@ extension TransactionClient {
 				return [:]
 			}()
 
-			/// If notary is signatory, count the signature of the notary that will be added.
+			// If notary is signatory, count the signature of the notary that will be added.
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
 			var transactionFee = try TransactionFee(
 				executionSummary: preview.executionSummary,
@@ -284,10 +274,10 @@ extension TransactionClient {
 			)
 
 			if transactionFee.totalFee.lockFee > .zero {
-				/// LockFee required
-				/// Total cost > `zero`, recalculate the total by adding lockFee cost.
+				// LockFee required
+				// Total cost > `zero`, recalculate the total by adding lockFee cost.
 				transactionFee.addLockFeeCost()
-				/// Fee Payer is required, thus there will be a signature with user account added
+				// Fee Payer is required, thus there will be a signature with user account added
 				transactionFee.updateNotarizingCost(notaryIsSignatory: false)
 			}
 
@@ -317,7 +307,7 @@ extension TransactionClient {
 			let accounts = involvedEntites.accountsDepositedInto.elements + involvedEntites.accountsWithdrawnFrom.elements + involvedEntites.accountsRequiringAuth.elements
 			let feePayerCandidates = try await getFeePayerCandidates(refreshingBalances: true, accounts: accounts.asIdentified())
 
-			/// Select the account that can pay the transaction fee
+			// Select the account that can pay the transaction fee
 			return try await feePayerSelectionAmongstCandidates(
 				request: request,
 				feePayerCandidates: feePayerCandidates,
@@ -384,7 +374,7 @@ extension TransactionClient {
 					.guaranteedFungibleAmount ?? .zero
 
 				if request.transactionSigners.intentSignerEntitiesOrEmpty().contains(.account(candidate.account)) {
-					/// The cost of the fee payer signature is already accounted for.
+					// The cost of the fee payer signature is already accounted for.
 					if candidate.xrdBalance >= totalCost + candidateXRDWithdraw {
 						return .init(
 							payer: candidate,
@@ -395,12 +385,12 @@ extension TransactionClient {
 					}
 				}
 
-				/// We do have the base fee calculated with the signatures cost for `accountsRequiringAuth`.
-				/// However, if we are to select a fee payer outside of the `accountsRequiringAuth` it is needed:
-				/// - Include the fee payer account as signer
-				/// - Update the signingFactors to contain the factors for the fee payer.
-				/// - Recalculate the fee by taking into account the new signature cost.
-				/// - Makes sure that the account can pay for the base fee + the fee for its signature.
+				// We do have the base fee calculated with the signatures cost for `accountsRequiringAuth`.
+				// However, if we are to select a fee payer outside of the `accountsRequiringAuth` it is needed:
+				// - Include the fee payer account as signer
+				// - Update the signingFactors to contain the factors for the fee payer.
+				// - Recalculate the fee by taking into account the new signature cost.
+				// - Makes sure that the account can pay for the base fee + the fee for its signature.
 
 				let signerEntities = allSignerEntities + [.account(candidate.account)]
 				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(

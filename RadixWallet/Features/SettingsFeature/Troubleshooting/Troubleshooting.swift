@@ -1,8 +1,10 @@
 // MARK: - Troubleshooting
 import FirebaseCrashlytics
+import Sargon
 
-struct Troubleshooting: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+// MARK: - Troubleshooting
+struct Troubleshooting: FeatureReducer {
+	struct State: Hashable {
 		var isLegacyImportEnabled = true
 		var shareCrashReportsIsEnabled = false
 
@@ -12,33 +14,36 @@ struct Troubleshooting: Sendable, FeatureReducer {
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstTask
 		case accountScanButtonTapped
 		case legacyImportButtonTapped
+		case rawManifestButtonTapped
 		case contactSupportButtonTapped
 		case discordButtonTapped
 		case factoryResetButtonTapped
 		case crashReportingToggled(Bool)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadedIsLegacyImportEnabled(Bool)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 			case factoryReset(FactoryReset.State)
+			case rawManifestTransaction(RawManifestTransaction.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 			case factoryReset(FactoryReset.Action)
+			case rawManifestTransaction(RawManifestTransaction.Action)
 		}
 
 		var body: some ReducerOf<Self> {
@@ -51,6 +56,9 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			Scope(state: \.factoryReset, action: \.factoryReset) {
 				FactoryReset()
 			}
+			Scope(state: \.rawManifestTransaction, action: \.rawManifestTransaction) {
+				RawManifestTransaction()
+			}
 		}
 	}
 
@@ -58,8 +66,6 @@ struct Troubleshooting: Sendable, FeatureReducer {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.contactSupportClient) var contactSupport
 	@Dependency(\.userDefaults) var userDefaults
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -84,9 +90,13 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			state.destination = .importOlympiaWallet(.init())
 			return .none
 
+		case .rawManifestButtonTapped:
+			state.destination = .rawManifestTransaction(.init())
+			return .none
+
 		case .contactSupportButtonTapped:
 			return .run { _ in
-				await contactSupport.openEmail(nil)
+				await contactSupport.openSupport()
 			}
 
 		case .discordButtonTapped:
@@ -137,6 +147,92 @@ struct Troubleshooting: Sendable, FeatureReducer {
 			await send(.internal(.loadedIsLegacyImportEnabled(
 				gatewaysClient.getCurrentGateway().networkID == .mainnet
 			)))
+		}
+	}
+}
+
+// MARK: - RawManifestTransaction
+struct RawManifestTransaction: FeatureReducer {
+	struct State: Hashable {
+		var manifest: String = ""
+		var isSending: Bool = false
+
+		var canSend: Bool {
+			!manifest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+		}
+	}
+
+	enum ViewAction: Equatable {
+		case manifestChanged(String)
+		case sendTapped
+	}
+
+	enum InternalAction: Equatable {
+		case interactionCompleted
+	}
+
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.errorQueue) var errorQueue
+
+	var body: some ReducerOf<Self> {
+		Reduce(core)
+	}
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case let .manifestChanged(manifest):
+			state.manifest = manifest
+			return .none
+
+		case .sendTapped:
+			guard state.canSend, !state.isSending else {
+				return .none
+			}
+
+			state.isSending = true
+			return submitTransaction(state.manifest)
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .interactionCompleted:
+			state.isSending = false
+			return .none
+		}
+	}
+
+	private func submitTransaction(_ manifestString: String) -> Effect<Action> {
+		.run { send in
+			do {
+				let networkID = await gatewaysClient.getCurrentGateway().networkID
+				let manifest = try TransactionManifest(
+					instructionsString: manifestString,
+					networkID: networkID
+				)
+
+				let result = await dappInteractionClient.addWalletInteraction(
+					.transaction(.init(send: .init(transactionManifest: manifest))),
+					.rawManifestTransaction
+				)
+
+				switch result.p2pResponse {
+				case let .dapp(.success(success)):
+					if case .transaction = success.items {
+						await send(.internal(.interactionCompleted))
+						return
+					}
+					assertionFailure("Not a transaction response for raw manifest")
+
+				case .dapp(.failure):
+					break
+				}
+			} catch {
+				errorQueue.schedule(error)
+			}
+
+			await send(.internal(.interactionCompleted))
 		}
 	}
 }

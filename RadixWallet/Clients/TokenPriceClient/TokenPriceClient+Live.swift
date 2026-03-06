@@ -48,10 +48,6 @@ extension TokenPricesClient.TokenPrices {
 // MARK: - TokensPriceResponse
 struct TokensPriceResponse: Decodable {
 	let tokens: [TokenPrice]
-
-	init(tokens: [TokenPrice]) {
-		self.tokens = tokens
-	}
 }
 
 // MARK: TokensPriceResponse.TokenPrice

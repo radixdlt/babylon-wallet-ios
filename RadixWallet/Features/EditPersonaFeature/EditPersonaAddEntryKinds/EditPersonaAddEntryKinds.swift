@@ -4,8 +4,8 @@ import SwiftUI
 typealias EntryKind = PersonaData.Entry.Kind
 
 // MARK: - EditPersonaAddEntryKinds
-struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct EditPersonaAddEntryKinds: FeatureReducer {
+	struct State: Hashable {
 		let availableEntryKinds: [EntryKind]
 		var selectedEntryKinds: [EntryKind]? = nil
 
@@ -15,13 +15,13 @@ struct EditPersonaAddEntryKinds: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case selectedEntryKindsChanged([EntryKind]?)
 		case addButtonTapped([EntryKind])
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case addEntryKinds([EntryKind])
 	}
 

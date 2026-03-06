@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - FeesView
 struct FeesView: View {
-	struct ViewState: Equatable, Sendable {
+	struct ViewState: Equatable {
 		let feeViewStates: IdentifiedArrayOf<FeeViewState>
 		let totalFee: Decimal192
 		let isAdvancedMode: Bool
@@ -36,7 +36,6 @@ struct FeesView: View {
 		}
 	}
 
-	@ViewBuilder
 	func transactionFeeView(fee: String, isAdvancedMode: Bool) -> some SwiftUI.View {
 		HStack {
 			VStack(spacing: .zero) {
@@ -57,7 +56,6 @@ struct FeesView: View {
 		}
 	}
 
-	@ViewBuilder
 	func feeView(state: FeeViewState) -> some SwiftUI.View {
 		HStack {
 			Text(state.name)
@@ -73,8 +71,10 @@ struct FeesView: View {
 }
 
 // MARK: - FeeViewState
-struct FeeViewState: Equatable, Sendable, Identifiable {
-	var id: String { name }
+struct FeeViewState: Equatable, Identifiable {
+	var id: String {
+		name
+	}
 
 	let name: String
 	let amount: Decimal192

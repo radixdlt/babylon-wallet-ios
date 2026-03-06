@@ -3,7 +3,9 @@ import SwiftUI
 // MARK: - BlueButtonStyle
 
 extension ButtonStyle where Self == BlueTextButtonStyle {
-	static var blueText: Self { .blueText() }
+	static var blueText: Self {
+		.blueText()
+	}
 
 	static func blueText(textStyle: TextStyle = .body1StandaloneLink) -> Self {
 		Self(textStyle: textStyle)

@@ -1,9 +1,9 @@
 // MARK: - SigningTooManyFactorsSkipped
 @Reducer
-struct SigningTooManyFactorsSkipped: Sendable, FeatureReducer {
+struct SigningTooManyFactorsSkipped: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
-		enum Intent: Sendable, Hashable {
+	struct State: Hashable {
+		enum Intent: Hashable {
 			case transaction(TransactionIntent)
 			case preAuth(Subintent)
 		}
@@ -13,12 +13,12 @@ struct SigningTooManyFactorsSkipped: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case restartButtonTapped
 		case cancelButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case restart(State.Intent)
 		case cancel
 	}

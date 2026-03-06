@@ -1,14 +1,14 @@
 import Sargon
 
 // MARK: - DappInteractionFlow
-struct DappInteractionFlow: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum AnyInteractionItem: Sendable, Hashable {
+struct DappInteractionFlow: FeatureReducer {
+	struct State: Hashable {
+		enum AnyInteractionItem: Hashable {
 			case remote(RemoteInteractionItem)
 			case local(LocalInteractionItem)
 		}
 
-		enum AnyInteractionResponseItem: Sendable, Hashable {
+		enum AnyInteractionResponseItem: Hashable {
 			case remote(RemoteInteractionResponseItem)
 			case local(LocalInteractionResponseItem)
 		}
@@ -17,11 +17,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		typealias RemoteInteractionItem = DappToWalletInteraction.AnyInteractionItem
 		typealias RemoteInteractionResponseItem = WalletToDappInteractionSuccessResponse.AnyInteractionResponseItem
 
-		enum LocalInteractionItem: Sendable, Hashable {
+		enum LocalInteractionItem: Hashable {
 			case accountPermissionRequested(DappInteractionNumberOfAccounts)
 		}
 
-		enum LocalInteractionResponseItem: Sendable, Hashable {
+		enum LocalInteractionResponseItem: Hashable {
 			case accountPermissionGranted
 		}
 
@@ -77,18 +77,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case closeButtonTapped
 		case backButtonTapped
 		case personaNotFoundErrorAlert(PresentationAction<PersonaNotFoundErrorAlertAction>)
 
-		enum PersonaNotFoundErrorAlertAction: Sendable, Equatable {
+		enum PersonaNotFoundErrorAlertAction: Equatable {
 			case cancelButtonTapped
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case usePersona(
 			DappToWalletInteractionAuthUsePersonaRequestItem,
 			Persona,
@@ -99,8 +99,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
 		case delayedAppendToPath(DappInteractionFlow.Path.State)
 
-		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
-			struct AccountsPayload: Sendable, Equatable {
+		struct AutofillOngoingResponseItemsPayload: Equatable {
+			struct AccountsPayload: Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
 				var numberOfAccountsRequested: DappInteractionNumberOfAccounts
 				var accounts: [Account]
@@ -118,26 +118,26 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismissWithFailure(WalletToDappInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata, DappInteractionCompletionKind)
 		case submit(WalletToDappInteractionSuccessResponse, DappMetadata, NotarizedTransaction?)
 		case dismiss
 	}
 
-	struct Path: Sendable, Reducer {
-		struct State: Sendable, Hashable {
+	struct Path: Reducer {
+		struct State: Hashable {
 			let item: DappInteractionFlow.State.AnyInteractionItem
 			var state: MainState
 		}
 
 		@CasePathable
-		enum MainState: Sendable, Hashable {
+		enum MainState: Hashable {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(AccountPermissionChooseAccounts.State)
@@ -150,7 +150,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(AccountPermissionChooseAccounts.Action)
@@ -710,7 +710,7 @@ extension DappInteractionFlow {
 
 // MARK: - DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload
 extension DappInteractionFlow.InternalAction.AutofillOngoingResponseItemsPayload {
-	struct PersonaDataPayload: Sendable, Equatable {
+	struct PersonaDataPayload: Equatable {
 		var personaDataRequested: DappToWalletInteractionPersonaDataRequestItem
 		var responseItem: WalletToDappInteractionPersonaDataRequestResponseItem
 	}

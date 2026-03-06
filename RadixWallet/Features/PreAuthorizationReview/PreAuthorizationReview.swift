@@ -1,9 +1,9 @@
 // MARK: - PreAuthorizationReview
-struct PreAuthorizationReview: Sendable, FeatureReducer {
+struct PreAuthorizationReview: FeatureReducer {
 	typealias Common = InteractionReview
 	typealias Expiration = DappToWalletInteractionSubintentExpiration
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let expiration: Expiration
 		let nonce: Nonce
@@ -26,18 +26,18 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case toggleDisplayModeButtonTapped
 		case approvalSliderSlid
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case sections(Common.Sections.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case previewLoaded(TaskResult<PreAuthorizationPreview>)
 		case builtSubintent(Subintent)
 		case updateSecondsToExpiration(Date)
@@ -45,7 +45,7 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 		case tooManyFactorsSkipped(Subintent)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case signedPreAuthorization(SignedSubintent)
 		case failed(TransactionFailure)
 		case dismiss
@@ -53,13 +53,13 @@ struct PreAuthorizationReview: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case rawManifestAlert(AlertState<Never>)
 			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case rawManifestAlert(Never)
 			case tooManyFactorSkipped(SigningTooManyFactorsSkipped.Action)
 		}

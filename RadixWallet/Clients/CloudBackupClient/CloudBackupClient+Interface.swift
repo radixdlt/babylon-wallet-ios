@@ -4,7 +4,7 @@ import DependenciesAdditions
 import os
 
 // MARK: - CloudBackupClient
-struct CloudBackupClient: DependencyKey, Sendable {
+struct CloudBackupClient: DependencyKey {
 	let isCloudProfileSyncEnabled: IsCloudProfileSyncEnabled
 	let startAutomaticBackups: StartAutomaticBackups
 	let migrateProfilesFromKeychain: MigrateProfilesFromKeychain
@@ -14,28 +14,6 @@ struct CloudBackupClient: DependencyKey, Sendable {
 	let loadProfile: LoadProfile
 	let loadProfileHeaders: LoadProfileHeaders
 	let claimProfileOnICloud: ClaimProfileOnICloud
-
-	init(
-		isCloudProfileSyncEnabled: @escaping IsCloudProfileSyncEnabled,
-		startAutomaticBackups: @escaping StartAutomaticBackups,
-		migrateProfilesFromKeychain: @escaping MigrateProfilesFromKeychain,
-		deleteProfileBackup: @escaping DeleteProfileBackup,
-		checkAccountStatus: @escaping CheckAccountStatus,
-		lastBackup: @escaping LastBackup,
-		loadProfile: @escaping LoadProfile,
-		loadProfileHeaders: @escaping LoadProfileHeaders,
-		claimProfileOnICloud: @escaping ClaimProfileOnICloud
-	) {
-		self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled
-		self.startAutomaticBackups = startAutomaticBackups
-		self.migrateProfilesFromKeychain = migrateProfilesFromKeychain
-		self.deleteProfileBackup = deleteProfileBackup
-		self.checkAccountStatus = checkAccountStatus
-		self.lastBackup = lastBackup
-		self.loadProfile = loadProfile
-		self.loadProfileHeaders = loadProfileHeaders
-		self.claimProfileOnICloud = claimProfileOnICloud
-	}
 }
 
 extension CloudBackupClient {
@@ -52,7 +30,7 @@ extension CloudBackupClient {
 
 // MARK: CloudBackupClient.BackedUpProfile
 extension CloudBackupClient {
-	struct BackedUpProfile: Hashable, Sendable {
+	struct BackedUpProfile: Hashable {
 		let profile: Profile
 		let containsLegacyP2PLinks: Bool
 	}

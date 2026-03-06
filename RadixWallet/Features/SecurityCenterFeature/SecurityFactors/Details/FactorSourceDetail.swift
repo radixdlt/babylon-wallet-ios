@@ -1,8 +1,8 @@
 // MARK: - FactorSourceDetail
 @Reducer
-struct FactorSourceDetail: Sendable, FeatureReducer {
+struct FactorSourceDetail: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var integrity: FactorSourceIntegrity
 		var name: String
 		var lastUsed: Timestamp
@@ -25,7 +25,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case renameTapped
 		case signatureNftTapped
 		case viewSeedPhraseTapped
@@ -35,7 +35,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		// case spotCheckTapped
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case integrityUpdated(FactorSourceIntegrity)
 		case signatureNftLoaded(NonFungibleGlobalId)
 		case signatureNftFailed
@@ -43,7 +43,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case rename(RenameLabel.State)
 			case addressDetails(AddressDetails.State)
 			case displayMnemonic(DisplayMnemonic.State)
@@ -53,7 +53,7 @@ struct FactorSourceDetail: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case rename(RenameLabel.Action)
 			case addressDetails(AddressDetails.Action)
 			case displayMnemonic(DisplayMnemonic.Action)

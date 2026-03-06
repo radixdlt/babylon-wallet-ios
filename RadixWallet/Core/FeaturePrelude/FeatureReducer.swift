@@ -59,10 +59,12 @@ protocol DestinationReducer: Reducer where State: Sendable & Hashable, Action: S
 
 // MARK: - EmptyDestination
 enum EmptyDestination: DestinationReducer {
-	struct State: Sendable, Hashable {}
+	struct State: Hashable {}
 	typealias Action = Never
 	func reduce(into state: inout State, action: Never) -> Effect<Action> {}
-	func reduceDismissedDestination(into state: inout State) -> Effect<Action> { .none }
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		.none
+	}
 }
 
 extension Reducer where Self: FeatureReducer {
@@ -286,7 +288,7 @@ extension FeatureReducer {
 }
 
 // MARK: - SecurityProblemHandlerDestination
-enum SecurityProblemHandlerDestination: Hashable, Sendable {
+enum SecurityProblemHandlerDestination: Hashable {
 	case displayMnemonic(DisplayMnemonic.State)
 	case enterMnemonic(ImportMnemonicForFactorSource.State)
 	case securityCenter(SecurityCenter.State)
@@ -304,7 +306,7 @@ extension FactorSourceIntegrity {
 }
 
 // MARK: - SimplePrivateFactorSource
-struct SimplePrivateFactorSource: Sendable, Hashable {
+struct SimplePrivateFactorSource: Hashable {
 	let mnemonicWithPassphrase: MnemonicWithPassphrase
 	let factorSourceID: FactorSourceIdFromHash
 }

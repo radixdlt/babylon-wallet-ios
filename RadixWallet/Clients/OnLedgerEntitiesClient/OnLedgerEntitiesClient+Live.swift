@@ -339,15 +339,15 @@ extension Address {
 }
 
 extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
-	// The fungible resources used to build up the pool units.
-	// Will be used to filter out those from the general fungible resources list.
+	/// The fungible resources used to build up the pool units.
+	/// Will be used to filter out those from the general fungible resources list.
 	var fungibleResourceAddresses: [ResourceAddress] {
 		radixNetworkStakes.compactMap(\.stakeUnitResource?.resourceAddress) +
 			poolUnits.map(\.resource.resourceAddress)
 	}
 
-	// The non fungible resources used to build up the pool units.
-	// Will be used to filter out those from the general fungible resources list.
+	/// The non fungible resources used to build up the pool units.
+	/// Will be used to filter out those from the general fungible resources list.
 	var nonFungibleResourceAddresses: [ResourceAddress] {
 		radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress)
 	}

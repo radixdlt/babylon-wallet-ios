@@ -1,5 +1,5 @@
 struct TotalCurrencyWorthView: View {
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		let totalCurrencyWorth: Loadable<FiatWorth>
 	}
 

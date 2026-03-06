@@ -64,11 +64,18 @@ extension Troubleshooting.View {
 				icon: .asset(.recovery),
 				action: .legacyImportButtonTapped
 			).valid(if: isLegacyImportEnabled),
+			.header("Transaction"),
+			.model(
+				title: "Raw transaction manifest",
+				subtitle: "Paste and submit a manifest using the wallet interaction flow",
+				icon: .asset(.code),
+				action: .rawManifestButtonTapped
+			),
 			.header(L10n.Troubleshooting.support),
 			.model(
 				title: L10n.Troubleshooting.ContactSupport.title,
 				subtitle: L10n.Troubleshooting.ContactSupport.subtitle,
-				icon: .systemImage("envelope"),
+				icon: .systemImage("paperplane"),
 				accessory: .iconLinkOut,
 				action: .contactSupportButtonTapped
 			),
@@ -112,6 +119,7 @@ private extension View {
 		return accountRecovery(with: destinationStore)
 			.importOlympiaWallet(with: destinationStore)
 			.factoryReset(with: destinationStore)
+			.rawManifestTransaction(with: destinationStore)
 	}
 
 	private func accountRecovery(with destinationStore: PresentationStoreOf<Troubleshooting.Destination>) -> some View {
@@ -140,10 +148,114 @@ private extension View {
 			destination: { FactoryReset.View(store: $0) }
 		)
 	}
+
+	private func rawManifestTransaction(with destinationStore: PresentationStoreOf<Troubleshooting.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Troubleshooting.Destination.State.rawManifestTransaction,
+			action: Troubleshooting.Destination.Action.rawManifestTransaction,
+			destination: { RawManifestTransaction.View(store: $0) }
+		)
+	}
 }
 
 private extension SettingsRow.Kind {
 	func valid(if condition: Bool) -> Self? {
 		condition ? self : nil
+	}
+}
+
+extension RawManifestTransaction.State {
+	var viewState: RawManifestTransaction.ViewState {
+		.init(
+			manifest: manifest,
+			sendButtonState: isSending ? .loading(.local) : (canSend ? .enabled : .disabled)
+		)
+	}
+}
+
+extension RawManifestTransaction {
+	struct ViewState: Equatable {
+		let manifest: String
+		let sendButtonState: ControlState
+	}
+
+	@MainActor
+	struct View: SwiftUI.View {
+		private let store: StoreOf<RawManifestTransaction>
+		@Dependency(\.pasteboardClient) var pasteboardClient
+
+		init(store: StoreOf<RawManifestTransaction>) {
+			self.store = store
+		}
+	}
+}
+
+extension RawManifestTransaction.View {
+	var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			VStack(spacing: .zero) {
+				ScrollView {
+					VStack(alignment: .leading, spacing: .medium2) {
+						Text("Enter a raw transaction manifest to preview and submit to the network.")
+							.textStyle(.body1Regular)
+							.foregroundColor(.secondaryText)
+
+						HStack(spacing: .small2) {
+							Button {
+								let pastedText = pasteboardClient.getString() ?? ""
+								viewStore.send(.manifestChanged(pastedText))
+							} label: {
+								Label("Paste", systemImage: "doc.on.clipboard")
+									.labelStyle(.titleAndIcon)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: true))
+
+							Button {
+								viewStore.send(.manifestChanged(""))
+							} label: {
+								Label("Clear", systemImage: "xmark")
+									.labelStyle(.titleAndIcon)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: true))
+
+							Button {
+								pasteboardClient.copyString(viewStore.manifest)
+							} label: {
+								Label("Copy", systemImage: "doc.on.doc")
+									.labelStyle(.titleAndIcon)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: true))
+						}
+
+						AppTextEditor(
+							placeholder: "CALL_METHOD\n    Address(\"...\")\n    ...",
+							text: viewStore.binding(
+								get: \.manifest,
+								send: RawManifestTransaction.ViewAction.manifestChanged
+							)
+						)
+						.padding(.medium3)
+						.frame(minHeight: 640, alignment: .topLeading)
+						.background(.secondaryBackground)
+						.roundedCorners(strokeColor: .border)
+						.textStyle(.monospace)
+						.scrollContentBackground(.hidden)
+					}
+					.padding(.medium3)
+				}
+
+				Separator()
+
+				Button("Transaction Preview") {
+					viewStore.send(.sendTapped)
+				}
+				.buttonStyle(.primaryRectangular(shouldExpand: true))
+				.controlState(viewStore.sendButtonState)
+				.padding(.medium3)
+			}
+			.background(.secondaryBackground)
+			.radixToolbar(title: "Submit Transaction Manifest")
+		}
 	}
 }

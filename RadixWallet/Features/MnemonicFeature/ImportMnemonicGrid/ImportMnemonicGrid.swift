@@ -1,8 +1,8 @@
 // MARK: - ImportMnemonicGrid
 @Reducer
-struct ImportMnemonicGrid: Sendable, FeatureReducer {
+struct ImportMnemonicGrid: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
 
 		var words: Words
@@ -38,7 +38,7 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case appeared
 		case wordCountChanged(BIP39WordCount)
 
@@ -49,16 +49,16 @@ struct ImportMnemonicGrid: Sendable, FeatureReducer {
 		#endif
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case focusOn(ImportMnemonicWord.State.ID)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case word(ImportMnemonicWord.State.ID, ImportMnemonicWord.Action)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case didUpdateGrid
 	}
 
@@ -292,7 +292,7 @@ extension ImportMnemonicGrid.State {
 	}
 
 	/// An enum describing the different errors that can take place from user's input.
-	enum Status: Sendable, Hashable {
+	enum Status: Hashable {
 		/// User hasn't entered every word yet.
 		case incomplete
 

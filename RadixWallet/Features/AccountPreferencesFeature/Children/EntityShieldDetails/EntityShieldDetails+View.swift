@@ -50,7 +50,6 @@ extension EntityShieldDetails {
 			}
 		}
 
-		@ViewBuilder
 		private func timedRecoveryButtonLabel(state: AccountBannerView.TimedRecoveryBannerState) -> some SwiftUI.View {
 			HStack(spacing: .small2) {
 				switch state {

@@ -7,14 +7,6 @@ struct CheckmarkView: View {
 
 	let appearance: Appearance
 	var isChecked: Bool
-
-	init(
-		appearance: Appearance,
-		isChecked: Bool
-	) {
-		self.appearance = appearance
-		self.isChecked = isChecked
-	}
 }
 
 extension CheckmarkView {

@@ -1,5 +1,5 @@
 // MARK: - PreAuthorizationClient
-struct PreAuthorizationClient: Sendable {
+struct PreAuthorizationClient {
 	var getPreview: GetPreview
 	var buildSubintent: BuildSubintent
 	var pollStatus: PollStatus
@@ -14,13 +14,13 @@ extension PreAuthorizationClient {
 
 // MARK: PreAuthorizationClient.GetPreviewRequest
 extension PreAuthorizationClient {
-	struct GetPreviewRequest: Hashable, Sendable {
+	struct GetPreviewRequest: Hashable {
 		let unvalidatedManifest: UnvalidatedSubintentManifest
 		let nonce: Nonce
 		let notaryPublicKey: Curve25519.Signing.PublicKey
 	}
 
-	struct BuildSubintentRequest: Sendable {
+	struct BuildSubintentRequest {
 		let intentDiscriminator: IntentDiscriminator
 		let manifest: SubintentManifest
 		let expiration: DappToWalletInteractionSubintentExpiration
@@ -28,7 +28,7 @@ extension PreAuthorizationClient {
 		let header: DappToWalletInteractionSubintentHeader?
 	}
 
-	struct PollStatusRequest: Sendable {
+	struct PollStatusRequest {
 		let subintentHash: SubintentHash
 		let expirationTimestamp: Instant
 	}

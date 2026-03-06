@@ -1,12 +1,6 @@
 // MARK: - ResetWalletClient
-struct ResetWalletClient: Sendable {
+struct ResetWalletClient {
 	var resetWallet: ResetWallet
-
-	init(
-		resetWallet: @escaping ResetWallet
-	) {
-		self.resetWallet = resetWallet
-	}
 }
 
 // MARK: ResetWalletClient.ResetWallet

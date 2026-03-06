@@ -2,10 +2,7 @@ import ComposableArchitecture
 @_exported import SwiftUI
 
 // MARK: - FeaturesPreviewer
-struct FeaturesPreviewer<Feature>
-	where
-	Feature: PreviewedFeature
-{
+struct FeaturesPreviewer<Feature: PreviewedFeature> {
 	/// Extracts a "result" from `Feature.Action`
 	static func action(
 		wrapInNavigationView: Bool = false,

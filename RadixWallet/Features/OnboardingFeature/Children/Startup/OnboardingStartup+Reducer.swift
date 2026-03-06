@@ -1,31 +1,31 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct OnboardingStartup: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct OnboardingStartup: FeatureReducer {
+	struct State: Hashable {
 		@PresentationState
 		var destination: Destination.State?
 
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case selectedNewWalletUser
 		case selectedRestoreFromBackup
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case setupNewUser
 		case profileCreatedFromImportedBDFS
 		case completed
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.Action)
 		}
 

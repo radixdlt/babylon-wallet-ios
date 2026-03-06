@@ -1,8 +1,8 @@
 // MARK: - PasswordFactorSourceAccess
 @Reducer
-struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
+struct PasswordFactorSourceAccess: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let factorSource: PasswordFactorSource
 		var input: String = "" {
 			didSet {
@@ -16,12 +16,12 @@ struct PasswordFactorSourceAccess: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case inputChanged(String)
 		case confirmButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case validated(String)
 	}
 

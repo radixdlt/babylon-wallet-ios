@@ -11,7 +11,7 @@ protocol SignalingTransport: Sendable {
 
 // MARK: - SignalingClient
 /// The client communicating with SignalingServer
-struct SignalingClient: Sendable {
+struct SignalingClient {
 	// MARK: - Configuration
 
 	/// The transport to be used to send and receive client messages

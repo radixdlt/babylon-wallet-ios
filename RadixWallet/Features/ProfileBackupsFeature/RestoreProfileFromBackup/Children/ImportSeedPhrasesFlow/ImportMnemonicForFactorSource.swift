@@ -1,8 +1,8 @@
 // MARK: - ImportMnemonicForFactorSource
 @Reducer
-struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
+struct ImportMnemonicForFactorSource: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let deviceFactorSource: DeviceFactorSource
 		let profileToCheck: ProfileToCheck
 		let isAllowedToSkip: Bool
@@ -44,7 +44,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case passphraseChanged(String)
 		case toggleModeButtonTapped
@@ -53,16 +53,16 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case entitieLinkedLoadResult(TaskResult<EntitiesLinkedToFactorSource>)
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case grid(ImportMnemonicGrid.Action)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case skipped(DeviceFactorSource)
 		case imported(DeviceFactorSource)
 		case closed
@@ -160,7 +160,7 @@ struct ImportMnemonicForFactorSource: Sendable, FeatureReducer {
 
 extension ImportMnemonicForFactorSource.State {
 	/// An enum describing the different errors that can take place from user's input.
-	enum Status: Sendable, Hashable {
+	enum Status: Hashable {
 		/// User hasn't entered every word yet.
 		case incomplete
 

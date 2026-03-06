@@ -10,11 +10,11 @@ struct SelectionItem<Value> {
 extension SelectionItem: Sendable where Value: Sendable {}
 
 // MARK: - SelectionRequirement
-enum SelectionRequirement: Sendable, Hashable {
+enum SelectionRequirement: Hashable {
 	case exactly(Int)
 	case atLeast(Int)
 
-	enum Quantifier: Sendable, Hashable {
+	enum Quantifier: Hashable {
 		case exactly
 		case atLeast
 	}

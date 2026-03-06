@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - PickShieldBuilderSeedingFactors
 @Reducer
-struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
+struct PickShieldBuilderSeedingFactors: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		/// Factor sources from the profile, sorted and filtered for eligibility in the primary threshold role
@@ -23,7 +23,7 @@ struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case onFirstAppear
 		case selectedFactorSourcesChanged([FactorSource]?)
 		case continueButtonTapped
@@ -31,11 +31,11 @@ struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
 		case skipButtonTapped
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setFactorSources([FactorSource])
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case finished
 	}
 
@@ -106,7 +106,7 @@ struct PickShieldBuilderSeedingFactors: FeatureReducer, Sendable {
 }
 
 // MARK: - ShieldStatusMessageInfo
-struct ShieldStatusMessageInfo: Hashable, Sendable {
+struct ShieldStatusMessageInfo: Hashable {
 	let type: StatusMessageView.ViewType
 	let text: String
 	let contexts: [Context]

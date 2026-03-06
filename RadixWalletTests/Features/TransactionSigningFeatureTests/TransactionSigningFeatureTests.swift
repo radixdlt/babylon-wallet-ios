@@ -1,5 +1,3 @@
-/// Disabled tests, should be migrated to TransactionReviewFeatureTests
-
 // import XCTest
 import Sargon
 

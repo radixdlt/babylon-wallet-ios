@@ -6,7 +6,7 @@ extension Profile {
 }
 
 // MARK: - SecureStorageClient
-struct SecureStorageClient: Sendable {
+struct SecureStorageClient {
 	var loadProfileSnapshotData: LoadProfileSnapshotData
 	var saveProfileSnapshotData: SaveProfileSnapshotData
 	var deleteProfile: DeleteProfile
@@ -175,7 +175,7 @@ struct SecureStorageClient: Sendable {
 }
 
 // MARK: - LoadMnemonicByFactorSourceIDRequest
-struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
+struct LoadMnemonicByFactorSourceIDRequest: Hashable {
 	let factorSourceID: FactorSourceIDFromHash
 	let notifyIfMissing: Bool
 }
@@ -225,7 +225,7 @@ extension SecureStorageClient {
 
 	typealias ContainsDataForKey = @Sendable (SargonUniFFI.SecureStorageKey) throws -> Bool
 
-	enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
+	enum LoadMnemonicPurpose: Hashable, CustomStringConvertible {
 		case signTransaction
 		case signAuthChallenge
 		case importOlympiaAccounts
@@ -298,7 +298,7 @@ extension DeviceInfo {
 #if DEBUG
 
 // MARK: - KeyedMnemonicWithPassphrase
-struct KeyedMnemonicWithPassphrase: Sendable, Hashable {
+struct KeyedMnemonicWithPassphrase: Hashable {
 	let factorSourceID: FactorSourceIDFromHash
 	let mnemonicWithPassphrase: MnemonicWithPassphrase
 }

@@ -31,7 +31,6 @@ extension EditPersonaName {
 		}
 
 		// FIXME: Probably worth having as a kind of EditPersonaField
-		@ViewBuilder
 		func variantPicker(_ viewStore: ViewStoreOf<EditPersonaName>) -> some SwiftUI.View {
 			Menu {
 				Picker(

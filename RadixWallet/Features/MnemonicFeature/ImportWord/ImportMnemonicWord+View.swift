@@ -26,7 +26,7 @@ extension ImportMnemonicWord.State {
 }
 
 // MARK: - MnemonicValidation
-enum MnemonicValidation: Sendable, Hashable {
+enum MnemonicValidation: Hashable {
 	case invalid
 	case valid
 }

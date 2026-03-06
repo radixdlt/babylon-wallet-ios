@@ -7,6 +7,9 @@ extension ContactSupportClient: DependencyKey {
 		@Dependency(\.device) var device
 		@Dependency(\.bundleInfo) var bundleInfo
 
+		let recipient = ""
+		let subject = "Customer Support Case"
+
 		@Sendable
 		func buildBody(additionalInfo: String?) async -> String {
 			let version = bundleInfo.shortVersion
@@ -18,15 +21,26 @@ extension ContactSupportClient: DependencyKey {
 
 		return .init(
 			openEmail: { additionalBodyInfo in
+				guard !recipient.isEmpty else {
+					return
+				}
+
 				let uiApplicaition = await UIApplication.shared
 				let body = await buildBody(additionalInfo: additionalBodyInfo)
 
 				for app in EmailApp.allCases {
-					if let url = app.build(body: body), await uiApplicaition.canOpenURL(url) {
+					if let url = app.build(recipient: recipient, subject: subject, body: body), await uiApplicaition.canOpenURL(url) {
 						return await openURL(url)
 					}
 				}
-			}
+			},
+			openSupport: {
+				guard let url = URL(string: "https://t.me/radix_dlt") else {
+					return
+				}
+				await openURL(url)
+			},
+			isEmailSupportAvailable: { !recipient.isEmpty }
 		)
 	}
 }
@@ -38,10 +52,7 @@ private extension ContactSupportClient {
 		case outlook
 		case appleMail
 
-		func build(body: String) -> URL? {
-			let recipient = "hello@radixdlt.com"
-			let subject = "Customer Support Case"
-
+		func build(recipient: String, subject: String, body: String) -> URL? {
 			switch self {
 			case .gmail:
 				guard var components = URLComponents(string: "googlegmail://co") else {

@@ -1,7 +1,7 @@
 import Sargon
 
 // MARK: - AccessControllerClient
-struct AccessControllerClient: Sendable {
+struct AccessControllerClient {
 	/// Get all access controller state details
 	var getAllAccessControllerStateDetails: GetAllAccessControllerStateDetails
 

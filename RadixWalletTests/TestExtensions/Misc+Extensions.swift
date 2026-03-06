@@ -9,8 +9,7 @@ extension String {
 
 extension FixedWidthInteger {
 	var data: Data {
-		let data = withUnsafeBytes(of: self) { Data($0) }
-		return data
+		withUnsafeBytes(of: self) { Data($0) }
 	}
 }
 

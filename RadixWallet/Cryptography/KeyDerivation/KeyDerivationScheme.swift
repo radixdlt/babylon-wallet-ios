@@ -14,7 +14,7 @@ protocol VersionedPasswordBasedKeyDerivation: VersionedKeyDerivation where Versi
 
 // MARK: - PasswordBasedKeyDerivationScheme
 /// The KDF algorithm used to derive the decryption key from a user provided password.
-enum PasswordBasedKeyDerivationScheme: Sendable, Hashable, VersionedAlgorithm {
+enum PasswordBasedKeyDerivationScheme: Hashable, VersionedAlgorithm {
 	case version1
 }
 
@@ -48,7 +48,7 @@ extension PasswordBasedKeyDerivationScheme {
 
 // MARK: PasswordBasedKeyDerivationScheme.Version
 extension PasswordBasedKeyDerivationScheme {
-	enum Version: Int, Sendable, Hashable, Codable {
+	enum Version: Int, Hashable, Codable {
 		case version1 = 1
 	}
 }

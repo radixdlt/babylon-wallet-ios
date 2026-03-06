@@ -46,7 +46,10 @@ extension DebugKeychainContents {
 
 struct KeyedMnemonicView: SwiftUI.View {
 	let keyedMnemonicWithMetadata: KeyedMnemonicWithMetadata
-	var keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase { keyedMnemonicWithMetadata.keyedMnemonic }
+	var keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase {
+		keyedMnemonicWithMetadata.keyedMnemonic
+	}
+
 	let delete: @Sendable () -> Void
 
 	init(_ keyedMnemonicWithMetadata: KeyedMnemonicWithMetadata, delete: @escaping @Sendable () -> Void) {

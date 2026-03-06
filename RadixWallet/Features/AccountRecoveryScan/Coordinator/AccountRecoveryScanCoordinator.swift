@@ -1,8 +1,8 @@
 // MARK: - AccountRecoveryScanCoordinator
 
-struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Root: Sendable, Hashable {
+struct AccountRecoveryScanCoordinator: FeatureReducer {
+	struct State: Hashable {
+		enum Root: Hashable {
 			case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.State)
 			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.State)
 		}
@@ -24,7 +24,7 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		var backTo: AccountRecoveryScanInProgress.State?
 
 		/// Create new Profile or add accounts
-		enum Purpose: Sendable, Hashable {
+		enum Purpose: Hashable {
 			case createProfile(PrivateHierarchicalDeterministicFactorSource)
 
 			case addAccounts(
@@ -55,17 +55,17 @@ struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.Action)
 		case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case createProfileResult(TaskResult<EqVoid>)
 		case addAccountsToExistingProfileResult(TaskResult<EqVoid>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case completed
 		case dismissed
 	}

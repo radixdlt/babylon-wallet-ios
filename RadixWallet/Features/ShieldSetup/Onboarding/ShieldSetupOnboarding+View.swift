@@ -42,7 +42,6 @@ extension ShieldSetupOnboarding {
 			.background(.primaryBackground)
 		}
 
-		@ViewBuilder
 		private var positionIndicator: some SwiftUI.View {
 			HStack(spacing: .small3) {
 				ForEach(0 ..< store.steps.count, id: \.self) { index in

@@ -5,7 +5,7 @@ import SwiftUI
 // MARK: - AuthorizedDapps
 extension DAppsDirectory {
 	@Reducer
-	struct AuthorizedDappsFeature: Sendable, FeatureReducer {
+	struct AuthorizedDappsFeature: FeatureReducer {
 		@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.accountLockersClient) var accountLockersClient
@@ -17,7 +17,7 @@ extension DAppsDirectory {
 		// MARK: State
 
 		// TODO: Add `@ObservableState` after migrating `DappDetails` to `ObservableState`
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			var filtering: DAppsFiltering.State = .init()
 			var dappsWithClaims: Set<DappDefinitionAddress> = []
 
@@ -44,19 +44,19 @@ extension DAppsDirectory {
 		// MARK: Action
 
 		@CasePathable
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case task
 			case didSelectDapp(AuthorizedDapp.ID)
 			case pullToRefreshStarted
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case loadedDapps(TaskResult<DAppsDirectory.DApps>)
 			case setDappsWithClaims([DappDefinitionAddress])
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case filtering(DAppsFiltering.Action)
 		}
 
@@ -64,12 +64,12 @@ extension DAppsDirectory {
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Hashable, Sendable {
+			enum State: Hashable {
 				case presentedDapp(DappDetails.State)
 			}
 
 			@CasePathable
-			enum Action: Equatable, Sendable {
+			enum Action: Equatable {
 				case presentedDapp(DappDetails.Action)
 			}
 
@@ -162,7 +162,7 @@ extension DAppsDirectory {
 						)
 						.asIdentified()) ?? []
 
-					let dApps = authorizedDapps.map { profileDApp in
+					return authorizedDapps.map { profileDApp in
 						let dAppTagsCategory = dAppsList[id: profileDApp.id]
 						let details = dAppDetails[id: profileDApp.id]
 
@@ -174,8 +174,6 @@ extension DAppsDirectory {
 						)
 					}
 					.asIdentified()
-
-					return dApps
 				}
 				await send(.internal(.loadedDapps(result)))
 			}

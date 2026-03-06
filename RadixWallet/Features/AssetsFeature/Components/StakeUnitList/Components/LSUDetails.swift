@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - LSUDetails
 @Reducer
-struct LSUDetails: Sendable, FeatureReducer {
+struct LSUDetails: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let validator: OnLedgerEntity.Validator
 		let stakeUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
 		let xrdRedemptionValue: ResourceAmount
@@ -15,7 +15,7 @@ struct LSUDetails: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 

@@ -1,10 +1,10 @@
 // MARK: - AddFactorSource.NameFactorSource
 extension AddFactorSource {
 	@Reducer
-	struct NameFactorSource: Sendable, FeatureReducer {
+	struct NameFactorSource: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
-			enum FactorSourceInput: Sendable, Hashable {
+		struct State: Hashable {
+			enum FactorSourceInput: Hashable {
 				case device(DeviceFactorSource, MnemonicWithPassphrase)
 				case arculus(ArculusCardFactorSource, MnemonicWithPassphrase, String)
 				case ledger(LedgerHardwareWalletFactorSource)
@@ -47,27 +47,27 @@ extension AddFactorSource {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case nameChanged(String)
 			case saveTapped(NonEmptyString)
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case addFactorSourceResult(TaskResult<EqVoid>)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case saved(FactorSource)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case completion
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Equatable {
 				case completion
 			}
 

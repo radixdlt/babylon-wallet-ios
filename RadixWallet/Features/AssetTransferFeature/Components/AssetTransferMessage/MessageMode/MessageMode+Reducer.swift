@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct MessageMode: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {}
+struct MessageMode: FeatureReducer {
+	struct State: Hashable {}
 }

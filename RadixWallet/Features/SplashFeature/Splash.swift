@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Splash
-struct Splash: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Context: Sendable {
+struct Splash: FeatureReducer {
+	struct State: Hashable {
+		enum Context {
 			case appStarted
 			case appForegrounded
 		}
@@ -25,33 +25,33 @@ struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case didTapToUnlock
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case biometricsCheckResult(TaskResult<Bool>)
 		case advancedLockStateLoaded(isEnabled: Bool)
 		case showAppLockMessage
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case completed(ProfileState)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case errorAlert(ErrorAlert)
 
-			enum ErrorAlert: Sendable, Equatable {
+			enum ErrorAlert: Equatable {
 				case retryVerifyPasscodeButtonTapped
 				case openSettingsButtonTapped
 				case appLockOkButtonTapped

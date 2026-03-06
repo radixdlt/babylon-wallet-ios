@@ -330,13 +330,15 @@ extension SecureStorageClient: DependencyKey {
 				keychainKey = activeProfileId.keychainKey
 			case let .deviceFactorSourceMnemonic(factorSourceId):
 				keychainKey = key(factorSourceID: factorSourceId)
+			case let .radixConnectMobileSession(sessionId: sessionId):
+				keychainKey = .init(.init(rawValue: sessionId)!)
 			}
 			return try keychainClient.contains(keychainKey)
 		}
 
 		let deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs = {
 			profileID,
-				requestedToKeepInIcloud in
+			requestedToKeepInIcloud in
 			guard
 				let profileSnapshotData = try loadProfileSnapshotData(profileID)
 			else {

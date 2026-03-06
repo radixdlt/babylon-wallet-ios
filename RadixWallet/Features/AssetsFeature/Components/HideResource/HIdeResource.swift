@@ -1,8 +1,8 @@
 // MARK: - HideResource
 @Reducer
-struct HideResource: Sendable, FeatureReducer {
+struct HideResource: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let kind: Kind
 		var shouldShow = true
 
@@ -13,7 +13,7 @@ struct HideResource: Sendable, FeatureReducer {
 			self.kind = kind
 		}
 
-		enum Kind: Hashable, Sendable {
+		enum Kind: Hashable {
 			case fungible(ResourceAddress)
 			case nonFungible(ResourceAddress, name: String?)
 			case poolUnit(PoolAddress)
@@ -30,28 +30,28 @@ struct HideResource: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setShouldShow(Bool)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case buttonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case didHideResource
 	}
 
 	// MARK: - Destination
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case confirmation
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case confirmation(ConfirmationAction)
 		}
 

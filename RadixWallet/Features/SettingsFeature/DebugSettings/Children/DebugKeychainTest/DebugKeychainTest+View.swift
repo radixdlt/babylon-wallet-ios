@@ -21,7 +21,9 @@ extension DebugKeychainTest {
 		let containsDataForAuth: Bool
 		let containsDataForNoAuth: Bool
 		var serviceAndAccessGroup: KeychainClient.KeychainServiceAndAccessGroup?
-		var canTest: Bool { status.canTest }
+		var canTest: Bool {
+			status.canTest
+		}
 	}
 
 	@MainActor

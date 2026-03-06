@@ -4,7 +4,7 @@ typealias ArbitraryDataField = ArbitraryDataFieldView.Field
 
 // MARK: - ArbitraryDataFieldView.Field
 extension ArbitraryDataFieldView {
-	struct Field: Hashable, Sendable {
+	struct Field: Hashable {
 		let kind: Kind
 		let name: String
 		let isLocked: Bool
@@ -13,7 +13,7 @@ extension ArbitraryDataFieldView {
 
 // MARK: - ArbitraryDataFieldView.Field.Kind
 extension ArbitraryDataFieldView.Field {
-	enum Kind: Hashable, Sendable {
+	enum Kind: Hashable {
 		case primitive(String)
 		case truncated(String)
 		case complex
@@ -28,7 +28,7 @@ extension ArbitraryDataFieldView.Field {
 
 // MARK: - ArbitraryDataFieldView.Action
 extension ArbitraryDataFieldView {
-	enum Action: Hashable, Sendable {
+	enum Action: Hashable {
 		case urlTapped(URL)
 	}
 }

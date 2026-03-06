@@ -2,13 +2,15 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NewConnectionName
-struct NewConnectionName: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct NewConnectionName: FeatureReducer {
+	struct State: Hashable {
 		var isConnecting: Bool
 		var nameOfConnection: String
 		var focusedField: Field?
 
-		var isNameValid: Bool { !nameOfConnection.isEmpty }
+		var isNameValid: Bool {
+			!nameOfConnection.isEmpty
+		}
 
 		init(
 			isConnecting: Bool = false,
@@ -21,14 +23,14 @@ struct NewConnectionName: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case textFieldFocused(NewConnectionName.State.Field?)
 		case nameOfConnectionChanged(String)
 		case confirmNameButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case nameSet(String)
 	}
 

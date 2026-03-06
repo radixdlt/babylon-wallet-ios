@@ -113,7 +113,6 @@ extension TransactionReview {
 			}
 		}
 
-		@ViewBuilder
 		private func coreView(with viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {

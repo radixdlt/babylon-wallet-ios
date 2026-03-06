@@ -128,10 +128,15 @@ private extension View {
 }
 
 // MARK: - DateRangeItem
-struct DateRangeItem: ScrollBarItem, Sendable, Hashable, Identifiable {
-	var id: Date { startDate }
+struct DateRangeItem: ScrollBarItem, Hashable, Identifiable {
+	var id: Date {
+		startDate
+	}
+
 	let caption: String
 	let startDate: Date
 	let endDate: Date
-	var range: Range<Date> { startDate ..< endDate }
+	var range: Range<Date> {
+		startDate ..< endDate
+	}
 }

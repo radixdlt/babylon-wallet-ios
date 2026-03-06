@@ -4,8 +4,8 @@ import XCTest
 
 // MARK: - SecureStorageClientTests
 final class SecureStorageClientTests: TestCase {
-	// THIS TEST IS NEVER EVER EVER EVER ALLOWED TO FAIL!!! If it does, user might
-	// lose their funds!!!!!!
+	/// THIS TEST IS NEVER EVER EVER EVER ALLOWED TO FAIL!!! If it does, user might
+	/// lose their funds!!!!!!
 	func test_assert_key_for_mnemonic_is_unchanged() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)

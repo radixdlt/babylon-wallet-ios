@@ -81,13 +81,13 @@ private struct GlassPromptBackground: ViewModifier {
 
 // MARK: AccountBannerView.Kind
 extension AccountBannerView {
-	enum Kind: Sendable, Hashable {
+	enum Kind: Hashable {
 		case securityProblem(message: String)
 		case lockerClaim(dappName: String?)
 		case accessControllerTimedRecovery(state: TimedRecoveryBannerState)
 	}
 
-	enum TimedRecoveryBannerState: Sendable, Hashable {
+	enum TimedRecoveryBannerState: Hashable {
 		/// Recovery is in progress and the countdown (if any) is provided
 		case inProgress(countdown: String?)
 		/// Recovery is unknown to the wallet

@@ -17,7 +17,7 @@ struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>
 		}
 	}
 
-	struct PrimaryHeading: Sendable, Hashable, ExpressibleByStringLiteral {
+	struct PrimaryHeading: Hashable, ExpressibleByStringLiteral {
 		let text: String
 		let isProminent: Bool
 		init(text: String, isProminent: Bool = true) {

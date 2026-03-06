@@ -14,14 +14,14 @@
 "homePage_visitDashboard_title" = "Visit the Radix Dashboard";
 "homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
 "homePage_profileOlympiaError_title" = "SERIOUS ERROR - PLEASE READ";
-"homePage_profileOlympiaError_subtitle" = "Your wallet is in a rare condition that must be resolved manually. Please email support at hello@radixdlt.com with subject line BDFS ERROR. Somebody will respond and help you resolve the issue safely.";
+"homePage_profileOlympiaError_subtitle" = "Your wallet is in a rare condition that must be resolved manually. Please visit the Radix Telegram channel and mention BDFS ERROR so the team can help you resolve the issue safely.";
 "homePage_profileOlympiaError_affectedAccounts" = "Affected Accounts";
 "homePage_profileOlympiaError_affectedPersonas" = "Affected Personas";
 "homePage_profileOlympiaError_okCountdown" = "OK (%d)";
 "homePage_radixBanner_title" = "Start Using Radix";
 "homePage_radixBanner_subtitle" = "Complete setting up your wallet and start staking, using dApps and more!";
 "homePage_radixBanner_action" = "Get Started Now";
-"homePage_secureFolder_warning" = "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please contact support at hello@radixdlt.com for assistance.";
+"homePage_secureFolder_warning" = "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please visit the Radix Telegram channel for assistance.";
 "homePage_deletedAccountWarning_title" = "Previously Deleted Account Detected";
 "homePage_deletedAccountWarning_message" = "Your Radix Wallet is syncing, and removing the Account from view.";
 "homePage_tab_wallet" = "Wallet";
@@ -584,8 +584,8 @@
 "error_accountLabel_tooLong" = "Account label too long";
 "error_accountLabel_missing" = "Account label required";
 "error_transactionFailure_doesNotAllowThirdPartyDeposits" = "One of the receiving accounts does not allow Third-Party deposits";
-"error_emailSupportButtonTitle" = "Email Support";
-"error_emailSupportMessage" = "Please email support to automatically provide debugging info, and get assistance.
+"error_emailSupportButtonTitle" = "Reference Code";
+"error_emailSupportMessage" = "Keep this code for support reference.
 Code: %@";
 "error_rns_unknownDomain" = "This XRD domain does not exist, or is not associated to any account.";
 "error_rns_unknownDomainButtonTitle" = "Visit XRD domains";
@@ -1228,7 +1228,7 @@ Code: %@";
 "walletSettings_preferences_title" = "Preferences";
 "walletSettings_preferences_subtitle" = "Deposits, hidden Accounts and Personas, and advanced preferences";
 "walletSettings_troubleshooting_title" = "Troubleshooting";
-"walletSettings_troubleshooting_subtitle" = "Add your existing Accounts and contact support";
+"walletSettings_troubleshooting_subtitle" = "Add your existing Accounts and find support resources";
 "walletSettings_appVersion" = "App version: %@";
 "walletSettings_linkToConnectorHeader_title" = "Link your Wallet to a desktop browser";
 "walletSettings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
@@ -1260,8 +1260,8 @@ Code: %@";
 "troubleshooting_legacyImport_title" = "Import from a Legacy Wallet";
 "troubleshooting_legacyImport_subtitle" = "Import Accounts from an Olympia wallet";
 "troubleshooting_support" = "Support";
-"troubleshooting_contactSupport_title" = "Contact Support";
-"troubleshooting_contactSupport_subtitle" = "Connect directly with the Radix support team";
+"troubleshooting_contactSupport_title" = "Open Telegram";
+"troubleshooting_contactSupport_subtitle" = "Open the official Radix Telegram channel";
 "troubleshooting_resetAccount" = "Reset Account";
 "troubleshooting_factoryReset_title" = "Factory Reset";
 "troubleshooting_factoryReset_subtitle" = "Restore your Radix wallet to its original state";

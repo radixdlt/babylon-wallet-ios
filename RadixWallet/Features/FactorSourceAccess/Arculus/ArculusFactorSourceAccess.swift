@@ -1,8 +1,8 @@
 // MARK: - ArculusFactorSourceAccess
 @Reducer
-struct ArculusFactorSourceAccess: Sendable, FeatureReducer {
+struct ArculusFactorSourceAccess: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let factorSource: ArculusCardFactorSource
 		var pinInput: ArculusPINInput.State = .init(shouldConfirmPIN: false)
 
@@ -12,28 +12,28 @@ struct ArculusFactorSourceAccess: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case pinAdded(String)
 		case forgotPinButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case pinInput(ArculusPINInput.Action)
 	}
 
-	enum DelegateAction: Sendable, Hashable {
+	enum DelegateAction: Hashable {
 		case perform(PrivateFactorSource)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case arculusForgotPIN(ArculusForgotPIN.InputSeedPhrase.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Hashable {
+		enum Action: Hashable {
 			case arculusForgotPIN(ArculusForgotPIN.InputSeedPhrase.Action)
 		}
 

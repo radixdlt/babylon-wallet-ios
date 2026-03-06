@@ -1,12 +1,6 @@
 // MARK: - IOSSecurityClient
-struct IOSSecurityClient: Sendable {
+struct IOSSecurityClient {
 	var isJailbroken: IsJailbroken
-
-	init(
-		isJailbroken: @escaping IsJailbroken
-	) {
-		self.isJailbroken = isJailbroken
-	}
 }
 
 // MARK: IOSSecurityClient.IsJailbroken

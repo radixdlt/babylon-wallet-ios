@@ -101,7 +101,6 @@ extension AccountRecoveryScanInProgress {
 			.background(.primaryBackground)
 		}
 
-		@ViewBuilder
 		func coreView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			VStack(alignment: .center, spacing: .medium1) {
 				if viewStore.isScanInProgress {
@@ -115,7 +114,6 @@ extension AccountRecoveryScanInProgress {
 			.controlState(viewStore.loadingState)
 		}
 
-		@ViewBuilder
 		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			VStack(alignment: .center, spacing: 0) {
 				Text(L10n.AccountRecoveryScan.InProgress.headerTitle)
@@ -138,7 +136,6 @@ extension AccountRecoveryScanInProgress {
 			.padding(.horizontal, .medium1)
 		}
 
-		@ViewBuilder
 		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			ScrollView {
 				VStack(alignment: .center, spacing: 0) {

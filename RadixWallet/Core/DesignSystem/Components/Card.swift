@@ -28,16 +28,14 @@ struct Card<Contents: View>: View {
 }
 
 extension ButtonStyle where Self == CardButtonStyle {
-	static func cardButtonStyle(_ color: Color) -> CardButtonStyle { CardButtonStyle(color: color) }
+	static func cardButtonStyle(_ color: Color) -> CardButtonStyle {
+		CardButtonStyle(color: color)
+	}
 }
 
 // MARK: - CardButtonStyle
 struct CardButtonStyle: ButtonStyle {
 	let color: Color
-
-	init(color: Color) {
-		self.color = color
-	}
 
 	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label

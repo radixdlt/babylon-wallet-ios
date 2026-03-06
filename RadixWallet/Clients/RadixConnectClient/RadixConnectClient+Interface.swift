@@ -10,7 +10,7 @@ extension DependencyValues {
 
 // MARK: - P2P.LinkConnectionUpdate
 extension P2P {
-	struct LinkConnectionUpdate: Sendable, Hashable {
+	struct LinkConnectionUpdate: Hashable {
 		let link: P2PLink
 		let idsOfConnectedPeerConnections: [PeerConnectionID]
 		var hasAnyConnectedPeers: Bool {
@@ -20,7 +20,7 @@ extension P2P {
 }
 
 // MARK: - RadixConnectClient
-struct RadixConnectClient: DependencyKey, Sendable {
+struct RadixConnectClient: DependencyKey {
 	/// Connects to the p2p links stored in secure storage.
 	var loadP2PLinksAndConnectAll: LoadFromProfileAndConnectAll
 	var disconnectAll: DisconnectAll
@@ -48,7 +48,7 @@ struct RadixConnectClient: DependencyKey, Sendable {
 }
 
 extension RadixConnectClient {
-	// Returns an async sequence of connection events
+	/// Returns an async sequence of connection events
 	typealias LoadFromProfileAndConnectAll = @Sendable () async -> AnyAsyncSequence<[P2P.LinkConnectionUpdate]>
 
 	typealias DisconnectAll = @Sendable () async -> Void

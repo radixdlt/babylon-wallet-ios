@@ -3,11 +3,11 @@ typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWalle
 
 // MARK: - AddLedgerFactorSource
 @Reducer
-struct AddLedgerFactorSource: Sendable, FeatureReducer {
+struct AddLedgerFactorSource: FeatureReducer {
 	// MARK: AddLedgerFactorSource
 
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var isWaitingForResponseFromLedger = false
 		var unnamedDeviceToAdd: LedgerDeviceInfo?
 
@@ -19,18 +19,18 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case sendAddLedgerRequestButtonTapped
 		case closeButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case getDeviceInfoResult(TaskResult<LedgerDeviceInfo>)
 		case alreadyExists(LedgerHardwareWalletFactorSource)
 		case proceedToNameDevice(LedgerDeviceInfo)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case completed(LedgerHardwareWalletFactorSource)
 		case failedToAddLedger
 	}
@@ -39,13 +39,13 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case ledgerAlreadyExistsAlert(Never)
 			case nameLedger(NameLedgerFactorSource.Action)
 		}
@@ -64,8 +64,6 @@ struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.dismiss) var dismiss
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

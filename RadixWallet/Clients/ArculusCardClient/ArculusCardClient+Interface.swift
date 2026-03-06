@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Sargon
 
 // MARK: - ArculusCardClient
-struct ArculusCardClient: Sendable {
+struct ArculusCardClient {
 	var validateMinFirmwareVersion: ValidateMinFirmwareVersion
 	var derivePublicKeys: DerivePublicKeys
 	var signTransaction: SignTransaction

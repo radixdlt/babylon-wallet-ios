@@ -28,8 +28,8 @@ extension VerifyMnemonic.State {
 }
 
 extension VerifyMnemonic {
-	struct ViewState: Sendable, Equatable {
-		struct WordViewState: Sendable, Equatable, Identifiable {
+	struct ViewState: Equatable {
+		struct WordViewState: Equatable, Identifiable {
 			var id: OffsetIdentified<BIP39Word> {
 				word
 			}
@@ -91,7 +91,6 @@ extension VerifyMnemonic {
 			.radixToolbar(title: L10n.ConfirmMnemonicBackedUp.title)
 		}
 
-		@ViewBuilder
 		private func wordsGrid(viewStore: ViewStoreOf<VerifyMnemonic>) -> some SwiftUI.View {
 			SwiftUI.Grid(horizontalSpacing: .small2, verticalSpacing: .medium1) {
 				ForEach(Array(viewStore.words.chunks(ofCount: 3).enumerated()), id: \.offset) { _, row in
@@ -110,7 +109,6 @@ extension VerifyMnemonic {
 			}
 		}
 
-		@ViewBuilder
 		private func placeholderWord(_ viewState: ViewState.WordViewState) -> some SwiftUI.View {
 			AppTextField(
 				primaryHeading: .init(
@@ -123,7 +121,6 @@ extension VerifyMnemonic {
 			.disabled(true)
 		}
 
-		@ViewBuilder
 		private func verifyWord(_ viewState: ViewState.WordViewState, viewStore: ViewStoreOf<VerifyMnemonic>) -> some SwiftUI.View {
 			AppTextField(
 				primaryHeading: .init(
@@ -137,8 +134,8 @@ extension VerifyMnemonic {
 						.init(
 							offset: viewState.word.offset,
 							element: $0.lowercased().trimmingWhitespacesAndNewlines()
-						))
-					) }
+						)
+					)) }
 				),
 				focus: .on(
 					viewState.word.offset,

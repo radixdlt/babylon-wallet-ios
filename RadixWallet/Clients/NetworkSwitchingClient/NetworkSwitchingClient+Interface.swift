@@ -1,5 +1,5 @@
 // MARK: - NetworkSwitchingClient
-struct NetworkSwitchingClient: Sendable, DependencyKey {
+struct NetworkSwitchingClient: DependencyKey {
 	var validateGatewayURL: ValidateGatewayURL
 	var hasAccountOnNetwork: HasAccountOnNetwork
 	var switchTo: SwitchTo

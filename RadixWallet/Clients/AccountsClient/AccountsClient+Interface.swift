@@ -2,7 +2,7 @@ import IdentifiedCollections
 import Sargon
 
 // MARK: - AccountsClient
-struct AccountsClient: Sendable {
+struct AccountsClient {
 	var getCurrentNetworkID: GetCurrentNetworkID
 	var nextAppearanceID: NextAppearanceID
 
@@ -56,7 +56,7 @@ extension AccountsClient {
 }
 
 // MARK: - NewAccountRequest
-struct NewAccountRequest: Sendable, Hashable {
+struct NewAccountRequest: Hashable {
 	let name: NonEmptyString
 	let factorInstance: HierarchicalDeterministicFactorInstance
 	let networkID: NetworkID

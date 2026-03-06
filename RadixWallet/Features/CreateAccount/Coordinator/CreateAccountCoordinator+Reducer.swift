@@ -4,9 +4,9 @@ import SwiftUI
 
 // MARK: - CreateAccountCoordinator
 @Reducer
-struct CreateAccountCoordinator: Sendable, FeatureReducer {
+struct CreateAccountCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var root: Path.State
 		var path: StackState<Path.State> = .init()
 
@@ -41,21 +41,21 @@ struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		case completion(NewAccountCompletion)
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case handleAccountCreated(Account)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismissed
 		case accountCreated
 		case completed
@@ -171,7 +171,7 @@ extension CreateAccountCoordinator {
 
 // MARK: - CreateAccountCoordinator.Mode
 extension CreateAccountCoordinator {
-	enum Mode: Sendable, Hashable {
+	enum Mode: Hashable {
 		case bdfs
 		case specific(FactorSource)
 	}

@@ -1,22 +1,22 @@
 // MARK: - AddShieldBuilderSeedingFactors.SelectFactorSourceToAdd
 extension AddShieldBuilderSeedingFactors {
 	@Reducer
-	struct SelectFactorSourceToAdd: Sendable, FeatureReducer {
+	struct SelectFactorSourceToAdd: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let mode: Mode
 			var selected: FactorSourceKind?
 		}
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case selected(FactorSourceKind)
 			case addButtonTapped
 			case skipButtonTapped
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case addFactorSource(FactorSourceKind)
 			case skipAutomaticShield
 		}

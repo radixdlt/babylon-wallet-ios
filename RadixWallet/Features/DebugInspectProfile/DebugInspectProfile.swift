@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DebugInspectProfile
-struct DebugInspectProfile: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Mode: Sendable, Hashable {
+struct DebugInspectProfile: FeatureReducer {
+	struct State: Hashable {
+		enum Mode: Hashable {
 			case rawJSON, structured
 		}
 
@@ -24,7 +24,7 @@ struct DebugInspectProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case toggleModeButtonTapped
 		case copyJSONButtonTapped
 	}

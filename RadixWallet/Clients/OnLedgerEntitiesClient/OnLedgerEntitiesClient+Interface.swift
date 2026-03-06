@@ -2,7 +2,7 @@ import Sargon
 
 // MARK: - OnLedgerEntitiesClient
 /// A client that manages loading Entities from the Ledger.
-struct OnLedgerEntitiesClient: Sendable {
+struct OnLedgerEntitiesClient {
 	/// Retrieve the entities identified by addresses
 	var getEntities: GetEntities
 
@@ -23,7 +23,7 @@ extension OnLedgerEntitiesClient {
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
 extension OnLedgerEntitiesClient {
-	struct GetAccountOwnedNonFungibleResourceIdsRequest: Sendable {
+	struct GetAccountOwnedNonFungibleResourceIdsRequest {
 		/// The address of the account that owns the non fungible resource ids
 		let accountAddress: AccountAddress
 		/// The non fungible resource collection for with to retrieve the ids
@@ -42,7 +42,7 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	struct GetNonFungibleTokenDataRequest: Sendable {
+	struct GetNonFungibleTokenDataRequest {
 		/// The ledger state at which to retrieve the data, should be ledger state
 		/// from the OnLedgerEntity.OwnedNonFungibleResource.
 		let atLedgerState: AtLedgerState?
@@ -61,8 +61,8 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	struct GetAccountOwnedNonFungibleTokenDataRequest: Sendable {
-		enum Mode: Sendable {
+	struct GetAccountOwnedNonFungibleTokenDataRequest {
+		enum Mode {
 			case loadAll
 			case loadPage(pageCursor: String?)
 		}
@@ -85,7 +85,7 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	struct GetAccountOwnedNonFungibleTokenResponse: Sendable {
+	struct GetAccountOwnedNonFungibleTokenResponse {
 		let tokens: [OnLedgerEntity.NonFungibleToken]
 		let nextPageCursor: String?
 
@@ -101,7 +101,7 @@ extension OnLedgerEntitiesClient {
 
 // MARK: OnLedgerEntitiesClient.ItemsPage
 extension OnLedgerEntitiesClient {
-	struct ItemsPage: Sendable {
+	struct ItemsPage {
 		let cursor: String?
 		let pageLimit: Int
 
@@ -113,13 +113,13 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	struct CachingStrategy: Sendable, Hashable, CustomDebugStringConvertible {
-		enum Read: Sendable, Hashable {
+	struct CachingStrategy: Hashable, CustomDebugStringConvertible {
+		enum Read: Hashable {
 			case fromCache
 			case fromLedger
 		}
 
-		enum Write: Sendable, Hashable {
+		enum Write: Hashable {
 			case toCache
 			case skip
 		}
@@ -325,7 +325,7 @@ extension OnLedgerEntitiesClient {
 }
 
 // MARK: - OnLedgerSyncOfAccounts
-struct OnLedgerSyncOfAccounts: Sendable, Hashable {
+struct OnLedgerSyncOfAccounts: Hashable {
 	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
 	let inactive: IdentifiedArrayOf<Account>
 	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
@@ -376,7 +376,7 @@ extension OnLedgerEntitiesClient {
 		return OnLedgerSyncOfAccounts(inactive: inactive, active: active)
 	}
 
-	struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
+	struct CustomizedOnLedgerThirdPartDepositForAccount: Hashable {
 		let address: AccountAddress
 		let rule: DepositRule
 	}

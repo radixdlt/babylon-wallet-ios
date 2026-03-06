@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - App
-struct App: Sendable, FeatureReducer {
+struct App: FeatureReducer {
 	struct State: Hashable {
 		@CasePathable
 		enum Root: Hashable {
@@ -33,13 +33,13 @@ struct App: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case urlOpened(URL)
 	}
 
 	@CasePathable
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case incompatibleProfileDeleted
 		case toMain(isAccountRecoveryNeeded: Bool)
 		case toOnboarding
@@ -48,7 +48,7 @@ struct App: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case main(Main.Action)
 		case onboardingCoordinator(OnboardingCoordinator.Action)
 		case splash(Splash.Action)
@@ -195,7 +195,7 @@ struct App: Sendable, FeatureReducer {
 // MARK: App.UserFacingError
 extension App {
 	/// A purely user-facing error. Not made for developer logging or analytics collection.
-	struct UserFacingError: Sendable, Equatable, LocalizedError {
+	struct UserFacingError: Equatable, LocalizedError {
 		let underlyingError: Swift.Error
 
 		init(_ underlyingError: Swift.Error) {

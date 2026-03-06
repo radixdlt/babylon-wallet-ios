@@ -1,7 +1,7 @@
 import Foundation
 
 extension InteractionReview {
-	struct SectionsData: Sendable, Hashable {
+	struct SectionsData: Hashable {
 		var withdrawals: Accounts.State? = nil
 		var dAppsUsed: InteractionReviewDappsUsed.State? = nil
 		var deposits: Accounts.State? = nil

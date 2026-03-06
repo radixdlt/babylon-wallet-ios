@@ -33,7 +33,9 @@ extension DefaultCodable {
 
 	enum Providers {
 		enum EmptyCollection<Collection: Codable & EmptyInitializable>: DefaultValueProvider {
-			static var defaultValue: Collection { .init() }
+			static var defaultValue: Collection {
+				.init()
+			}
 		}
 	}
 }

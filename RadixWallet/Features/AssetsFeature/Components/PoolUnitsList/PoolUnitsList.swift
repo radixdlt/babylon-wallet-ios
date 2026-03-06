@@ -2,23 +2,26 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PoolUnitsList
-struct PoolUnitsList: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct PoolUnitsList: FeatureReducer {
+	struct State: Hashable {
 		var poolUnits: IdentifiedArrayOf<PoolUnitState>
 
-		struct PoolUnitState: Sendable, Hashable, Identifiable {
-			var id: PoolAddress { poolUnit.resourcePoolAddress }
+		struct PoolUnitState: Hashable, Identifiable {
+			var id: PoolAddress {
+				poolUnit.resourcePoolAddress
+			}
+
 			var poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit
 			var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle
 			var isSelected: Bool? = nil
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case poolUnitWasTapped(PoolAddress)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case selected(OnLedgerEntitiesClient.OwnedResourcePoolDetails)
 	}
 

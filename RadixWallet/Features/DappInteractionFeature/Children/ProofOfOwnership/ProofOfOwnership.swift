@@ -1,8 +1,8 @@
 // MARK: - ProofOfOwnership
 @Reducer
-struct ProofOfOwnership: Sendable, FeatureReducer {
+struct ProofOfOwnership: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let kind: Kind
 		let dappMetadata: DappMetadata
 		let challenge: DappToWalletInteractionAuthChallengeNonce
@@ -33,17 +33,17 @@ struct ProofOfOwnership: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case continueButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setPersona(Persona)
 		case setAccounts(Accounts)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case provenPersonaOwnership(IdentityAddress, SignedAuthIntent)
 		case provenAccountsOwnership([AccountAddress], SignedAuthIntent)
 		case failedToGetEntities
@@ -138,7 +138,7 @@ private extension ProofOfOwnership {
 }
 
 extension ProofOfOwnership.State {
-	enum Kind: Sendable, Hashable {
+	enum Kind: Hashable {
 		case persona(IdentityAddress)
 		case accounts([AccountAddress])
 	}

@@ -1,9 +1,9 @@
 // MARK: - AllDapps
 extension DAppsDirectory {
 	@Reducer
-	struct AllDapps: Sendable, FeatureReducer {
+	struct AllDapps: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			var filtering: DAppsFiltering.State = .init()
 			var dApps: Loadable<IdentifiedArrayOf<DAppsCategory>> = .idle
 			var isOnMainnet = true
@@ -23,31 +23,31 @@ extension DAppsDirectory {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case task
 			case didSelectDapp(DApp.ID)
 			case pullToRefreshStarted
 		}
 
 		@CasePathable
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case loadedDApps(TaskResult<DApps>)
 			case currentGatewayChanged(to: Gateway)
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case filtering(DAppsFiltering.Action)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Hashable, Sendable {
+			enum State: Hashable {
 				case presentedDapp(DappDetails.State)
 			}
 
 			@CasePathable
-			enum Action: Equatable, Sendable {
+			enum Action: Equatable {
 				case presentedDapp(DappDetails.Action)
 			}
 

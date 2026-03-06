@@ -3,15 +3,23 @@ import SwiftUI
 
 // MARK: - GatewayRow
 @Reducer
-struct GatewayRow: Sendable, FeatureReducer {
+struct GatewayRow: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable, Identifiable {
+	struct State: Hashable, Identifiable {
 		typealias ID = URL
-		var id: URL { gateway.id }
+		var id: URL {
+			gateway.id
+		}
 
 		let gateway: Gateway
-		var name: String { gateway.displayName }
-		var description: String { gateway.network.displayDescription }
+		var name: String {
+			gateway.displayName
+		}
+
+		var description: String {
+			gateway.network.displayDescription
+		}
+
 		var isSelected: Bool
 		let canBeDeleted: Bool
 
@@ -28,12 +36,12 @@ struct GatewayRow: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case didSelect
 		case removeButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case didSelect
 		case removeButtonTapped
 	}

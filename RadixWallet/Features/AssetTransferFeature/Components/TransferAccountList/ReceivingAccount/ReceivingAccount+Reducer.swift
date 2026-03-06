@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - ReceivingAccount
-struct ReceivingAccount: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
+struct ReceivingAccount: FeatureReducer {
+	struct State: Hashable, Identifiable {
 		typealias ID = UUID
 		let id = ID()
 
@@ -27,20 +27,20 @@ struct ReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case chooseAccountTapped
 		case addAssetTapped
 		case removeTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case remove
 		case chooseAccount
 		case addAssets
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case row(id: ResourceAsset.State.ID, child: ResourceAsset.Action)
 	}
 

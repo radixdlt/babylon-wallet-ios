@@ -3,7 +3,7 @@ import Sargon
 // MARK: - P2P.ConnectorExtension.Response
 extension P2P.ConnectorExtension {
 	/// A response received from connector extension for some request we have sent.
-	enum Response: Sendable, Hashable, Decodable {
+	enum Response: Hashable, Decodable {
 		/// Messages sent from Connector Extension being a response
 		/// from an interaction with a Ledger hardware wallet by LedgerHQ,
 		/// e.g. Ledger Nano S
@@ -20,7 +20,7 @@ extension P2P.ConnectorExtension.Response {
 	/// Message sent from Connector Extension being a response
 	/// from an interaction with a Ledger hardware wallet by LedgerHQ,
 	/// e.g. Ledger Nano S
-	struct LedgerHardwareWallet: Sendable, Hashable, Decodable {
+	struct LedgerHardwareWallet: Hashable, Decodable {
 		let interactionID: P2P.LedgerHardwareWallet.InteractionId
 		let discriminator: P2P.LedgerHardwareWallet.Discriminator
 		let response: Result<Success, Failure>
@@ -29,8 +29,8 @@ extension P2P.ConnectorExtension.Response {
 
 // MARK: - P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-	struct Failure: LocalizedError, Sendable, Hashable, Decodable {
-		enum Reason: Int, Sendable, Hashable, Decodable {
+	struct Failure: LocalizedError, Hashable, Decodable {
+		enum Reason: Int, Hashable, Decodable {
 			case generic = 0
 			case blindSigningNotEnabledButRequired = 1
 			case userRejectedSigningOfTransaction = 2
@@ -74,7 +74,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Failure {
 }
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-	enum Success: Sendable, Hashable {
+	enum Success: Hashable {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
@@ -82,23 +82,23 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case signChallenge([SignatureOfSigner])
 		case deriveAndDisplayAddress(DerivedAddress)
 
-		struct GetDeviceInfo: Sendable, Hashable, Decodable {
+		struct GetDeviceInfo: Hashable, Decodable {
 			let id: Exactly32Bytes
 			let model: P2P.LedgerHardwareWallet.Model
 		}
 
-		struct DerivedAddress: Sendable, Hashable, Decodable {
+		struct DerivedAddress: Hashable, Decodable {
 			let derivedKey: DerivedPublicKey
 			let address: String
 		}
 
-		struct DerivedPublicKey: Sendable, Hashable, Decodable {
+		struct DerivedPublicKey: Hashable, Decodable {
 			let curve: String
 			let derivationPath: String
 			let publicKey: HexCodable
 		}
 
-		struct SignatureOfSigner: Sendable, Hashable, Decodable {
+		struct SignatureOfSigner: Hashable, Decodable {
 			let signature: HexCodable
 			let derivedPublicKey: DerivedPublicKey
 		}

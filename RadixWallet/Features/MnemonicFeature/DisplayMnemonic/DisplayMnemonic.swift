@@ -4,9 +4,9 @@ import SwiftUI
 
 // MARK: - DisplayMnemonic
 @Reducer
-struct DisplayMnemonic: Sendable, FeatureReducer {
+struct DisplayMnemonic: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		@Shared(.mnemonicBuilder) var mnemonicBuilder
 		let mnemonic: Mnemonic
 
@@ -22,7 +22,7 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case doneViewingButtonTapped
 		case closeButtonTapped
 		case backButtonTapped
@@ -31,30 +31,30 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 		#endif
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case backedUp(FactorSourceIdFromHash)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 			case verifyMnemonic(AddFactorSource.ConfirmSeedPhrase.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case backupConfirmation(BackupConfirmation)
 			case onContinueWarning(OnContinueWarning)
 			case verifyMnemonic(AddFactorSource.ConfirmSeedPhrase.Action)
 
-			enum BackupConfirmation: Sendable, Hashable {
+			enum BackupConfirmation: Hashable {
 				case userHasBackedUp
 				case userHasNotBackedUp
 			}
 
-			enum OnContinueWarning: Sendable, Hashable {
+			enum OnContinueWarning: Hashable {
 				case buttonTapped
 			}
 		}
@@ -93,6 +93,7 @@ struct DisplayMnemonic: Sendable, FeatureReducer {
 
 		case .closeButtonTapped:
 			return markAsBackedUpIfNeeded(&state)
+
 		#if DEBUG
 		case .debugCopy:
 			let phrase = state.words.elements.map(\.element.word).joined(separator: " ")

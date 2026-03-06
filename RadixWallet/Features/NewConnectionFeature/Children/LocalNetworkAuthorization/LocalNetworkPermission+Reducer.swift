@@ -2,16 +2,16 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - LocalNetworkPermission
-struct LocalNetworkPermission: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct LocalNetworkPermission: FeatureReducer {
+	struct State: Hashable {
 		@PresentationState
 		var permissionDeniedAlert: AlertState<ViewAction.PermissionDeniedAlertAction>? = nil
 
 		init() {}
 	}
 
-	enum ViewAction: Sendable, Equatable {
-		enum PermissionDeniedAlertAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
+		enum PermissionDeniedAlertAction: Equatable {
 			case cancelButtonTapped
 			case openSettingsButtonTapped
 		}
@@ -20,11 +20,11 @@ struct LocalNetworkPermission: Sendable, FeatureReducer {
 		case permissionDeniedAlert(PresentationAction<PermissionDeniedAlertAction>)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case displayPermissionDeniedAlert
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case permissionResponse(Bool)
 	}
 

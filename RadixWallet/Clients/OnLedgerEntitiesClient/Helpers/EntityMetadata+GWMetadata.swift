@@ -244,11 +244,11 @@ extension GatewayAPI.EntityMetadataCollection {
 		)
 	}
 
-	private func extract<Value, Field>(
+	private func extract<Value: Hashable & Codable, Field>(
 		key: EntityMetadataKey,
 		from keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
 		transform: @escaping (Field) throws -> Value
-	) -> Value? where Value: Hashable & Codable {
+	) -> Value? {
 		extractWithAtStateVersion(key: key, from: keyPath, transform: transform)?.value
 	}
 

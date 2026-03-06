@@ -20,7 +20,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// given
 		let otherGateways: Gateways = [.stokenet, .ansharnet]
 		let currentGateway: Gateway = .mainnet
-		let savedGateways = try! SavedGateways(
+		let savedGateways = try SavedGateways(
 			current: currentGateway,
 			other: otherGateways.elements
 		)
@@ -34,8 +34,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 			}
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([
 				try! .init(current: currentGateway, other: otherGateways.elements),
-			]
-			).eraseToAnyAsyncSequence() }
+			]).eraseToAnyAsyncSequence() }
 		}
 
 		// when
@@ -57,7 +56,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await viewTask.cancel()
 	}
 
-	func test_whenTappedOnRemoveGateway_removeGatewayAlertIsShown() async throws {
+	func test_whenTappedOnRemoveGateway_removeGatewayAlertIsShown() async {
 		// given
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
@@ -89,11 +88,11 @@ final class GatewaySettingsFeatureTests: TestCase {
 		let otherGateways: Gateways = [.stokenet, .ansharnet]
 		let currentGateway: Gateway = .mainnet
 		let otherAfterDeletion: Gateways = [.stokenet]
-		let savedGateways = try! SavedGateways(
+		let savedGateways = try SavedGateways(
 			current: currentGateway,
 			other: otherGateways.elements
 		)
-		let gatewaysAfterDeletion = try! SavedGateways(
+		let gatewaysAfterDeletion = try SavedGateways(
 			current: currentGateway,
 			other: otherAfterDeletion.elements
 		)
@@ -160,7 +159,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 	}
 
-	func test_whenAddGatewayButtonIsTapped_thenPresentAddNewGatewayScreen() async throws {
+	func test_whenAddGatewayButtonIsTapped_thenPresentAddNewGatewayScreen() async {
 		// given
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
@@ -175,7 +174,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 	}
 
-	func test_whenNewAddGatewayButtonIsTapped_thenDelegateIsCalled() async throws {
+	func test_whenNewAddGatewayButtonIsTapped_thenDelegateIsCalled() async {
 		// given
 		let allGateways: Gateways = [.nebunet, .hammunet, .enkinet, .mardunet]
 		let validURL = URL.previewValue.absoluteString
@@ -202,7 +201,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await store.receive(.internal(.addGatewayResult(.success(.instance))))
 	}
 
-	func test_whenNewAddGatewayButtonIsTapped_duplicateGatewayIsRejected() async throws {
+	func test_whenNewAddGatewayButtonIsTapped_duplicateGatewayIsRejected() async {
 		// given
 		let allGateways: Gateways = [.nebunet, .hammunet, .enkinet, .mardunet]
 		let validURL = URL.previewValue.absoluteString

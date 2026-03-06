@@ -6,7 +6,7 @@ import XCTest
 extension Olympia.AccountType: Codable {}
 
 // MARK: - TestVector
-private struct TestVector: Codable, Sendable, Hashable {
+private struct TestVector: Codable, Hashable {
 	let testID: Int
 	let olympiaWallet: OlympiaWallet
 	let payloadSizeThreshold: Int
@@ -23,7 +23,7 @@ private struct TestVector: Codable, Sendable, Hashable {
 	struct OlympiaWallet: Codable, Hashable {
 		let mnemonic: String
 		let accounts: [TestVector.OlympiaWallet.Account]
-		struct Account: Sendable, Hashable, Codable {
+		struct Account: Hashable, Codable {
 			let accountType: Olympia.AccountType
 			let publicKeyCompressedBase64: String
 			enum CodingKeys: String, CodingKey {
@@ -172,7 +172,7 @@ private func generateTestVectors() throws -> [TestVector] {
 
 	var testID = 0
 
-	let testVectors: [TestVector] = try payloadAndNumberOfAccounts.flatMap { payloadSizeThreshold, numberOfAccountsPossible in
+	return try payloadAndNumberOfAccounts.flatMap { payloadSizeThreshold, numberOfAccountsPossible in
 		try [BIP39WordCount.twelve, BIP39WordCount.twentyFour].flatMap { wordCount in
 			let mnemonic = Mnemonic(wordCount: wordCount, language: .english)
 			return try numberOfAccountsPossible.map { numberOfAccounts in
@@ -186,8 +186,6 @@ private func generateTestVectors() throws -> [TestVector] {
 			}
 		}
 	}
-
-	return testVectors
 }
 
 extension TestVector.OlympiaWallet.Account {

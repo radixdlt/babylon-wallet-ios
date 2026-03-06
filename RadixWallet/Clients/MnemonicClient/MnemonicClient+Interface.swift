@@ -1,5 +1,5 @@
 // MARK: - MnemonicClient
-struct MnemonicClient: Sendable {
+struct MnemonicClient {
 	var generate: Generate
 	var `import`: Import
 	var lookup: LookupWord
@@ -21,18 +21,8 @@ extension MnemonicClient {
 }
 
 // MARK: - LookupRequest
-struct LookupRequest: Sendable, Hashable {
+struct LookupRequest: Hashable {
 	let language: BIP39Language
 	let input: String
 	let minLenghForCandidatesLookup: Int
-
-	init(
-		language: BIP39Language,
-		input: String,
-		minLenghForCandidatesLookup: Int
-	) {
-		self.language = language
-		self.input = input
-		self.minLenghForCandidatesLookup = minLenghForCandidatesLookup
-	}
 }

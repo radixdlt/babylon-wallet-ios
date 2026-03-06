@@ -1,10 +1,10 @@
 // MARK: - ArculusCreatePIN
 @Reducer
-struct ArculusPINInput: Sendable, FeatureReducer {
+struct ArculusPINInput: FeatureReducer {
 	static let pinLength = 6
 
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var inputText: String = ""
 		var enteredPIN: String.SubSequence {
 			inputText.prefix(pinLength)
@@ -65,7 +65,7 @@ struct ArculusPINInput: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Hashable {
+	enum ViewAction: Hashable {
 		case appeared
 		case enteredPINUpdated(String)
 	}

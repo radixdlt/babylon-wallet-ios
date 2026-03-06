@@ -809,12 +809,10 @@
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
 		8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */; };
-		830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */; };
 		830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */; };
 		830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */; };
 		830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */; };
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
-		831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */; };
 		831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification+View.swift */; };
 		831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */; };
 		831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */; };
@@ -921,6 +919,17 @@
 		A0BA90452E8167E600ED76E8 /* EditSecurityShieldCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA90442E8167E600ED76E8 /* EditSecurityShieldCoordinator+View.swift */; };
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
 		A0C673072DA6BD7F0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */; };
+		A0CBEFF62F5B1F8D004D904F /* P2PTransportProfilesClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBEFF42F5B1F8D004D904F /* P2PTransportProfilesClient+Test.swift */; };
+		A0CBEFF72F5B1F8D004D904F /* P2PTransportProfilesClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBEFF22F5B1F8D004D904F /* P2PTransportProfilesClient+Interface.swift */; };
+		A0CBEFF82F5B1F8D004D904F /* P2PTransportProfilesClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBEFF32F5B1F8D004D904F /* P2PTransportProfilesClient+Live.swift */; };
+		A0CBEFFC2F5B2065004D904F /* SargonLoggingDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBEFFB2F5B2065004D904F /* SargonLoggingDriver.swift */; };
+		A0CBEFFE2F5B2065004D904F /* SargonDriversFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBEFFA2F5B2065004D904F /* SargonDriversFactory.swift */; };
+		A0CBF0072F5B2197004D904F /* RelayServicesSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBEFFF2F5B2197004D904F /* RelayServicesSettings+Reducer.swift */; };
+		A0CBF0082F5B2197004D904F /* RelayServicesSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBF0002F5B2197004D904F /* RelayServicesSettings+View.swift */; };
+		A0CBF0092F5B2197004D904F /* SignalingServersSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBF0042F5B2197004D904F /* SignalingServersSettings+Reducer.swift */; };
+		A0CBF00A2F5B2197004D904F /* SignalingServerDetails+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBF0022F5B2197004D904F /* SignalingServerDetails+Reducer.swift */; };
+		A0CBF00B2F5B2197004D904F /* SignalingServersSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBF0052F5B2197004D904F /* SignalingServersSettings+View.swift */; };
+		A0CBF00C2F5B2197004D904F /* SignalingServerDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0CBF0032F5B2197004D904F /* SignalingServerDetails+View.swift */; };
 		A0D201662E01489A009DA055 /* BlogPostCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201652E014893009DA055 /* BlogPostCard.swift */; };
 		A0D201692E029394009DA055 /* BlogPostsCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201672E029394009DA055 /* BlogPostsCarousel.swift */; };
 		A0D2016A2E029394009DA055 /* BlogPostsCarousel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201682E029394009DA055 /* BlogPostsCarousel+View.swift */; };
@@ -2206,13 +2215,11 @@
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
 		8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Mock.swift"; sourceTree = "<group>"; };
-		830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStorageTests.swift; sourceTree = "<group>"; };
 		830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		830EA9E22AEB8933004C8051 /* EntitiesHidingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitiesHidingTests.swift; sourceTree = "<group>"; };
 		830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultValueDecodable.swift; sourceTree = "<group>"; };
 		830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
-		831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobileSessionStorage.swift; sourceTree = "<group>"; };
 		831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionOriginVerification+View.swift"; sourceTree = "<group>"; };
 		831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Live.swift"; sourceTree = "<group>"; };
 		831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Test.swift"; sourceTree = "<group>"; };
@@ -2305,6 +2312,17 @@
 		A0BA444F2E7F085D00ED76E8 /* SecurityStructureOfFactorSourcesView+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityStructureOfFactorSourcesView+View.swift"; sourceTree = "<group>"; };
 		A0BA90422E8167E000ED76E8 /* EditSecurityShieldCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSecurityShieldCoordinator.swift; sourceTree = "<group>"; };
 		A0BA90442E8167E600ED76E8 /* EditSecurityShieldCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EditSecurityShieldCoordinator+View.swift"; sourceTree = "<group>"; };
+		A0CBEFF22F5B1F8D004D904F /* P2PTransportProfilesClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "P2PTransportProfilesClient+Interface.swift"; sourceTree = "<group>"; };
+		A0CBEFF32F5B1F8D004D904F /* P2PTransportProfilesClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "P2PTransportProfilesClient+Live.swift"; sourceTree = "<group>"; };
+		A0CBEFF42F5B1F8D004D904F /* P2PTransportProfilesClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "P2PTransportProfilesClient+Test.swift"; sourceTree = "<group>"; };
+		A0CBEFFA2F5B2065004D904F /* SargonDriversFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SargonDriversFactory.swift; sourceTree = "<group>"; };
+		A0CBEFFB2F5B2065004D904F /* SargonLoggingDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SargonLoggingDriver.swift; sourceTree = "<group>"; };
+		A0CBEFFF2F5B2197004D904F /* RelayServicesSettings+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RelayServicesSettings+Reducer.swift"; sourceTree = "<group>"; };
+		A0CBF0002F5B2197004D904F /* RelayServicesSettings+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RelayServicesSettings+View.swift"; sourceTree = "<group>"; };
+		A0CBF0022F5B2197004D904F /* SignalingServerDetails+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServerDetails+Reducer.swift"; sourceTree = "<group>"; };
+		A0CBF0032F5B2197004D904F /* SignalingServerDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServerDetails+View.swift"; sourceTree = "<group>"; };
+		A0CBF0042F5B2197004D904F /* SignalingServersSettings+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServersSettings+Reducer.swift"; sourceTree = "<group>"; };
+		A0CBF0052F5B2197004D904F /* SignalingServersSettings+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServersSettings+View.swift"; sourceTree = "<group>"; };
 		A0D201652E014893009DA055 /* BlogPostCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogPostCard.swift; sourceTree = "<group>"; };
 		A0D201672E029394009DA055 /* BlogPostsCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlogPostsCarousel.swift; sourceTree = "<group>"; };
 		A0D201682E029394009DA055 /* BlogPostsCarousel+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlogPostsCarousel+View.swift"; sourceTree = "<group>"; };
@@ -3012,6 +3030,8 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				A0CBF0012F5B2197004D904F /* RelayServicesSettingsFeature */,
+				A0CBF0062F5B2197004D904F /* SignalingServersSettingsFeature */,
 				A0E77D7C2ED091750092D8DA /* HandleAccessControllerTimedRecovery */,
 				A04AA7DF2E12E04900F38E67 /* SelectFactorSource */,
 				A09F8FD92DF6E49700DB5614 /* Discover */,
@@ -4665,6 +4685,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A0CBEFF52F5B1F8D004D904F /* P2PTransportProfilesClient */,
 				A0B566E82ED75F96002655C0 /* AccessControllerClient */,
 				A089D4342E35342F00866A47 /* ArculusCardClient */,
 				A09F8FD22DEF4D8500DB5614 /* RadixNameServiceClient */,
@@ -6169,14 +6190,6 @@
 			path = Password;
 			sourceTree = "<group>";
 		};
-		830E43AD2C2D8B3800B6E95F /* Mobile */ = {
-			isa = PBXGroup;
-			children = (
-				830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */,
-			);
-			path = Mobile;
-			sourceTree = "<group>";
-		};
 		830EA9D92AEA8750004C8051 /* EntitiesVisibilityClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -6226,7 +6239,6 @@
 			isa = PBXGroup;
 			children = (
 				8381C8B22BC0619100A470B4 /* RadixConnectMobile.swift */,
-				831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */,
 			);
 			path = Mobile;
 			sourceTree = "<group>";
@@ -6273,6 +6285,8 @@
 		83D908AB2C931A5600822CC4 /* SargonExtensions */ = {
 			isa = PBXGroup;
 			children = (
+				A0CBEFFA2F5B2065004D904F /* SargonDriversFactory.swift */,
+				A0CBEFFB2F5B2065004D904F /* SargonLoggingDriver.swift */,
 				A0FFCE382E2B7D5700C29802 /* NFCSessionClient.swift */,
 				B1C0D1012F0B1A0000A0C001 /* ArculusCSDKDriverNoop.swift */,
 				5B2A0D7C2D354E7F0049C702 /* SargonHostInteractor.swift */,
@@ -6505,6 +6519,36 @@
 				A0B566E72ED75F96002655C0 /* AccessControllerClient+Test.swift */,
 			);
 			path = AccessControllerClient;
+			sourceTree = "<group>";
+		};
+		A0CBEFF52F5B1F8D004D904F /* P2PTransportProfilesClient */ = {
+			isa = PBXGroup;
+			children = (
+				A0CBEFF22F5B1F8D004D904F /* P2PTransportProfilesClient+Interface.swift */,
+				A0CBEFF32F5B1F8D004D904F /* P2PTransportProfilesClient+Live.swift */,
+				A0CBEFF42F5B1F8D004D904F /* P2PTransportProfilesClient+Test.swift */,
+			);
+			path = P2PTransportProfilesClient;
+			sourceTree = "<group>";
+		};
+		A0CBF0012F5B2197004D904F /* RelayServicesSettingsFeature */ = {
+			isa = PBXGroup;
+			children = (
+				A0CBEFFF2F5B2197004D904F /* RelayServicesSettings+Reducer.swift */,
+				A0CBF0002F5B2197004D904F /* RelayServicesSettings+View.swift */,
+			);
+			path = RelayServicesSettingsFeature;
+			sourceTree = "<group>";
+		};
+		A0CBF0062F5B2197004D904F /* SignalingServersSettingsFeature */ = {
+			isa = PBXGroup;
+			children = (
+				A0CBF0022F5B2197004D904F /* SignalingServerDetails+Reducer.swift */,
+				A0CBF0032F5B2197004D904F /* SignalingServerDetails+View.swift */,
+				A0CBF0042F5B2197004D904F /* SignalingServersSettings+Reducer.swift */,
+				A0CBF0052F5B2197004D904F /* SignalingServersSettings+View.swift */,
+			);
+			path = SignalingServersSettingsFeature;
 			sourceTree = "<group>";
 		};
 		A0D742A62DD478BD0062DB01 /* ThemeSelection */ = {
@@ -7138,7 +7182,6 @@
 		E6DBA2582ADEBFB200A38425 /* RadixConnectTests */ = {
 			isa = PBXGroup;
 			children = (
-				830E43AD2C2D8B3800B6E95F /* Mobile */,
 				E6DBA2592ADEBFB200A38425 /* DataChannel */,
 				E6DBA25C2ADEBFB200A38425 /* SignalingServerClient */,
 				E6DBA25E2ADEBFB200A38425 /* Negotiation */,
@@ -8143,7 +8186,6 @@
 				E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */,
 				8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */,
 				E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */,
-				830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */,
 				482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */,
 				8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */,
 				E6DBA3472ADEBFB300A38425 /* HexStringToDataTests.swift in Sources */,
@@ -8551,6 +8593,8 @@
 				48CFC6592ADC10DB00E77A5C /* Profile+Account+Add.swift in Sources */,
 				48CFC3402ADC10D900E77A5C /* DappInteractionCoordinator+View.swift in Sources */,
 				48CFC3152ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes+View.swift in Sources */,
+				A0CBEFFC2F5B2065004D904F /* SargonLoggingDriver.swift in Sources */,
+				A0CBEFFE2F5B2065004D904F /* SargonDriversFactory.swift in Sources */,
 				48CFC2922ADC10D900E77A5C /* TransactionReviewNetworkFee.swift in Sources */,
 				E7607DE22D4CF9B10083B3A5 /* ChoosePersonas+View.swift in Sources */,
 				4813AFF52BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift in Sources */,
@@ -8585,6 +8629,12 @@
 				A04E36302E884E5E00895C35 /* EntityShieldDetails.swift in Sources */,
 				A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */,
 				E7607DE02D4CE3ED0083B3A5 /* ChoosePersonasForShield+View.swift in Sources */,
+				A0CBF0072F5B2197004D904F /* RelayServicesSettings+Reducer.swift in Sources */,
+				A0CBF0082F5B2197004D904F /* RelayServicesSettings+View.swift in Sources */,
+				A0CBF0092F5B2197004D904F /* SignalingServersSettings+Reducer.swift in Sources */,
+				A0CBF00A2F5B2197004D904F /* SignalingServerDetails+Reducer.swift in Sources */,
+				A0CBF00B2F5B2197004D904F /* SignalingServersSettings+View.swift in Sources */,
+				A0CBF00C2F5B2197004D904F /* SignalingServerDetails+View.swift in Sources */,
 				A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */,
 				E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */,
 				48CFC27E2ADC10D900E77A5C /* HUD+View.swift in Sources */,
@@ -9192,7 +9242,6 @@
 				4827521A2BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift in Sources */,
 				48D5F3992BD8DE0A000DE964 /* DebugInspectProfile+View.swift in Sources */,
 				48CFC4222ADC10DA00E77A5C /* BitArray+Extra.swift in Sources */,
-				831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */,
 				48CFC5872ADC10DA00E77A5C /* FaucetClient+Live.swift in Sources */,
 				48CFC2912ADC10D900E77A5C /* TransactionReviewNetworkFee+View.swift in Sources */,
 				A40815B62C7E0D08005E65B9 /* NativeResourcePackageOwnerBadgeValue.swift in Sources */,
@@ -9433,6 +9482,9 @@
 				48D5F3932BD8DDB9000DE964 /* DebugSettingsCoordinator+View.swift in Sources */,
 				48CFC2512ADC10D900E77A5C /* GatewaySettings+Reducer.swift in Sources */,
 				480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */,
+				A0CBEFF62F5B1F8D004D904F /* P2PTransportProfilesClient+Test.swift in Sources */,
+				A0CBEFF72F5B1F8D004D904F /* P2PTransportProfilesClient+Interface.swift in Sources */,
+				A0CBEFF82F5B1F8D004D904F /* P2PTransportProfilesClient+Live.swift in Sources */,
 				48CFC45D2ADC10DA00E77A5C /* TransactionClient+TestValue.swift in Sources */,
 				48CFC2F32ADC10D900E77A5C /* CreatePersonaCoordinator+Models.swift in Sources */,
 				48CFC2772ADC10D900E77A5C /* P2PLinksFeature+View.swift in Sources */,
@@ -10157,7 +10209,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.2.50;
+				version = 1.2.52;
 			};
 		};
 		A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {

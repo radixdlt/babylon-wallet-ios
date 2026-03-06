@@ -1,9 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct AssetTransferMessage: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Kind: Sendable, Hashable {
+struct AssetTransferMessage: FeatureReducer {
+	struct State: Hashable {
+		enum Kind: Hashable {
 			case `private`
 			case `public`
 		}
@@ -24,23 +24,23 @@ struct AssetTransferMessage: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case messageKindTapped
 		case removeMessageTapped
 		case focusChanged(Bool)
 		case messageChanged(String)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case removed
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case messageMode(MessageMode.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case messageMode(MessageMode.Action)
 		}
 

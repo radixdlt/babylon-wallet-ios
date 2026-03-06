@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - FactorSourceAccess.State.Purpose
 extension FactorSourceAccess.State {
-	enum Purpose: Sendable, Hashable {
+	enum Purpose: Hashable {
 		/// Signing a transaction or a subintent.
 		case signature
 

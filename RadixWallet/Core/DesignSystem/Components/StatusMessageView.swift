@@ -23,7 +23,7 @@ struct StatusMessageView: View {
 		self.emphasizedTextStyle = emphasizedTextStyle
 	}
 
-	enum ViewType: Sendable, Hashable {
+	enum ViewType: Hashable {
 		case warning
 		case error
 		case success

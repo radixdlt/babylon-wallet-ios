@@ -92,9 +92,9 @@ extension ProfileStore {
 
 // MARK: "Private"
 extension ProfileStore {
-	func _lens<Property>(
+	func _lens<Property: Sendable & Equatable>(
 		_ transform: @escaping @Sendable (Profile) -> Property?
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+	) -> AnyAsyncSequence<Property> {
 		profileSubject
 			.compactMap { $0.flatMap(transform) }
 			.share() // Multicast

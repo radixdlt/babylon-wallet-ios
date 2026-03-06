@@ -4,7 +4,7 @@ import Foundation
 // MARK: - KeychainClient
 /// A CRUD client around Keychain, that provides async methods for operations that requires auth
 /// and sync methods for operations on data without authentication.
-struct KeychainClient: Sendable {
+struct KeychainClient {
 	var _getServiceAndAccessGroup: GetServiceAndAccessGroup
 	var _containsDataForKey: ContainsDataForKey
 	var _setDataWithoutAuthForKey: SetDataWithoutAuthForKey
@@ -54,7 +54,7 @@ extension KeychainClient {
 	typealias IfNilSetWithoutAuth = IfNilSetWithAttributes<KeychainClient.AttributesWithoutAuth>
 	typealias IfNilSetWithAuth = IfNilSetWithAttributes<KeychainClient.AttributesWithAuth>
 
-	struct IfNilSetWithAttributes<Attributes: KeychainAttributes>: Sendable {
+	struct IfNilSetWithAttributes<Attributes: KeychainAttributes> {
 		typealias GetValueToSet = @Sendable () throws -> Data
 
 		let getValueToSet: GetValueToSet
@@ -66,7 +66,7 @@ extension KeychainClient {
 		}
 	}
 
-	struct KeychainServiceAndAccessGroup: Sendable, Hashable {
+	struct KeychainServiceAndAccessGroup: Hashable {
 		let service: String
 		let accessGroup: String?
 	}

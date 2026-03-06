@@ -36,7 +36,6 @@ extension Discover {
 }
 
 extension Discover.View {
-	@ViewBuilder
 	var socialsSection: some SwiftUI.View {
 		Section {
 			VStack(spacing: .small1) {
@@ -60,7 +59,6 @@ extension Discover.View {
 		}
 	}
 
-	@ViewBuilder
 	var learnSection: some SwiftUI.View {
 		Section {
 			Discover.LearnItemsList.View(store: store.scope(state: \.learnItemsList, action: \.child.learnItemsList))
@@ -72,7 +70,6 @@ extension Discover.View {
 		}
 	}
 
-	@ViewBuilder
 	var blogPostsSection: some SwiftUI.View {
 		Section {
 			Discover.BlogPostsCarousel.View(store: store.scope(state: \.blogPostsCarousel, action: \.child.blogPostsCarousel))
@@ -85,7 +82,6 @@ extension Discover.View {
 		}
 	}
 
-	@ViewBuilder
 	func sectionHeader(title: String, seeMoreAction: Discover.ViewAction? = nil) -> some SwiftUI.View {
 		HStack {
 			Text(title)

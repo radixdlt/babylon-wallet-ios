@@ -1,6 +1,8 @@
 
 extension ButtonStyle where Self == InertButtonStyle {
-	static var inert: Self { .init() }
+	static var inert: Self {
+		.init()
+	}
 }
 
 // MARK: - InertButtonStyle

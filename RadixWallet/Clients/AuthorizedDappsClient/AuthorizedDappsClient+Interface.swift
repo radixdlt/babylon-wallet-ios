@@ -2,7 +2,7 @@ import IdentifiedCollections
 import Sargon
 
 // MARK: - AuthorizedDappsClient
-struct AuthorizedDappsClient: Sendable {
+struct AuthorizedDappsClient {
 	var getAuthorizedDapps: GetAuthorizedDapps
 	var authorizedDappValues: AuthorizedDappValues
 	var addAuthorizedDapp: AddAuthorizedDapp
@@ -11,26 +11,6 @@ struct AuthorizedDappsClient: Sendable {
 	var updateOrAddAuthorizedDapp: UpdateOrAddAuthorizedDapp
 	var deauthorizePersonaFromDapp: DeauthorizePersonaFromDapp
 	var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
-
-	init(
-		getAuthorizedDapps: @escaping GetAuthorizedDapps,
-		authorizedDappValues: @escaping AuthorizedDappValues,
-		addAuthorizedDapp: @escaping AddAuthorizedDapp,
-		forgetAuthorizedDapp: @escaping ForgetAuthorizedDapp,
-		updateAuthorizedDapp: @escaping UpdateAuthorizedDapp,
-		updateOrAddAuthorizedDapp: @escaping UpdateOrAddAuthorizedDapp,
-		deauthorizePersonaFromDapp: @escaping DeauthorizePersonaFromDapp,
-		detailsForAuthorizedDapp: @escaping DetailsForAuthorizedDapp
-	) {
-		self.getAuthorizedDapps = getAuthorizedDapps
-		self.authorizedDappValues = authorizedDappValues
-		self.addAuthorizedDapp = addAuthorizedDapp
-		self.forgetAuthorizedDapp = forgetAuthorizedDapp
-		self.updateAuthorizedDapp = updateAuthorizedDapp
-		self.updateOrAddAuthorizedDapp = updateOrAddAuthorizedDapp
-		self.deauthorizePersonaFromDapp = deauthorizePersonaFromDapp
-		self.detailsForAuthorizedDapp = detailsForAuthorizedDapp
-	}
 }
 
 extension AuthorizedDappsClient {

@@ -87,7 +87,7 @@ final class TransactionClientTests: TestCase {
 		try assertNormalModeFees(for: transaction)
 	}
 
-	func testAdvancedMode() throws {
+	func testAdvancedMode() {
 		let feeLocks = TransactionFee.FeeLocks(nonContingentLock: 10, contingentLock: 0)
 		var advancedMode = TransactionFee.AdvancedFeeCustomization(feeSummary: feeSummary, feeLocks: feeLocks)
 		advancedMode.tipPercentage = 10
@@ -139,10 +139,10 @@ final class TransactionClientTests: TestCase {
 
 		let notary = Curve25519.Signing.PrivateKey()
 
-		let defaultSigners = TransactionSigners(
+		let defaultSigners = try TransactionSigners(
 			notaryPublicKey: notary.publicKey,
 			intentSigning: .intentSigners(
-				.init(rawValue: OrderedSet(signersAfterAnalysis.map { .account($0) }))!
+				XCTUnwrap(.init(rawValue: OrderedSet(signersAfterAnalysis.map { .account($0) })))
 			)
 		)
 
@@ -183,24 +183,24 @@ final class TransactionClientTests: TestCase {
 
 		let unwrapedResult = try XCTUnwrap(result)
 
-		/// Proper fee payer was determined
+		// Proper fee payer was determined
 		XCTAssertEqual(unwrapedResult.payer, potentialCandidate2)
 
 		let expectedSigners = defaultSigners.intentSignerEntitiesOrEmpty().union([.account(potentialCandidate2.account)])
-		/// The FeePayer signature was added to transactionSigners
+		// The FeePayer signature was added to transactionSigners
 		XCTAssertEqual(
 			unwrapedResult.transactionSigners.intentSignerEntitiesOrEmpty(),
 			expectedSigners
 		)
 
 		let expectedfactorsForDevice = defaultFactors + [potentialCandidate2.account.signingFactor]
-		let expectedFactors: SigningFactors = [.device: .init(rawValue: Set(expectedfactorsForDevice))!]
+		let expectedFactors: SigningFactors = try [.device: XCTUnwrap(.init(rawValue: Set(expectedfactorsForDevice)))]
 
-		/// The FeePayer signing factor was added
+		// The FeePayer signing factor was added
 		XCTAssertEqual(unwrapedResult.signingFactors, expectedFactors)
 
 		txFee.updateSignaturesCost(expectedFactors.expectedSignatureCount)
-		/// The lockFee was increased with the additional signature cost.
+		// The lockFee was increased with the additional signature cost.
 		XCTAssertEqual(unwrapedResult.updatedFee.totalFee.lockFee, txFee.totalFee.lockFee)
 	}
 

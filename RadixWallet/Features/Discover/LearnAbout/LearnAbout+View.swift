@@ -21,7 +21,6 @@ extension Discover.LearnAbout {
 }
 
 extension Discover.LearnAbout.View {
-	@ViewBuilder
 	func learnItemsView() -> some SwiftUI.View {
 		ScrollView {
 			Discover.LearnItemsList.View(store: store.scope(state: \.learnItemsList, action: \.child.learnItemsList))
@@ -31,7 +30,6 @@ extension Discover.LearnAbout.View {
 		.background(.secondaryBackground)
 	}
 
-	@ViewBuilder
 	func headerView() -> some SwiftUI.View {
 		searchView()
 			.padding(.horizontal, .medium3)

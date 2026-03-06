@@ -61,7 +61,7 @@ struct SelectNumberOfFactorsView: View {
 
 // MARK: SelectNumberOfFactorsView.Action
 extension SelectNumberOfFactorsView {
-	enum Action: Sendable, Hashable {
+	enum Action: Hashable {
 		case close
 		case set(Threshold)
 	}

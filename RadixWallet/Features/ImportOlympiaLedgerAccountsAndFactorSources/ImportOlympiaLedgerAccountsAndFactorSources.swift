@@ -3,10 +3,10 @@ import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
-struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
+struct ImportOlympiaLedgerAccountsAndFactorSources: FeatureReducer {
 	typealias ValidatedAccounts = NonEmpty<Set<OlympiaAccountToMigrate>>
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let networkID: NetworkID
 
 		/// Not yet migrated, containing unvalidated and validated accounts.
@@ -35,14 +35,14 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
 			case nameLedger(ImportOlympiaNameLedger.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
 			case nameLedger(ImportOlympiaNameLedger.Action)
@@ -58,12 +58,12 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstTask
 		case continueTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case hasAConnectorExtension(Bool)
 
 		/// Starts the process of adding a new Ledger device
@@ -74,15 +74,15 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 
 		case derivedPublicKeys(FactorSourceIdFromHash, [HierarchicalDeterministicPublicKey])
 
-		// Validates and migrates Olympia hardware accounts
+		/// Validates and migrates Olympia hardware accounts
 		case processedOlympiaHardwareAccounts(ValidatedAccounts, MigratedHardwareAccounts)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case failed(Failure)
 		case completed(IdentifiedArrayOf<Account>)
 
-		enum Failure: Sendable, Equatable {
+		enum Failure: Equatable {
 			case failedToSaveNewLedger
 			case failedToDerivePublicKey
 		}
@@ -94,8 +94,6 @@ struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-
-	init() {}
 
 	var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
@@ -345,11 +343,7 @@ extension LedgerHardwareWalletModel {
 }
 
 // MARK: - OlympiaAccountsValidation
-struct OlympiaAccountsValidation: Sendable, Hashable {
+struct OlympiaAccountsValidation: Hashable {
 	var validated: Set<OlympiaAccountToMigrate>
 	var unvalidated: Set<OlympiaAccountToMigrate>
-	init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
-		self.validated = validated
-		self.unvalidated = unvalidated
-	}
 }

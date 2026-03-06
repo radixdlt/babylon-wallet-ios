@@ -3,9 +3,12 @@ import Sargon
 typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Account>>
 
 // MARK: - EntitiesControlledByFactorSource
-struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable {
+struct EntitiesControlledByFactorSource: Hashable, Identifiable {
 	typealias ID = FactorSourceID
-	var id: ID { deviceFactorSource.id.asGeneral }
+	var id: ID {
+		deviceFactorSource.id.asGeneral
+	}
+
 	let entities: [AccountOrPersona]
 	let hiddenEntities: [AccountOrPersona]
 	var isMnemonicPresentInKeychain: Bool
@@ -28,8 +31,8 @@ struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable {
 }
 
 extension EntitiesControlledByFactorSource {
-	struct EntitiesControlledByKeysOnSameCurve: Equatable, Sendable {
-		struct ID: Sendable, Hashable {
+	struct EntitiesControlledByKeysOnSameCurve: Equatable {
+		struct ID: Hashable {
 			let factorSourceID: FactorSourceIdFromHash
 			let isOlympia: Bool
 		}
@@ -80,10 +83,21 @@ extension EntitiesControlledByFactorSource {
 		hiddenAccounts.filter(\.isLegacy).asIdentified()
 	}
 
-	var accounts: [Account] { entities.compactMap { try? $0.asAccount() } }
-	var hiddenAccounts: [Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
-	var personas: [Persona] { entities.compactMap { try? $0.asPersona() } }
-	var hiddenPersonas: [Persona] { hiddenEntities.compactMap { try? $0.asPersona() } }
+	var accounts: [Account] {
+		entities.compactMap { try? $0.asAccount() }
+	}
+
+	var hiddenAccounts: [Account] {
+		hiddenEntities.compactMap { try? $0.asAccount() }
+	}
+
+	var personas: [Persona] {
+		entities.compactMap { try? $0.asPersona() }
+	}
+
+	var hiddenPersonas: [Persona] {
+		hiddenEntities.compactMap { try? $0.asPersona() }
+	}
 }
 
 extension EntitiesControlledByFactorSource {

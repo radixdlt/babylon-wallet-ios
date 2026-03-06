@@ -2,10 +2,12 @@ import ComposableArchitecture
 import SwiftUI
 
 extension FungibleAssetList.Section {
-	struct Row: Sendable, FeatureReducer {
-		struct State: Sendable, Hashable, Identifiable {
+	struct Row: FeatureReducer {
+		struct State: Hashable, Identifiable {
 			typealias ID = ResourceAddress
-			var id: ID { token.resourceAddress }
+			var id: ID {
+				token.resourceAddress
+			}
 
 			var token: OnLedgerEntity.OwnedFungibleResource
 			var isXRD: Bool
@@ -44,11 +46,11 @@ extension FungibleAssetList.Section {
 			}
 		}
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case tapped
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case selected(OnLedgerEntity.OwnedFungibleResource)
 		}
 

@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DappDetails
-struct DappDetails: Sendable, FeatureReducer {
+struct DappDetails: FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
@@ -15,12 +15,12 @@ struct DappDetails: Sendable, FeatureReducer {
 
 	// MARK: State
 
-	struct State: Sendable, Hashable {
-		enum Context: Sendable, Hashable {
+	struct State: Hashable {
+		enum Context: Hashable {
 			case general
 			case settings(SettingsContext)
 
-			enum SettingsContext: Sendable, Hashable {
+			enum SettingsContext: Hashable {
 				case personaDetails
 				case dAppsList
 			}
@@ -30,7 +30,7 @@ struct DappDetails: Sendable, FeatureReducer {
 
 		let dAppDefinitionAddress: DappDefinitionAddress
 
-		// This will only be non-nil if the dApp is in fact authorized
+		/// This will only be non-nil if the dApp is in fact authorized
 		var authorizedDapp: AuthorizedDappDetailed?
 
 		var personaList: PersonaList.State
@@ -49,7 +49,7 @@ struct DappDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		// Authorized dApp
+		/// Authorized dApp
 		init(
 			dApp: AuthorizedDappDetailed,
 			context: Context.SettingsContext,
@@ -68,7 +68,7 @@ struct DappDetails: Sendable, FeatureReducer {
 			self.destination = destination
 		}
 
-		// General
+		/// General
 		init(
 			dAppDefinitionAddress: DappDefinitionAddress,
 			context: Context = .general,
@@ -87,7 +87,7 @@ struct DappDetails: Sendable, FeatureReducer {
 			self.destination = destination
 		}
 
-		struct Resources: Hashable, Sendable {
+		struct Resources: Hashable {
 			var fungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 			var nonFungible: IdentifiedArrayOf<OnLedgerEntity.Resource>
 
@@ -99,7 +99,7 @@ struct DappDetails: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
@@ -108,11 +108,11 @@ struct DappDetails: Sendable, FeatureReducer {
 		case forgetThisDappTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dAppForgotten
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case metadataLoaded(Loadable<OnLedgerEntity.Metadata>)
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
@@ -120,14 +120,14 @@ struct DappDetails: Sendable, FeatureReducer {
 		case mainWebsiteValidated(URL)
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case personaList(PersonaList.Action)
 	}
 
 	// MARK: - Destination
 
 	struct Destination: DestinationReducer {
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case personaDetails(PersonaDetails.State)
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
@@ -135,14 +135,14 @@ struct DappDetails: Sendable, FeatureReducer {
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case personaDetails(PersonaDetails.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
 			case dappDetails(DappDetails.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
-			enum ConfirmDisconnectAlert: Sendable, Equatable {
+			enum ConfirmDisconnectAlert: Equatable {
 				case confirmTapped
 				case cancelTapped
 			}
@@ -172,8 +172,6 @@ struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.rolaClient) var rolaClient
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {

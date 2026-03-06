@@ -3,10 +3,10 @@ import Sargon
 import SwiftUI
 
 // MARK: - ImportMnemonic
-struct ImportMnemonic: Sendable, FeatureReducer {
+struct ImportMnemonic: FeatureReducer {
 	static let wordsPerRow = 3
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var grid: ImportMnemonicGrid.State
 		var bip39Passphrase: String = ""
 
@@ -41,12 +41,12 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State?
 
-		struct PersistStrategy: Sendable, Hashable {
-			enum Location: Sendable, Hashable {
+		struct PersistStrategy: Hashable {
+			enum Location: Hashable {
 				case intoKeychainAndProfile
 			}
 
-			enum OnMnemonicExistsStrategy: Sendable, Hashable {
+			enum OnMnemonicExistsStrategy: Hashable {
 				case abort
 				case appendWithCryptoParamaters
 			}
@@ -66,7 +66,7 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		struct OnContinueWarning: Sendable, Hashable {
+		struct OnContinueWarning: Hashable {
 			let title: String
 			let text: String
 			let button: String
@@ -102,7 +102,7 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 			self.warningOnContinue = warningOnContinue
 		}
 
-		struct Header: Sendable, Hashable {
+		struct Header: Hashable {
 			let title: String
 			let subtitle: String?
 
@@ -113,15 +113,15 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
 		case closeButtonTapped
 		case continueButtonTapped(Mnemonic)
 	}
 
-	enum InternalAction: Sendable, Equatable {
-		struct IntermediaryResult: Sendable, Equatable {
+	enum InternalAction: Equatable {
+		struct IntermediaryResult: Equatable {
 			let factorSource: FactorSource
 			let savedIntoProfile: Bool
 		}
@@ -130,11 +130,11 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case grid(ImportMnemonicGrid.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
@@ -142,15 +142,15 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case onContinueWarning(OnContinueWarning)
 
-			enum OnContinueWarning: Sendable, Hashable {
+			enum OnContinueWarning: Hashable {
 				case buttonTapped
 			}
 		}
@@ -171,8 +171,6 @@ struct ImportMnemonic: Sendable, FeatureReducer {
 	#if DEBUG
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	#endif
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.grid, action: \.child.grid) {

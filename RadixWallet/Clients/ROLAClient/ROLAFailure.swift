@@ -1,6 +1,6 @@
 import Sargon
 
-enum ROLAFailure: Sendable, LocalizedError, Equatable {
+enum ROLAFailure: LocalizedError, Equatable {
 	case wrongAccountType
 	case unknownWebsite
 	case radixJsonNotFound

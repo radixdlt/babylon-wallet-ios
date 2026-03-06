@@ -2,11 +2,6 @@
 struct VPair: View {
 	let heading: String
 	let item: String
-
-	init(heading: String, item: String) {
-		self.heading = heading
-		self.item = item
-	}
 }
 
 extension VPair {
@@ -33,11 +28,6 @@ extension VPair {
 struct HPair: View {
 	let label: String
 	let item: String
-
-	init(label: String, item: String) {
-		self.label = label
-		self.item = item
-	}
 }
 
 extension HPair {

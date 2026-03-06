@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - ImportMnemonicsFlowCoordinator
 @Reducer
-struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
+struct ImportMnemonicsFlowCoordinator: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var factorSourcesToImport: IdentifiedArrayOf<DeviceFactorSource> = []
 		var imported: Set<FactorSourceIDFromHash> = []
 
@@ -20,7 +20,7 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case path(StackActionOf<Path>)
 	}
 
@@ -31,12 +31,12 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case importMnemonic(ImportMnemonicForFactorSource.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case importMnemonic(ImportMnemonicForFactorSource.Action)
 		}
 
@@ -50,15 +50,15 @@ struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstTask
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadedToImport(IdentifiedArrayOf<DeviceFactorSource>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finishedImportingMnemonics(
 			imported: Set<FactorSourceIdFromHash>
 		)

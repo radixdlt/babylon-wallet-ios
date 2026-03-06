@@ -1,9 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct DappInteractionCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum ChildState: Sendable, Hashable {
+struct DappInteractionCoordinator: FeatureReducer {
+	struct State: Hashable {
+		enum ChildState: Hashable {
 			case loading(DappInteractionLoading.State)
 			case originVerification(DappInteractionOriginVerification.State)
 			case flow(DappInteractionFlow.State)
@@ -21,25 +21,25 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case malformedInteractionErrorAlert(PresentationAction<MalformedInteractionErrorAlertAction>)
 
-		enum MalformedInteractionErrorAlertAction: Sendable, Equatable {
+		enum MalformedInteractionErrorAlertAction: Equatable {
 			case okButtonTapped
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case presentMalformedInteractionErrorAlert
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case loading(DappInteractionLoading.Action)
 		case originVerification(DappInteractionOriginVerification.Action)
 		case flow(DappInteractionFlow.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case submit(WalletToDappInteractionResponse, DappMetadata, NotarizedTransaction?)
 		case dismiss(DappMetadata, DappInteractionCompletionKind)
 		case dismissSilently

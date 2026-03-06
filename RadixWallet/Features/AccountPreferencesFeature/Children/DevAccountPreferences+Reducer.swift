@@ -3,12 +3,14 @@ import Sargon
 import SwiftUI
 
 // MARK: - DevAccountPreferences
-struct DevAccountPreferences: Sendable, FeatureReducer {
+struct DevAccountPreferences: FeatureReducer {
 	// MARK: - State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let account: Account
-		var address: AccountAddress { account.address }
+		var address: AccountAddress {
+			account.address
+		}
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -38,7 +40,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case closeButtonTapped
 		case closeTransactionButtonTapped
@@ -52,7 +54,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif // DEBUG
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		#if DEBUG
 		case reviewTransaction(TransactionManifest)
 		case canCreateAuthSigningKey(Bool)
@@ -60,7 +62,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif // DEBUG
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 	}
 
@@ -68,14 +70,14 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
@@ -96,8 +98,6 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 	#if DEBUG
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	#endif // DEBUG
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -156,6 +156,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
+
 		case .createMultipleFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let manifest = TransactionManifest.createMultipleFungibleTokens(
@@ -167,6 +168,7 @@ struct DevAccountPreferences: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
 			}
+
 		case .createMultipleNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let manifest = TransactionManifest.createMultipleNonFungibleTokens(

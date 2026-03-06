@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - ManageThirdPartyDeposits
-struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
-	struct State: Hashable, Sendable {
+struct ManageThirdPartyDeposits: FeatureReducer {
+	struct State: Hashable {
 		var account: Account
 
 		var depositRule: DepositRule {
@@ -22,26 +22,26 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case updateTapped
 		case rowTapped(ManageThirdPartyDeposits.Section.Row)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case accountUpdated
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case updated(Account)
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case allowDenyAssets(ResourcesList.State)
 			case allowDepositors(ResourcesList.State)
 		}
 
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case allowDenyAssets(ResourcesList.Action)
 			case allowDepositors(ResourcesList.Action)
 		}
@@ -129,7 +129,7 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Account) -> Effect<Action> {
 		.run { send in
 			do {
-				/// Wait for user to complete the interaction with Transaction Review
+				// Wait for user to complete the interaction with Transaction Review
 				let result = await dappInteractionClient.addWalletInteraction(
 					.transaction(.init(send: .init(transactionManifest: manifest))),
 					.accountDepositSettings
@@ -138,10 +138,10 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				switch result.p2pResponse {
 				case let .dapp(.success(success)):
 					if case let .transaction(tx) = success.items {
-						/// Wait for the transaction to be committed
+						// Wait for the transaction to be committed
 						let txID = tx.send.transactionIntentHash
 						if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
-							/// Safe to update the account to new state
+							// Safe to update the account to new state
 							try await accountsClient.updateAccount(updatedAccount)
 							await send(.internal(.updated(updatedAccount)))
 						}
@@ -150,8 +150,8 @@ struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 					assertionFailure("Not a transaction Response?")
 				case .dapp(.failure):
-					/// Either user did dismiss the TransctionReview, or there was a failure.
-					/// Any failure message will be displayed in Transaction Review
+					// Either user did dismiss the TransctionReview, or there was a failure.
+					// Any failure message will be displayed in Transaction Review
 					break
 				}
 

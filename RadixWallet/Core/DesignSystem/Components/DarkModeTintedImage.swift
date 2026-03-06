@@ -7,7 +7,7 @@
 import SwiftUI
 
 extension Image {
-	@MainActor @ViewBuilder
+	@MainActor
 	func darkModeTinted() -> some View {
 		DarkModeTintedImageModifier(image: self)
 	}
@@ -17,10 +17,6 @@ extension Image {
 struct DarkModeTintedImageModifier: View {
 	@Environment(\.colorScheme) var colorScheme
 	var image: Image
-
-	init(image: Image) {
-		self.image = image
-	}
 
 	var body: some View {
 		image

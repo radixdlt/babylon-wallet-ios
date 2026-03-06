@@ -70,7 +70,7 @@ final class SignalingClientTests: TestCase {
 		)
 	}
 
-	func testSendMessage_awaitsConfirmation() async throws {
+	func testSendMessage_awaitsConfirmation() async {
 		let exp = expectation(description: "exp")
 		Task {
 			try await signalingClient.sendToRemote(Self.offer)
@@ -121,7 +121,7 @@ final class SignalingClientTests: TestCase {
 			method: "offer",
 			stream: signalingClient.onOffer,
 			expected: IdentifiedRTCOffer(
-				Self.offer.value.offer!,
+				XCTUnwrap(Self.offer.value.offer),
 				id: Self.offer.id
 			)
 		)
@@ -133,7 +133,7 @@ final class SignalingClientTests: TestCase {
 			method: "answer",
 			stream: signalingClient.onAnswer,
 			expected: IdentifiedRTCAnswer(
-				Self.answer.value.answer!,
+				XCTUnwrap(Self.answer.value.answer),
 				id: Self.answer.id
 			)
 		)
@@ -145,7 +145,7 @@ final class SignalingClientTests: TestCase {
 			method: "iceCandidate",
 			stream: signalingClient.onICECanddiate,
 			expected: IdentifiedRTCICECandidate(
-				Self.iceCandidate.value.iceCandidate!,
+				XCTUnwrap(Self.iceCandidate.value.iceCandidate),
 				id: Self.iceCandidate.id
 			)
 		)

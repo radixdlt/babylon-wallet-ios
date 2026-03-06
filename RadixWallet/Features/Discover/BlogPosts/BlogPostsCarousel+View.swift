@@ -21,7 +21,6 @@ extension Discover.BlogPostsCarousel {
 			}
 		}
 
-		@ViewBuilder
 		private func errorView(_ error: Error) -> some SwiftUI.View {
 			VStack(spacing: .small2) {
 				Image(systemName: "arrow.clockwise")
@@ -42,7 +41,6 @@ extension Discover.BlogPostsCarousel {
 			.frame(maxWidth: .infinity)
 		}
 
-		@ViewBuilder
 		private func loadingView() -> some SwiftUI.View {
 			VStack {
 				TabView(selection: $selectedCardIndex) {
@@ -59,7 +57,6 @@ extension Discover.BlogPostsCarousel {
 			}
 		}
 
-		@ViewBuilder
 		private func successView(_ posts: BlogPosts) -> some SwiftUI.View {
 			VStack {
 				postsView(posts)
@@ -70,7 +67,6 @@ extension Discover.BlogPostsCarousel {
 			.shadow(color: .shadow.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 		}
 
-		@ViewBuilder
 		private func postsView(_ posts: BlogPosts) -> some SwiftUI.View {
 			TabView(selection: $selectedCardIndex) {
 				ForEach(Array(posts.posts.prefix(Self.numberOfDisplayedBlogPosts).enumerated()), id: \.offset) { idx, post in
@@ -82,7 +78,6 @@ extension Discover.BlogPostsCarousel {
 			.tabViewStyle(.page(indexDisplayMode: .never))
 		}
 
-		@ViewBuilder
 		private var positionIndicator: some SwiftUI.View {
 			HStack(spacing: .small2) {
 				ForEach(0 ..< 3, id: \.self) { index in

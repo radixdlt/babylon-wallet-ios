@@ -5,7 +5,7 @@ import SargonUniFFI
 /// It mainly initializes the `live` version Sargon.RadixConnectMobile and
 /// exposes the incomming messages stream.
 struct RadixConnectMobile {
-	private let radixConnectMobile = Sargon.RadixConnectMobile.live(sessionStorage: SecureSessionStorage())
+	private let radixConnectMobile = Sargon.RadixConnectMobile.live(os: SargonOS.shared)
 	private let incomingMessagesSubject: AsyncReplaySubject<P2P.RTCIncomingMessage> = .init(bufferSize: 1)
 }
 

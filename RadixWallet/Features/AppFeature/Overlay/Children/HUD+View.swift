@@ -9,7 +9,7 @@ extension HUD.State {
 
 // MARK: - HUD.View
 extension HUD {
-	struct ViewState: Equatable, Sendable {
+	struct ViewState: Equatable {
 		let offset: Double
 		let text: String
 		let icon: OverlayWindowClient.Item.Icon?

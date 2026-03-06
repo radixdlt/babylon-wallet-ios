@@ -1,20 +1,20 @@
 // MARK: - BlogPostsCarousel
 extension Discover {
 	@Reducer
-	struct BlogPostsCarousel: Sendable, FeatureReducer {
+	struct BlogPostsCarousel: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			var posts: Loadable<BlogPosts> = .idle
 		}
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case task
 			case refreshButtonTapped
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case loadPostsResult(TaskResult<BlogPosts>)
 		}
 

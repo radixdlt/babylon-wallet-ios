@@ -1,6 +1,6 @@
 
 #if DEBUG
-// https://gist.github.com/cprovatas/5c9f51813bc784ef1d7fcbfb89de74fe
+/// https://gist.github.com/cprovatas/5c9f51813bc784ef1d7fcbfb89de74fe
 extension Data {
 	/// NSString gives us a nice sanitized debugDescription
 	var prettyPrintedJSONString: NSString? {

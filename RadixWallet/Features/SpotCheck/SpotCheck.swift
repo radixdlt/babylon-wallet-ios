@@ -1,8 +1,8 @@
 // MARK: - SpotCheck
 @Reducer
-struct SpotCheck: Sendable, FeatureReducer {
+struct SpotCheck: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var factorSourceAccess: FactorSourceAccess.State
 
 		init(factorSource: FactorSource, allowSkip: Bool) {
@@ -13,15 +13,15 @@ struct SpotCheck: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
-	enum InternalAction: Sendable, Hashable {
+	enum InternalAction: Hashable {
 		case spotCheckSucceeded(FactorSourceID)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case cancelled
 		case skipped
 		case validated

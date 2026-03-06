@@ -7,7 +7,7 @@ extension SignalingClient {
 	enum EncryptionKeyTag {}
 	typealias EncryptionKey = Tagged<EncryptionKeyTag, Exactly32Bytes>
 
-	enum ClientSource: String, Sendable, Codable, Equatable {
+	enum ClientSource: String, Codable, Equatable {
 		case wallet
 		case `extension`
 	}

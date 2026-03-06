@@ -2,7 +2,7 @@ import WebRTC
 
 // MARK: - DataChannelClient.Message
 extension DataChannelClient {
-	enum Message: Codable, Sendable, Equatable {
+	enum Message: Codable, Equatable {
 		case chunkedMessage(ChunkedMessage)
 		case receipt(Receipt)
 	}
@@ -11,12 +11,12 @@ extension DataChannelClient {
 extension DataChannelClient.Message {
 	typealias ID = Tagged<Self, String>
 
-	enum ChunkedMessage: Codable, Sendable, Equatable {
+	enum ChunkedMessage: Codable, Equatable {
 		case metaData(MetaDataPackage)
 		case chunk(ChunkPackage)
 	}
 
-	enum Receipt: Codable, Sendable, Equatable {
+	enum Receipt: Codable, Equatable {
 		case receiveMessageConfirmation(ReceiveConfirmation)
 		case receiveMessageError(ReceiveError)
 	}
@@ -37,14 +37,14 @@ extension DataChannelClient.Message {
 }
 
 extension DataChannelClient.Message.ChunkedMessage {
-	struct MetaDataPackage: Sendable, Equatable, Codable {
+	struct MetaDataPackage: Equatable, Codable {
 		let messageId: DataChannelClient.Message.ID
 		let chunkCount: Int
 		let messageByteCount: Int
 		let hashOfMessage: HexCodable
 	}
 
-	struct ChunkPackage: Sendable, Equatable, Codable {
+	struct ChunkPackage: Equatable, Codable {
 		let messageId: DataChannelClient.Message.ID
 		let chunkIndex: Int
 		let chunkData: Data
@@ -69,19 +69,19 @@ extension DataChannelClient.Message.ChunkedMessage {
 
 // MARK: - DataChannelClient.Message.ChunkedMessage.ChunkPackage + Comparable
 extension DataChannelClient.Message.ChunkedMessage.ChunkPackage: Comparable {
-	// Comparable so we can sort them conveniently if received unsorted.
+	/// Comparable so we can sort them conveniently if received unsorted.
 	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.chunkIndex < rhs.chunkIndex
 	}
 }
 
 extension DataChannelClient.Message.Receipt {
-	struct ReceiveConfirmation: Sendable, Equatable, Codable {
+	struct ReceiveConfirmation: Equatable, Codable {
 		let messageId: DataChannelClient.Message.ID
 	}
 
-	struct ReceiveError: Sendable, Equatable, Codable, LocalizedError {
-		enum Reason: String, Sendable, Codable {
+	struct ReceiveError: Equatable, Codable, LocalizedError {
+		enum Reason: String, Codable {
 			case messageHashesMismatch
 		}
 

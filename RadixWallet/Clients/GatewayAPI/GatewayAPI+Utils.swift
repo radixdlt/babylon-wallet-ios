@@ -51,7 +51,7 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 }
 
 // MARK: - EntityMetadataKey
-enum EntityMetadataKey: String, CaseIterable, Sendable {
+enum EntityMetadataKey: String, CaseIterable {
 	case name
 	case symbol
 	case description
@@ -71,7 +71,7 @@ enum EntityMetadataKey: String, CaseIterable, Sendable {
 	case ownerKeys = "owner_keys"
 	case ownerBadge = "owner_badge"
 
-	// The GW limits the number of metadata keys we can ask for
+	/// The GW limits the number of metadata keys we can ask for
 	static let maxAllowedKeys = 11
 }
 

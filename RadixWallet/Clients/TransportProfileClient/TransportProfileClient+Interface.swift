@@ -3,20 +3,10 @@ import Sargon
 typealias DeviceID = UUID
 
 // MARK: - TransportProfileClient
-struct TransportProfileClient: Sendable {
+struct TransportProfileClient {
 	var importProfile: ImportProfile
 	var profileForExport: ProfileForExport
 	var didExportProfile: DidExportProfile
-
-	init(
-		importProfile: @escaping ImportProfile,
-		profileForExport: @escaping ProfileForExport,
-		didExportProfile: @escaping DidExportProfile
-	) {
-		self.importProfile = importProfile
-		self.profileForExport = profileForExport
-		self.didExportProfile = didExportProfile
-	}
 }
 
 extension TransportProfileClient {

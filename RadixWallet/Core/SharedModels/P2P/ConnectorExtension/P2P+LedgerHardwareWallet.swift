@@ -11,7 +11,7 @@ extension P2P {
 
 		typealias InteractionId = Tagged<Self, String>
 
-		enum Discriminator: String, Sendable, Hashable, Codable {
+		enum Discriminator: String, Hashable, Codable {
 			case getDeviceInfo
 			case derivePublicKeys
 			case signTransaction
@@ -20,21 +20,21 @@ extension P2P {
 			case deriveAndDisplayAddress
 		}
 
-		// N.B. these *might* have the exact same JSON representation as
-		// `LedgerHardwareWalletFactorSource.Model` but in case we ever
-		// change the JSON values for CAP21 or for Profile, we want them
-		// to be **decoupled**.
-		enum Model: String, Sendable, Hashable, Codable {
+		/// N.B. these *might* have the exact same JSON representation as
+		/// `LedgerHardwareWalletFactorSource.Model` but in case we ever
+		/// change the JSON values for CAP21 or for Profile, we want them
+		/// to be **decoupled**.
+		enum Model: String, Hashable, Codable {
 			case nanoS
 			case nanoSPlus = "nanoS+"
 			case nanoX
 		}
 
-		// N.B. these *might* have the exact same JSON representation as
-		// `LedgerHardwareWalletFactorSource.Device` but in case we ever
-		// change the JSON values for CAP21 or for Profile, we want them
-		// to be **decoupled**.
-		struct LedgerDevice: Sendable, Hashable, Codable {
+		/// N.B. these *might* have the exact same JSON representation as
+		/// `LedgerHardwareWalletFactorSource.Device` but in case we ever
+		/// change the JSON values for CAP21 or for Profile, we want them
+		/// to be **decoupled**.
+		struct LedgerDevice: Hashable, Codable {
 			let name: NonEmptyString?
 
 			/// `FactorSourceID`
@@ -48,10 +48,10 @@ extension P2P {
 			}
 		}
 
-		struct KeyParameters: Sendable, Hashable, Codable {
+		struct KeyParameters: Hashable, Codable {
 			let curve: Curve
 			let derivationPath: String
-			enum Curve: String, Sendable, Hashable, Codable {
+			enum Curve: String, Hashable, Codable {
 				case curve25519
 				case secp256k1
 			}

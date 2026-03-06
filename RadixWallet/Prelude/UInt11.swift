@@ -1,5 +1,5 @@
 // MARK: - UInt11
-struct UInt11: Sendable, Hashable, ExpressibleByIntegerLiteral, Comparable {
+struct UInt11: Hashable, ExpressibleByIntegerLiteral, Comparable {
 	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.valueBoundBy16Bits < rhs.valueBoundBy16Bits
 	}
@@ -16,10 +16,21 @@ struct UInt11: Sendable, Hashable, ExpressibleByIntegerLiteral, Comparable {
 
 // MARK: - Static min/max
 extension UInt11 {
-	static var bitWidth: Int { 11 }
-	static var max16: UInt16 { UInt16(2047) }
-	static var max: UInt11 { UInt11(exactly: max16)! }
-	static var min: UInt11 { 0 }
+	static var bitWidth: Int {
+		11
+	}
+
+	static var max16: UInt16 {
+		UInt16(2047)
+	}
+
+	static var max: UInt11 {
+		UInt11(exactly: max16)!
+	}
+
+	static var min: UInt11 {
+		0
+	}
 }
 
 // MARK: - Convenience Init
@@ -72,7 +83,7 @@ extension FixedWidthInteger {
 		Self.bitWidth / .bitsPerByte
 	}
 
-	// Inspired by: https://developer.apple.com/documentation/swift/fixedwidthinteger
+	/// Inspired by: https://developer.apple.com/documentation/swift/fixedwidthinteger
 	var binaryString: String {
 		var result: [String] = []
 		for i in 0 ..< byteCount {
@@ -91,7 +102,7 @@ extension Int {
 }
 
 extension Data {
-	// Inspired by: https://developer.apple.com/documentation/swift/fixedwidthinteger
+	/// Inspired by: https://developer.apple.com/documentation/swift/fixedwidthinteger
 	var binaryString: String {
 		var result: [String] = []
 		for byte in self {

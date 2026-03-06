@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct NameAccount: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct NameAccount: FeatureReducer {
+	struct State: Hashable {
 		var isFirst: Bool
 		var inputtedName: String
 		var sanitizedName: NonEmptyString?
@@ -22,12 +22,12 @@ struct NameAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case confirmNameButtonTapped(NonEmptyString)
 		case textFieldChanged(String)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case proceed(accountName: NonEmpty<String>)
 	}
 

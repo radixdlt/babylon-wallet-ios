@@ -1,5 +1,7 @@
 extension ButtonStyle where Self == HeaderButtonStyle {
-	static var header: HeaderButtonStyle { .init() }
+	static var header: HeaderButtonStyle {
+		.init()
+	}
 }
 
 // MARK: - HeaderButtonStyle

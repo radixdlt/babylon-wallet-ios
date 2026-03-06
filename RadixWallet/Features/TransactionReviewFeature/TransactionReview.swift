@@ -2,10 +2,10 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionReview
-struct TransactionReview: Sendable, FeatureReducer {
+struct TransactionReview: FeatureReducer {
 	typealias Common = InteractionReview
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var displayMode: Common.DisplayMode = .detailed
 
 		let nonce: Nonce
@@ -16,7 +16,9 @@ struct TransactionReview: Sendable, FeatureReducer {
 		let proposingDappMetadata: DappMetadata.Ledger?
 		let p2pRoute: P2P.Route
 
-		var networkID: NetworkID? { reviewedTransaction?.networkID }
+		var networkID: NetworkID? {
+			reviewedTransaction?.networkID
+		}
 
 		var reviewedTransaction: ReviewedTransaction? = nil
 		var notarizedTransaction: NotarizedTransaction? = nil
@@ -91,20 +93,20 @@ struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case showRawTransactionTapped
 		case approvalSliderSlid
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case sections(Common.Sections.Action)
 		case proofs(Common.Proofs.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case buildTransactionIntentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
@@ -114,7 +116,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		case tooManyFactorsSkipped(TransactionIntent)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntentHash, NotarizedTransaction?)
 		case transactionCompleted(TransactionIntentHash)
@@ -123,7 +125,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case submitting(SubmitTransaction.State)
 			case customizeFees(CustomizeFees.State)
@@ -133,7 +135,7 @@ struct TransactionReview: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case submitting(SubmitTransaction.Action)
 			case customizeFees(CustomizeFees.Action)
@@ -167,8 +169,6 @@ struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.sections, action: \.child.sections) {
@@ -589,10 +589,6 @@ extension TransactionReview {
 // MARK: - FailedToAddLockFee
 struct FailedToAddLockFee: LocalizedError {
 	let underlyingError: Swift.Error
-	init(underlyingError: Swift.Error) {
-		self.underlyingError = underlyingError
-	}
-
 	var errorDescription: String? {
 		#if DEBUG
 		L10n.Error.TransactionFailure.failedToAddLockFee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
@@ -605,10 +601,6 @@ struct FailedToAddLockFee: LocalizedError {
 // MARK: - FailedToAddGuarantee
 struct FailedToAddGuarantee: LocalizedError {
 	let underlyingError: Swift.Error
-	init(underlyingError: Swift.Error) {
-		self.underlyingError = underlyingError
-	}
-
 	var errorDescription: String? {
 		#if DEBUG
 		L10n.Error.TransactionFailure.failedToAddGuarantee + "\n[DEBUG ONLY]: \(String(describing: underlyingError))"
@@ -782,7 +774,7 @@ struct TransactionReviewFailure: LocalizedError {
 }
 
 // MARK: - ReviewedTransaction
-struct ReviewedTransaction: Hashable, Sendable {
+struct ReviewedTransaction: Hashable {
 	let transactionManifest: TransactionManifest
 	let executionSummary: ExecutionSummary
 	let networkID: NetworkID
@@ -798,12 +790,12 @@ struct ReviewedTransaction: Hashable, Sendable {
 }
 
 // MARK: - FeePayerValidationOutcome
-enum FeePayerValidationOutcome: Sendable, Hashable {
+enum FeePayerValidationOutcome: Hashable {
 	case needsFeePayer
 	case insufficientBalance
 	case valid(Details?)
 
-	enum Details: Sendable {
+	enum Details {
 		case introducesNewAccount
 		case feePayerSuperfluous
 	}

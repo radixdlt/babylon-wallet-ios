@@ -1,5 +1,5 @@
 // MARK: - MakeTransactionHeaderInput
-struct MakeTransactionHeaderInput: Sendable, Hashable {
+struct MakeTransactionHeaderInput: Hashable {
 	var epochWindow: Epoch
 	var costUnitLimit: UInt32
 	var tipPercentage: UInt16

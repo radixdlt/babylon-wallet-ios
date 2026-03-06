@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - PrimaryRoleSetup
 @Reducer
-struct PrimaryRoleSetup: FeatureReducer, Sendable {
+struct PrimaryRoleSetup: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var factorSourcesFromProfile: [FactorSource] = []
@@ -17,7 +17,7 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case task
 		case continueButtonTapped
 		case addFactorSourceButtonTapped(ChooseFactorSourceContext)
@@ -30,23 +30,23 @@ struct PrimaryRoleSetup: FeatureReducer, Sendable {
 		case unsafeCombinationReadMoreTapped
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case setFactorSources([FactorSource])
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case chooseFactorSource(ChooseFactorSourceContext)
 		case finished
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case selectNumberOfFactorsView
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case selectNumberOfFactorsView(SelectNumberOfFactorsView.Action)
 		}
 

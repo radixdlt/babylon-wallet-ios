@@ -1,5 +1,5 @@
 // MARK: - ROLAClient
-struct ROLAClient: Sendable, DependencyKey {
+struct ROLAClient: DependencyKey {
 	/// verifies that the component on ledger at 'dAppDefinitionAddress' matches the metadata in the request from the dapp.
 	/// it does so by fetching the metadata for dAppDefinitionAddress
 	/// and asserting that the `accounType` is "dapp definition" and that its `relatedWebsites` contain the `metadata.origin`

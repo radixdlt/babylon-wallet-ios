@@ -1,9 +1,9 @@
 // MARK: - ArculusForgotPIN-EnterNewPIN
 extension ArculusForgotPIN {
 	@Reducer
-	struct EnterNewPIN: Sendable, FeatureReducer {
+	struct EnterNewPIN: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let factorSource: ArculusCardFactorSource
 			let mnemonic: Mnemonic
 			var createPIN: ArculusCreatePIN.State = .init()
@@ -12,11 +12,11 @@ extension ArculusForgotPIN {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ChildAction: Sendable, Hashable {
+		enum ChildAction: Hashable {
 			case createPIN(ArculusCreatePIN.Action)
 		}
 
-		enum DelegateAction: Sendable, Hashable {
+		enum DelegateAction: Hashable {
 			case finished
 		}
 

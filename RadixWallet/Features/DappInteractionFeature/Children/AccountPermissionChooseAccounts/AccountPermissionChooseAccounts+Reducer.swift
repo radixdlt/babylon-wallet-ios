@@ -6,9 +6,9 @@ import SwiftUI
 typealias AccountPermissionChooseAccountsResult = WalletToDappInteractionResponse.Accounts
 
 // MARK: - AccountPermissionChooseAccounts
-struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum AccessKind: Sendable, Hashable {
+struct AccountPermissionChooseAccounts: FeatureReducer {
+	struct State: Hashable {
+		enum AccessKind: Hashable {
 			case ongoing
 			case oneTime
 		}
@@ -47,20 +47,20 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case continueButtonTapped([ChooseAccountsRow.State])
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case handleSignedAuthIntent(SignedAuthIntent, selectedAccounts: [Account])
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case `continue`(
 			accessKind: AccountPermissionChooseAccounts.State.AccessKind,
 			chosenAccounts: AccountPermissionChooseAccountsResult

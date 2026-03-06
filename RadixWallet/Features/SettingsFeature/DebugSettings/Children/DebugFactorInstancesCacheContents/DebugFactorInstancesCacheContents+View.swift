@@ -27,7 +27,6 @@ extension DebugFactorInstancesCacheContents {
 			}
 		}
 
-		@ViewBuilder
 		private func content(instances: Instances) -> some SwiftUI.View {
 			ScrollView {
 				VStack(alignment: .leading) {

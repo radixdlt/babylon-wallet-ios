@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountPermission
-struct AccountPermission: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct AccountPermission: FeatureReducer {
+	struct State: Hashable {
 		let dappMetadata: DappMetadata
 		let numberOfAccounts: DappInteractionNumberOfAccounts
 
@@ -16,12 +16,12 @@ struct AccountPermission: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case continueButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case continueButtonTapped
 	}
 

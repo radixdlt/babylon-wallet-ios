@@ -8,7 +8,7 @@ extension DispatchQueue.SchedulerOptions: @unchecked Sendable {}
 extension DispatchQueue.SchedulerTimeType.Stride: @unchecked Sendable {}
 
 // MARK: - AsyncWebSocket
-/*
+/**
  A WebSocket implementation with AsyncAPI.
  One of the main functionality of this component is the recovering after
  any possible error: send/receive errors, aswell intternet connection going down.

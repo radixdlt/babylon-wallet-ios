@@ -2,7 +2,7 @@ import Algorithms
 import Sargon
 
 // MARK: - GatewayAPIClient
-struct GatewayAPIClient: Sendable, DependencyKey {
+struct GatewayAPIClient: DependencyKey {
 	// MARK: Request
 	var getNetworkName: GetNetworkName
 	var getEpoch: GetEpoch
@@ -76,8 +76,8 @@ extension GatewayAPIClient {
 		return item
 	}
 
-	// The maximum number of addresses the `getEntityDetails` can accept
-	// This needs to be synchronized with the actual value on the GW side
+	/// The maximum number of addresses the `getEntityDetails` can accept
+	/// This needs to be synchronized with the actual value on the GW side
 	static let entityDetailsPageSize = 20
 
 	/// Loads the details for all the addresses provided.
@@ -87,8 +87,8 @@ extension GatewayAPIClient {
 		optIns: GatewayAPI.StateEntityDetailsOptIns,
 		selector: GatewayAPI.LedgerStateSelector? = nil
 	) async throws -> GatewayAPI.StateEntityDetailsResponse {
-		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
-		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
+		// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
+		// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
 		let allResponses = try await addresses
 			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
 			.map(Array.init)

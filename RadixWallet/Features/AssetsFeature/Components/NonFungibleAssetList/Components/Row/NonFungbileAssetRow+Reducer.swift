@@ -3,11 +3,14 @@ import SwiftUI
 
 // MARK: - NonFungibleAssetList.Row
 extension NonFungibleAssetList {
-	struct Row: Sendable, FeatureReducer {
-		struct State: Sendable, Hashable, Identifiable {
+	struct Row: FeatureReducer {
+		struct State: Hashable, Identifiable {
 			static let pageSize = OnLedgerEntitiesClient.maximumNFTIDChunkSize
 
-			var id: ResourceAddress { resource.resourceAddress }
+			var id: ResourceAddress {
+				resource.resourceAddress
+			}
+
 			typealias AssetID = OnLedgerEntity.NonFungibleToken.ID
 
 			var resource: OnLedgerEntity.OwnedNonFungibleResource
@@ -42,18 +45,18 @@ extension NonFungibleAssetList {
 			}
 		}
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case isExpandedToggled
 			case assetTapped(OnLedgerEntity.NonFungibleToken)
 			case onTokenDidAppear(index: Int)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case open(OnLedgerEntity.NonFungibleToken)
 		}
 
-		enum InternalAction: Sendable, Equatable {
-			struct TokensLoadResult: Sendable, Equatable {
+		enum InternalAction: Equatable {
+			struct TokensLoadResult: Equatable {
 				let tokens: [OnLedgerEntity.NonFungibleToken]
 				let nextPageCursor: String?
 				let previousTokenIndex: Int
@@ -92,7 +95,7 @@ extension NonFungibleAssetList {
 
 			case let .onTokenDidAppear(index):
 				state.lastVisibleRowIndex = index
-				/// Load next page if not currently loading, there are more pages to load and current page was not loaded.
+				// Load next page if not currently loading, there are more pages to load and current page was not loaded.
 				if state.isLoadingResources == false, state.nextPageCursor != nil, index > state.lastLoadedTokenIndex {
 					return loadResources(&state, previousTokenIndex: state.lastLoadedTokenIndex)
 				}
@@ -110,8 +113,8 @@ extension NonFungibleAssetList {
 					state.tokens[tokensPage.previousTokenIndex ..< tokensPage.previousTokenIndex + success.count] = success[0 ..< success.count]
 					state.lastLoadedTokenIndex = tokensPage.previousTokenIndex + success.count
 
-					/// If user did quick scroll over the currently loading page, proactively load the next page.
-					/// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
+					// If user did quick scroll over the currently loading page, proactively load the next page.
+					// If there are 5 pages in total, and user did scroll fast to last one, this will load all pages in chain, one after another.
 					if state.lastVisibleRowIndex - State.pageSize + 2 > state.lastLoadedTokenIndex {
 						return loadResources(&state, previousTokenIndex: state.lastLoadedTokenIndex)
 					}

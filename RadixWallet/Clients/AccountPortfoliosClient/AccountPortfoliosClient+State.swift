@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Definition
 extension AccountPortfoliosClient {
-	struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
+	struct AccountPortfolio: Hashable, CustomDebugStringConvertible {
 		/// The visible account to consumers of this portfolio. It has already removed any reference to hidden resources.
 		var account: OnLedgerEntity.OnLedgerAccount
 
@@ -70,8 +70,8 @@ extension AccountPortfoliosClient {
 		var selectedCurrency: FiatCurrency = .usd
 		var isCurrencyAmountVisible: Bool = true
 
-		// Useful for DEBUG mode, when we want to display proper resources fiat worth on mainnet
-		// but use random prices on testnets; as one resources from mainnet have prices.
+		/// Useful for DEBUG mode, when we want to display proper resources fiat worth on mainnet
+		/// but use random prices on testnets; as one resources from mainnet have prices.
 		var gateway: Gateway = .mainnet
 	}
 }

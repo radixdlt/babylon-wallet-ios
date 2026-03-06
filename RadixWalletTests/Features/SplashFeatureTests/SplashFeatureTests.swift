@@ -5,7 +5,7 @@ import XCTest
 // MARK: - SplashFeatureTests
 @MainActor
 final class SplashFeatureTests: TestCase {
-	func test__GIVEN__splash_appeared__WHEN__advanced_lock_enabled__AND__message_not_shown() async throws {
+	func test__GIVEN__splash_appeared__WHEN__advanced_lock_enabled__AND__message_not_shown() async {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
 		let clock = TestClock()
@@ -75,7 +75,7 @@ final class SplashFeatureTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__splash_appeared__WHEN__advanced_lock_disabled() async throws {
+	func test__GIVEN__splash_appeared__WHEN__advanced_lock_disabled() async {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
 		let clock = TestClock()

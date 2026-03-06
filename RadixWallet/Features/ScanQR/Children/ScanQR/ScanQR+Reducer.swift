@@ -3,9 +3,9 @@ import SwiftUI
 
 // MARK: - ScanQR
 @Reducer
-struct ScanQR: Sendable, FeatureReducer {
+struct ScanQR: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let kind: Kind
 		#if targetEnvironment(simulator)
 		var manualQRContent: String
@@ -29,7 +29,7 @@ struct ScanQR: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case scanned(TaskResult<String>)
 		#if targetEnvironment(simulator)
 		case manualQRContentChanged(String)
@@ -37,7 +37,7 @@ struct ScanQR: Sendable, FeatureReducer {
 		#endif // sim
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case scanned(String)
 	}
 
@@ -72,7 +72,7 @@ struct ScanQR: Sendable, FeatureReducer {
 
 // MARK: ScanQR.Kind
 extension ScanQR {
-	enum Kind: Sendable, Hashable {
+	enum Kind: Hashable {
 		case connectorExtension
 		case account
 		case importOlympia

@@ -3,10 +3,10 @@ import SwiftUI
 
 // MARK: - AddNewGateway
 @Reducer
-struct AddNewGateway: Sendable, FeatureReducer {
+struct AddNewGateway: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
-		enum Field: String, Sendable, Hashable {
+	struct State: Hashable {
+		enum Field: String, Hashable {
 			case gatewayURL
 		}
 
@@ -22,14 +22,14 @@ struct AddNewGateway: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case addNewGatewayButtonTapped
 		case textFieldFocused(State.Field?)
 		case textFieldChanged(String)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case focusTextField(State.Field?)
 		case gatewayValidationResult(TaskResult<Gateway?>)
 		case addGatewayResult(TaskResult<EqVoid>)

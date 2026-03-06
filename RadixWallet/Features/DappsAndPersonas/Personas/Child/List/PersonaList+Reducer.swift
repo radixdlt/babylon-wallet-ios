@@ -3,12 +3,12 @@ import Sargon
 import SwiftUI
 
 // MARK: - PersonaList
-struct PersonaList: Sendable, FeatureReducer {
+struct PersonaList: FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var personas: IdentifiedArrayOf<PersonaFeature.State>
 		let strategy: ReloadingStrategy
 		var problems: [SecurityProblem] = []
@@ -26,30 +26,30 @@ struct PersonaList: Sendable, FeatureReducer {
 			self.init(personas: personas, strategy: .dApp(dApp.dAppDefinitionAddress))
 		}
 
-		enum ReloadingStrategy: Sendable, Hashable {
+		enum ReloadingStrategy: Hashable {
 			case all
 			case ids(OrderedSet<Persona.ID>)
 			case dApp(AuthorizedDapp.ID)
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case createNewPersonaButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case persona(id: Persona.ID, action: PersonaFeature.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case createNewPersona
 		case openDetails(Persona)
 		case presentSecurityProblemHandler(SecurityProblemHandlerDestination)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setPersonas([Persona])
 		case setSecurityProblems([SecurityProblem])
 	}

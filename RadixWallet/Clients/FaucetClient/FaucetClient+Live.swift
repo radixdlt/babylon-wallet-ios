@@ -7,7 +7,7 @@ extension FaucetClient: DependencyKey {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
-		// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
+		/// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
 		@Sendable func isAllowedToUseFaucetIfSoGetEpochs(accountAddress: AccountAddress) async -> (epochs: EpochForWhenLastUsedByAccountAddress, current: Epoch?)? {
 			@Dependency(\.gatewayAPIClient.getEpoch) var getEpoch
 			let epochs = userDefaults.loadEpochForWhenLastUsedByAccountAddress()

@@ -1,5 +1,5 @@
 // MARK: - HTTPClient
-struct HTTPClient: Sendable, DependencyKey {
+struct HTTPClient: DependencyKey {
 	let executeRequest: ExecuteRequest
 }
 

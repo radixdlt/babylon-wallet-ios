@@ -4,7 +4,7 @@ import Sargon
 import XCTest
 
 final class IdentifiedArrayOfTests: XCTestCase {
-	// https://github.com/pointfreeco/swift-identified-collections/pull/66
+	/// https://github.com/pointfreeco/swift-identified-collections/pull/66
 	func testIdentifiedArraySubscript() {
 		struct ProtoAccount: Identifiable {
 			let id: AccountAddress

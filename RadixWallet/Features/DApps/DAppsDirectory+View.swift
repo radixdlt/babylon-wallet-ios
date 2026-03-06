@@ -20,7 +20,6 @@ extension DAppsDirectory {
 			}
 		}
 
-		@ViewBuilder
 		func headerView() -> some SwiftUI.View {
 			VStack {
 				HStack {
@@ -70,7 +69,6 @@ extension DAppsDirectoryClient.DApp.Category {
 
 extension DAppsDirectory {
 	@MainActor
-	@ViewBuilder
 	static func loadedView(
 		dAppsCategories: DAppsDirectory.DAppsCategories,
 		dappsWithClaims: Set<DappDefinitionAddress> = [],
@@ -106,7 +104,6 @@ extension DAppsDirectory {
 	}
 
 	@MainActor
-	@ViewBuilder
 	static func loadingView() -> some SwiftUI.View {
 		ForEach(0 ..< 10) { _ in
 			Card {
@@ -128,7 +125,6 @@ extension DAppsDirectory {
 	}
 
 	@MainActor
-	@ViewBuilder
 	static func failedView(err: Error) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			Image(systemName: "arrow.clockwise")

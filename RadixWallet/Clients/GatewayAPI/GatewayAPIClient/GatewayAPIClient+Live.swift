@@ -31,14 +31,14 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func makeRequest<Response>(
+		func makeRequest<Response: Decodable>(
 			httpBodyData httpBody: Data? = nil,
 			method: String = "POST",
 			responseType _: Response.Type,
 			baseURL: URL,
 			timeoutInterval: TimeInterval? = nil,
 			urlFromBase: @Sendable (URL) -> URL
-		) async throws -> Response where Response: Decodable {
+		) async throws -> Response {
 			let url = urlFromBase(baseURL)
 			var urlRequest = URLRequest(url: url)
 			urlRequest.httpMethod = method
@@ -62,12 +62,12 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func makeRequest<Response>(
+		func makeRequest<Response: Decodable>(
 			httpBodyData httpBody: Data?,
 			method: String = "POST",
 			responseType: Response.Type,
 			urlFromBase: @escaping @Sendable (URL) -> URL
-		) async throws -> Response where Response: Decodable {
+		) async throws -> Response {
 			try await makeRequest(
 				httpBodyData: httpBody,
 				method: method,
@@ -78,11 +78,11 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func makeRequest<Response>(
+		func makeRequest<Response: Decodable>(
 			httpBodyData httpBody: Data?,
 			method: String = "POST",
 			urlFromBase: @escaping @Sendable (URL) -> URL
-		) async throws -> Response where Response: Decodable {
+		) async throws -> Response {
 			try await makeRequest(
 				httpBodyData: httpBody,
 				method: method,
@@ -92,18 +92,18 @@ extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func post<Response>(
+		func post<Response: Decodable>(
 			urlFromBase: @escaping @Sendable (URL) -> URL
-		) async throws -> Response where Response: Decodable {
+		) async throws -> Response {
 			try await makeRequest(httpBodyData: nil, responseType: Response.self, urlFromBase: urlFromBase)
 		}
 
 		@Sendable
-		func post<Response>(
+		func post<Response: Decodable>(
 			request: some Encodable,
 			dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate,
 			urlFromBase: @escaping @Sendable (URL) -> URL
-		) async throws -> Response where Response: Decodable {
+		) async throws -> Response {
 			jsonEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
 			jsonEncoder.dateEncodingStrategy = dateEncodingStrategy
 			let httpBody = try jsonEncoder.encode(request)
@@ -118,7 +118,8 @@ extension GatewayAPIClient {
 					atLedgerState: ledgerState,
 					optIns: optIns,
 					addresses: addresses, aggregationLevel: .vault
-				)) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+				)
+			) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
 
 		@Sendable

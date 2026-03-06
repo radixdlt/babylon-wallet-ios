@@ -23,10 +23,10 @@ import XCTest
 // * After timeout handler I've added a `XCTFail`
 
 /// RawValue is measured in milliseconds (must of course not be power's of two... just I like them!)
-enum TimeLimit: Sendable, Hashable {
+enum TimeLimit: Hashable {
 	case preset(Preset)
 	case custom(Duration)
-	enum Preset: Int, Sendable, Hashable {
+	enum Preset: Int, Hashable {
 		case fast = 256
 		case normal = 1024
 		case slow = 2048

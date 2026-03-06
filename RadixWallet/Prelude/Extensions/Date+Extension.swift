@@ -7,7 +7,6 @@ extension Date {
 		let jsonDecoder = JSONDecoder()
 		jsonDecoder.dateDecodingStrategy = .iso8601
 		let data = try! jsonEncoder.encode(self)
-		let persistable = try! jsonDecoder.decode(Self.self, from: data)
-		return persistable
+		return try! jsonDecoder.decode(Self.self, from: data)
 	}
 }

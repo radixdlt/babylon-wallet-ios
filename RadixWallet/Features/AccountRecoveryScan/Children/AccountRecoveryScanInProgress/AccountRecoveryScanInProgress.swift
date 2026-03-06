@@ -1,9 +1,9 @@
 import Sargon
 
 // MARK: - AccountRecoveryScanInProgress
-struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Status: Sendable, Hashable {
+struct AccountRecoveryScanInProgress: FeatureReducer {
+	struct State: Hashable {
+		enum Status: Hashable {
 			case new
 			case loadingFactorSource
 			case derivingPublicKeys
@@ -23,7 +23,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		var inactive: IdentifiedArrayOf<Account> = []
 		var deleted: IdentifiedArrayOf<Account> = []
 
-		enum Mode: Sendable, Hashable {
+		enum Mode: Hashable {
 			case createProfile(PrivateHierarchicalDeterministicFactorSource)
 			case addAccounts(factorSourceId: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
 		}
@@ -48,7 +48,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadIndicesUsedByFactorSourceResult(TaskResult<IndicesUsedByFactorSource>)
 		case startScan(accounts: IdentifiedArrayOf<Account>)
 		case derivedPublicKeys([HierarchicalDeterministicPublicKey])
@@ -60,14 +60,14 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case initiate
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case onFirstAppear
 		case scanMore
 		case continueTapped
 		case closeButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case foundAccounts(
 			active: IdentifiedArrayOf<Account>,
 			inactive: IdentifiedArrayOf<Account>,
@@ -155,7 +155,7 @@ struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				return .none
 			}
 
-			/// A temporary hack to fix ABW-2657. When the deriving keys slide up will not show
+			// A temporary hack to fix ABW-2657. When the deriving keys slide up will not show
 			return delayedMediumEffect(for: .internal(.initiate))
 
 		case .scanMore:

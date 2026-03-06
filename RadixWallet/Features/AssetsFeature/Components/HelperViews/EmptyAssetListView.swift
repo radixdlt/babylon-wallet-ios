@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - EmptyAssetListView
 struct EmptyAssetListView: View {
-	struct ViewState: Sendable, Equatable {
+	struct ViewState: Equatable {
 		let imageAsset: ImageAsset
 		let description: String
 		let glossaryItem: InfoLinkSheet.GlossaryItem

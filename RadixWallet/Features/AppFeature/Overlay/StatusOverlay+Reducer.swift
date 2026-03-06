@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct StatusOverlay: Sendable, FeatureReducer {
-	struct State: Hashable, Sendable {
+struct StatusOverlay: FeatureReducer {
+	struct State: Hashable {
 		var itemsQueue: OrderedSet<OverlayWindowClient.Item.Status> = []
 
 		var isPresenting: Bool {
@@ -13,24 +13,24 @@ struct StatusOverlay: Sendable, FeatureReducer {
 		var destination: Destination.State?
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case scheduleItem(OverlayWindowClient.Item.Status)
 		case showNextItemIfPossible
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
 		}

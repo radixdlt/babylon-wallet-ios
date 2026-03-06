@@ -162,7 +162,6 @@ private extension View {
 }
 
 extension ImportMnemonic.View {
-	@ViewBuilder
 	private func passphrase(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
 		AppTextField(
 			primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: true),
@@ -176,7 +175,6 @@ extension ImportMnemonic.View {
 		.autocorrectionDisabled()
 	}
 
-	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
 		WithControlRequirements(
 			viewStore.mnemonic,

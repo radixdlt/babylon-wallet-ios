@@ -9,7 +9,10 @@ final class SortedTests: XCTestCase {
 			case one, two, three, four, five
 		}
 
-		var id: String { String(name.hashValue) }
+		var id: String {
+			String(name.hashValue)
+		}
+
 		let name: String
 		let number: Number
 	}

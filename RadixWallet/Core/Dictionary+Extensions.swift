@@ -16,7 +16,7 @@ extension Dictionary {
 }
 
 extension Dictionary {
-	// Custom initializer that throws if there are duplicate keys
+	/// Custom initializer that throws if there are duplicate keys
 	init(keysWithValues: [(Key, Value)]) throws {
 		self = [:]
 
@@ -32,7 +32,7 @@ extension Dictionary {
 }
 
 extension OrderedDictionary {
-	// Custom initializer that throws if there are duplicate keys
+	/// Custom initializer that throws if there are duplicate keys
 	init(keysWithValues: [(Key, Value)]) throws {
 		self = OrderedDictionary()
 

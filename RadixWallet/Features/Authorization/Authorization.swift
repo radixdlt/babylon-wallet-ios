@@ -1,9 +1,9 @@
 // MARK: - Authorization
 /// A modal dialog that requests user authorization -by providing biometrics- before proceeding to perform an operation (e.g. Create Account).
 @Reducer
-struct Authorization: Sendable, FeatureReducer {
+struct Authorization: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var factorSourceAccess: FactorSourceAccess.State
 
 		init?(purpose: AuthorizationPurpose) {
@@ -14,11 +14,11 @@ struct Authorization: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ChildAction: Sendable, Hashable {
+	enum ChildAction: Hashable {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case authorized
 		case cancelled
 	}

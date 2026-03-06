@@ -1,14 +1,14 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct DefaultDepositGuarantees: Sendable, FeatureReducer {
+struct DefaultDepositGuarantees: FeatureReducer {
 	typealias Store = StoreOf<Self>
 
 	init() {}
 
 	// MARK: State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var depositGuarantee: Decimal192? {
 			percentageStepper.value.map { try! Decimal192(0.01) * $0 }
 		}
@@ -22,7 +22,7 @@ struct DefaultDepositGuarantees: Sendable, FeatureReducer {
 
 	// MARK: Action
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}
 

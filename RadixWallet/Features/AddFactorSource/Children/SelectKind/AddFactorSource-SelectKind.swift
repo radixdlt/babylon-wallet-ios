@@ -1,8 +1,8 @@
 extension AddFactorSource {
 	@Reducer
-	struct SelectKind: Sendable, FeatureReducer {
+	struct SelectKind: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let kinds: [FactorSourceKind]
 			var selectedKind: FactorSourceKind?
 
@@ -15,12 +15,12 @@ extension AddFactorSource {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case didSelectKind(FactorSourceKind?)
 			case continueButtonTapped(FactorSourceKind)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case completed(FactorSourceKind)
 		}
 

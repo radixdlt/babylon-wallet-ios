@@ -35,12 +35,10 @@ extension NetworkSwitchingClient {
 			// once it returns networkID!
 			let network = try NetworkDefinition.lookupBy(name: name)
 
-			let gateway = Gateway(
+			return Gateway(
 				network: network,
 				url: newURL
 			)
-
-			return gateway
 		}
 
 		let hasAccountOnNetwork: HasAccountOnNetwork = { gateway in

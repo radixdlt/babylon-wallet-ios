@@ -2,7 +2,6 @@ import ComposableArchitecture
 import SwiftUI
 
 extension View {
-	@ViewBuilder
 	func roundedCorners(
 		_ corners: UIRectCorner = .allCorners,
 		strokeColor: Color,

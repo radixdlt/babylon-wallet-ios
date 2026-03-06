@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - DisplayEntitiesControlledByMnemonic
-struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, Identifiable {
-		enum ID: Sendable, Hashable {
+struct DisplayEntitiesControlledByMnemonic: FeatureReducer {
+	struct State: Hashable, Identifiable {
+		enum ID: Hashable {
 			/// Mixture of account sets, including both:
 			/// * "Babylon accounts" (controlled by keys on `Curve25519`)
 			/// * "Olympia accounts" (controlled by keys on curve `secp256k1`)
@@ -35,7 +35,7 @@ struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		let personasCount: Int
 		var mode: Mode
 
-		enum Mode: Sendable, Hashable {
+		enum Mode: Hashable {
 			case mnemonicCanBeDisplayed
 			case mnemonicNeedsImport
 			case displayAccountListOnly
@@ -78,12 +78,12 @@ struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case navigateButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case displayMnemonic
 		case importMissingMnemonic
 	}

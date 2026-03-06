@@ -2,7 +2,7 @@ import Foundation
 import Sargon
 
 // MARK: - SignatureOfEntity
-struct SignatureOfEntity: Sendable, Hashable {
+struct SignatureOfEntity: Hashable {
 	let ownedFactorInstance: OwnedFactorInstance
 	let signatureWithPublicKey: SignatureWithPublicKey
 }

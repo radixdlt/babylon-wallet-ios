@@ -40,9 +40,17 @@ extension InteractionReview.Sections {
 		let confirmShieldUpdate: InteractionReview.ShieldState?
 		let stopTimedRecovery: InteractionReview.StopTimedRecoveryState?
 
-		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
-		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
-		var isExpandedClaimingFromValidators: Bool { claimingFromValidators?.isExpanded == true }
+		var isExpandedStakingToValidators: Bool {
+			stakingToValidators?.isExpanded == true
+		}
+
+		var isExpandedUnstakingFromValidators: Bool {
+			unstakingFromValidators?.isExpanded == true
+		}
+
+		var isExpandedClaimingFromValidators: Bool {
+			claimingFromValidators?.isExpanded == true
+		}
 	}
 
 	@MainActor
@@ -94,7 +102,6 @@ extension InteractionReview.Sections {
 			.destinations(with: store)
 		}
 
-		@ViewBuilder
 		private var withdrawals: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.withdrawals, action: \.child.withdrawals)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
@@ -104,7 +111,6 @@ extension InteractionReview.Sections {
 			}
 		}
 
-		@ViewBuilder
 		private func contributingToPools(_ isExpanded: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.contributingToPools, action: \.child.contributingToPools)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
@@ -119,7 +125,6 @@ extension InteractionReview.Sections {
 			}
 		}
 
-		@ViewBuilder
 		private func redeemingFromPools(_ isExpanded: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.redeemingFromPools, action: \.child.redeemingFromPools)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
@@ -181,7 +186,6 @@ extension InteractionReview.Sections {
 			}
 		}
 
-		@ViewBuilder
 		private func dAppsUsed(_ isExpanded: Bool, showPossibleDappCalls: Bool) -> some SwiftUI.View {
 			IfLetStore(store.scope(state: \.dAppsUsed, action: \.child.dAppsUsed)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
@@ -228,7 +232,6 @@ extension InteractionReview.Sections {
 			.cardShadow
 		}
 
-		@ViewBuilder
 		private var deposits: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.deposits, action: \.child.deposits)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
@@ -238,7 +241,6 @@ extension InteractionReview.Sections {
 			}
 		}
 
-		@ViewBuilder
 		private var proofs: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.proofs, action: \.child.proofs)) { childStore in
 				Common.Proofs.View(store: childStore)
@@ -246,7 +248,6 @@ extension InteractionReview.Sections {
 			}
 		}
 
-		@ViewBuilder
 		private var accountDeletion: some SwiftUI.View {
 			IfLetStore(store.scope(state: \.accountDeletion, action: \.child.accountDeletion)) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {

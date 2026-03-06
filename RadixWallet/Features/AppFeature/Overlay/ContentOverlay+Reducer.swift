@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct ContentOverlay: Sendable, FeatureReducer {
-	struct State: Hashable, Sendable {
+struct ContentOverlay: FeatureReducer {
+	struct State: Hashable {
 		var itemsQueue: OrderedSet<OverlayWindowClient.Item.Content> = []
 
 		@PresentationState
@@ -14,25 +14,25 @@ struct ContentOverlay: Sendable, FeatureReducer {
 		var destinationDismissed = true
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case destinationDismissed
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case scheduleItem(OverlayWindowClient.Item.Content)
 		case showItemIfPossible
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case sheet(SheetOverlayCoordinator.State)
 			case fullScreen(FullScreenOverlayCoordinator.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case sheet(SheetOverlayCoordinator.Action)
 			case fullScreen(FullScreenOverlayCoordinator.Action)
 		}
@@ -49,7 +49,6 @@ struct ContentOverlay: Sendable, FeatureReducer {
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
-	@Dependency(\.contactSupportClient) var contactSupport
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

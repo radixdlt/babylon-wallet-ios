@@ -79,7 +79,6 @@ extension StakeUnitList {
 			}
 		}
 
-		@ViewBuilder
 		private func validatorStakeView(_ viewState: ValidatorStakeView.ViewState) -> some SwiftUI.View {
 			ValidatorStakeView(
 				viewState: viewState,
@@ -96,7 +95,6 @@ extension StakeUnitList {
 			.background(.primaryBackground)
 		}
 
-		@ViewBuilder
 		private func stakedValidatorsSectionHeader(_ validatorsCount: Int) -> some SwiftUI.View {
 			HStack(spacing: .small2) {
 				Image(.iconValidator)

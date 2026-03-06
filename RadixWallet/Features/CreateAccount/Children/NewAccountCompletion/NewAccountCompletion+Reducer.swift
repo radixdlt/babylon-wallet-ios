@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct NewAccountCompletion: Sendable, FeatureReducer {
+struct NewAccountCompletion: FeatureReducer {
 	struct State: Sendable & Hashable {
 		let account: Account
 		let isFirstOnNetwork: Bool
@@ -29,11 +29,11 @@ struct NewAccountCompletion: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case goToDestination
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case completed
 	}
 

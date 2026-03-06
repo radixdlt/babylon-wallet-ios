@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountsToImport
-struct AccountsToImport: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct AccountsToImport: FeatureReducer {
+	struct State: Hashable {
 		let scannedAccounts: NonEmptyArray<ImportOlympiaWalletCoordinator.MigratableAccount>
 
 		init(
@@ -13,12 +13,12 @@ struct AccountsToImport: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case continueButtonTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case viewAppeared
 		case continueImport
 	}

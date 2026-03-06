@@ -1,8 +1,8 @@
 // MARK: - Discover
 @Reducer
-struct Discover: Sendable, FeatureReducer {
+struct Discover: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var blogPostsCarousel: BlogPostsCarousel.State = .init()
 		var learnItemsList: LearnItemsList.State = .withPreviewItems()
 
@@ -12,27 +12,27 @@ struct Discover: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case socialLinkTapped(SocialLink)
 		case seeMoreLearnItemsTapped
 		case seeMoreBlogPostsTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case blogPostsCarousel(BlogPostsCarousel.Action)
 		case learnItemsList(LearnItemsList.Action)
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case blogPosts(AllBlogPosts.State)
 			case learnAbout(LearnAbout.State)
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case blogPosts(AllBlogPosts.Action)
 			case learnAbout(LearnAbout.Action)
 		}
@@ -92,7 +92,7 @@ extension Discover.State {
 
 // MARK: - Discover.SocialLink
 extension Discover {
-	struct SocialLink: Identifiable, Equatable, Sendable {
+	struct SocialLink: Identifiable, Equatable {
 		var id: URL {
 			url
 		}
@@ -105,7 +105,7 @@ extension Discover {
 }
 
 extension Discover.SocialLink {
-	enum Platform: Equatable, Sendable {
+	enum Platform: Equatable {
 		case x
 		case telegram
 		case discord

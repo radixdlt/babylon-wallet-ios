@@ -63,7 +63,7 @@ struct SelectEmergencyFallbackPeriodView: View {
 
 // MARK: SelectEmergencyFallbackPeriodView.Action
 extension SelectEmergencyFallbackPeriodView {
-	enum Action: Sendable, Equatable {
+	enum Action: Equatable {
 		case close
 		case set(TimePeriod)
 	}

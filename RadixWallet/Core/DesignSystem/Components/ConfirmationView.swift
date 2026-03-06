@@ -59,13 +59,13 @@ struct ConfirmationView: View {
 }
 
 extension ConfirmationView {
-	enum Kind: Hashable, Sendable {
+	enum Kind: Hashable {
 		case hideAccount
 		case hideAsset
 		case hideCollection(name: String)
 	}
 
-	enum Action: Sendable {
+	enum Action {
 		case cancel
 		case confirm
 	}

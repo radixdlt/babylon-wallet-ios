@@ -12,10 +12,6 @@ struct RequestRetryAttemptsExceeded: Swift.Error {
 struct BadHTTPResponseCode: LocalizedError {
 	let got: Int
 
-	init(got: Int) {
-		self.got = got
-	}
-
 	var errorDescription: String? {
 		switch got {
 		case 429:
@@ -30,11 +26,6 @@ struct BadHTTPResponseCode: LocalizedError {
 struct ResponseDecodingError: Swift.Error {
 	let receivedData: Data
 	let error: Error
-
-	init(receivedData: Data, error: Error) {
-		self.receivedData = receivedData
-		self.error = error
-	}
 }
 
 // MARK: - HTTPStatusCode

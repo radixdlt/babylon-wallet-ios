@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - AnyRange
-struct AnyRange<Bound: Comparable & Sendable>: Sendable {
+struct AnyRange<Bound: Comparable & Sendable> {
 	let lowerBound: Bound?
 	let upperBound: Bound?
 

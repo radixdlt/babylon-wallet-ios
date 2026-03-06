@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - OnboardingCoordinator
-struct OnboardingCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct OnboardingCoordinator: FeatureReducer {
+	struct State: Hashable {
 		var startup: OnboardingStartup.State
 
 		@PresentationState
@@ -14,27 +14,27 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case newProfileCreated
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case startup(OnboardingStartup.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case completed
 	}
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case createAccount(CreateAccountCoordinator.State)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case createAccount(CreateAccountCoordinator.Action)
 		}
 
@@ -49,8 +49,6 @@ struct OnboardingCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.appEventsClient) var appEventsClient
 	@Dependency(\.errorQueue) var errorQueue
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.startup, action: \.child.startup) {

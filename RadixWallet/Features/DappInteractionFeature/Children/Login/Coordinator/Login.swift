@@ -3,8 +3,8 @@ import Sargon
 import SwiftUI
 
 // MARK: - Login
-struct Login: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct Login: FeatureReducer {
+	struct State: Hashable {
 		let dappMetadata: DappMetadata
 		let loginRequest: DappToWalletInteractionAuthRequestItem
 
@@ -30,14 +30,14 @@ struct Login: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case selectedPersonaChanged(PersonaRow.State?)
 		case createNewPersonaButtonTapped
 		case continueButtonTapped(Persona)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		typealias SelectedPersonaID = IdentityAddress
 
 		case personasLoaded(
@@ -50,11 +50,11 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case continueButtonTapped(
 			Persona,
 			AuthorizedDapp?,

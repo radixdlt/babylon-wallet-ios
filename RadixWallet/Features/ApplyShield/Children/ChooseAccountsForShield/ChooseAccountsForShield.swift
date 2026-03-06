@@ -1,19 +1,19 @@
-struct ChooseAccountsForShield: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct ChooseAccountsForShield: FeatureReducer {
+	struct State: Hashable {
 		var chooseAccounts: ChooseAccounts.State
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case continueButtonTapped([ChooseAccountsRow.State])
 		case skipButtonTapped
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case finished([AccountAddress])
 	}
 

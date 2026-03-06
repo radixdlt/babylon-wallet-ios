@@ -1,20 +1,10 @@
 import Sargon
 
 // MARK: - OnboardingClient
-struct OnboardingClient: Sendable {
+struct OnboardingClient {
 	var loadProfileState: LoadProfileState
 	var createNewProfile: CreateNewProfile
 	var finishOnboardingWithRecoveredAccountAndBDFS: FinishOnboardingWithRecoveredAccountsAndBDFS
-
-	init(
-		loadProfileState: @escaping LoadProfileState,
-		createNewProfile: @escaping CreateNewProfile,
-		finishOnboardingWithRecoveredAccountAndBDFS: @escaping FinishOnboardingWithRecoveredAccountsAndBDFS
-	) {
-		self.loadProfileState = loadProfileState
-		self.createNewProfile = createNewProfile
-		self.finishOnboardingWithRecoveredAccountAndBDFS = finishOnboardingWithRecoveredAccountAndBDFS
-	}
 }
 
 extension OnboardingClient {

@@ -2,9 +2,9 @@ import SargonUniFFI
 
 // MARK: - HandleAccessControllerTimedRecovery
 @Reducer
-struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
+struct HandleAccessControllerTimedRecovery: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		let acDetails: AccessControllerStateDetails
 		let provisionalSecurityState: SecurityStructureOfFactorSources?
 		let entity: AccountOrPersona
@@ -67,14 +67,14 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 
 	typealias Action = FeatureAction<Self>
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case stopButtonTapped
 		case confirmButtonTapped
 		case securityStructureToggled
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case timerTicked
 	}
 
@@ -122,7 +122,7 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 					switch result.p2pResponse {
 					case let .dapp(.success(success)):
 						if case let .transaction(tx) = success.items {
-							/// Wait for the transaction to be committed
+							// Wait for the transaction to be committed
 							let txID = tx.send.transactionIntentHash
 							if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 								// TODO: Use a client which wraps SargonOS so this features becomes testable
@@ -152,7 +152,7 @@ struct HandleAccessControllerTimedRecovery: Sendable, FeatureReducer {
 					switch result.p2pResponse {
 					case let .dapp(.success(success)):
 						if case let .transaction(tx) = success.items {
-							/// Wait for the transaction to be committed
+							// Wait for the transaction to be committed
 							let txID = tx.send.transactionIntentHash
 							if try await submitTXClient.hasTXBeenCommittedSuccessfully(txID) {
 								// TODO: Use a client which wraps SargonOS so this features becomes testable

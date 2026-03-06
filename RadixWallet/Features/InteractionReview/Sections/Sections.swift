@@ -1,9 +1,9 @@
 // MARK: - InteractionReview.Sections
 extension InteractionReview {
-	struct Sections: Sendable, FeatureReducer {
+	struct Sections: FeatureReducer {
 		typealias Common = InteractionReview
 
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let kind: InteractionReview.Kind
 
 			var withdrawals: Accounts.State? = nil
@@ -24,7 +24,7 @@ extension InteractionReview {
 			var shieldUpdate: InteractionReview.ShieldState? = nil
 			var confirmShieldUpdate: InteractionReview.ShieldState? = nil
 
-			// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
+			/// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
 
 			@PresentationState
@@ -33,20 +33,20 @@ extension InteractionReview {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case appeared
 			case expandableItemToggled(ExpandableItem)
 
-			enum ExpandableItem: Sendable, Equatable {
+			enum ExpandableItem: Equatable {
 				case dAppsUsed, contributingToPools, redeemingFromPools, stakingToValidators, unstakingFromValidators, claimingFromValidators
 			}
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case parent(ParentAction)
 			case setSections(Common.SectionsData?)
 
-			enum ParentAction: Sendable, Equatable {
+			enum ParentAction: Equatable {
 				case resolveExecutionSummary(ExecutionSummary, NetworkID)
 				case resolveManifestSummary(ManifestSummary, NetworkID)
 				case showResourceDetails(OnLedgerEntity.Resource, KnownResourceBalance.Details)
@@ -54,7 +54,7 @@ extension InteractionReview {
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case withdrawals(Common.Accounts.Action)
 			case deposits(Common.Accounts.Action)
 			case accountDeletion(Common.Accounts.Action)
@@ -64,14 +64,14 @@ extension InteractionReview {
 			case proofs(Common.Proofs.Action)
 		}
 
-		enum DelegateAction: Sendable, Hashable {
+		enum DelegateAction: Hashable {
 			case failedToResolveSections
 			case showCustomizeGuarantees([TransactionReviewGuarantee.State])
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case dApp(DappDetails.State)
 				case fungibleTokenDetails(FungibleTokenDetails.State)
 				case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
@@ -81,7 +81,7 @@ extension InteractionReview {
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Equatable {
 				case dApp(DappDetails.Action)
 				case fungibleTokenDetails(FungibleTokenDetails.Action)
 				case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)

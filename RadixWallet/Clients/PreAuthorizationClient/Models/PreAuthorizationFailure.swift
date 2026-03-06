@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - PreAuthorizationFailure
-enum PreAuthorizationFailure: Sendable, LocalizedError, Equatable {
+enum PreAuthorizationFailure: LocalizedError, Equatable {
 	case failedToGetPreview(FailedToGetPreview)
 
 	var errorDescription: String? {
@@ -23,7 +23,7 @@ extension PreAuthorizationFailure {
 
 // MARK: PreAuthorizationFailure.FailedToGetPreview
 extension PreAuthorizationFailure {
-	enum FailedToGetPreview: Sendable, LocalizedError, Equatable {
+	enum FailedToGetPreview: LocalizedError, Equatable {
 		case failedToAnalyse(Error)
 
 		var errorDescription: String? {

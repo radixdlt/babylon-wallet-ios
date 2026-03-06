@@ -1,5 +1,5 @@
 // MARK: - P2PLinksClient
-struct P2PLinksClient: Sendable {
+struct P2PLinksClient {
 	var getP2PLinks: GetP2PLinks
 	var updateOrAddP2PLink: UpdateOrAddP2PLink
 	var updateP2PLink: UpdateP2PLink
@@ -7,24 +7,6 @@ struct P2PLinksClient: Sendable {
 	var deleteAllP2PLinks: DeleteAllP2PLinks
 	var getP2PLinkPrivateKey: GetP2PLinkPrivateKey
 	var storeP2PLinkPrivateKey: StoreP2PLinkPrivateKey
-
-	init(
-		getP2PLinks: @escaping GetP2PLinks,
-		updateOrAddP2PLink: @escaping UpdateOrAddP2PLink,
-		updateP2PLink: @escaping UpdateP2PLink,
-		deleteP2PLinkByPassword: @escaping DeleteP2PLinkByPassword,
-		deleteAllP2PLinks: @escaping DeleteAllP2PLinks,
-		getP2PLinkPrivateKey: @escaping GetP2PLinkPrivateKey,
-		storeP2PLinkPrivateKey: @escaping StoreP2PLinkPrivateKey
-	) {
-		self.getP2PLinks = getP2PLinks
-		self.updateOrAddP2PLink = updateOrAddP2PLink
-		self.updateP2PLink = updateP2PLink
-		self.deleteP2PLinkByPassword = deleteP2PLinkByPassword
-		self.deleteAllP2PLinks = deleteAllP2PLinks
-		self.getP2PLinkPrivateKey = getP2PLinkPrivateKey
-		self.storeP2PLinkPrivateKey = storeP2PLinkPrivateKey
-	}
 }
 
 extension P2PLinksClient {

@@ -1,5 +1,5 @@
 // MARK: - LedgerIdentifiable
-enum LedgerIdentifiable: Sendable {
+enum LedgerIdentifiable {
 	case address(Address)
 	case transaction(TransactionIntentHash)
 	case preAuthorization(SubintentHash)
@@ -37,7 +37,7 @@ enum LedgerIdentifiable: Sendable {
 
 // MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
-	enum Address: Hashable, Sendable, Identifiable {
+	enum Address: Hashable, Identifiable {
 		case account(AccountAddress)
 		case identity(IdentityAddress)
 		case package(PackageAddress)
@@ -45,7 +45,7 @@ extension LedgerIdentifiable {
 		case resourcePool(PoolAddress)
 		case component(ComponentAddress)
 		case validator(ValidatorAddress)
-		// Will be displayd with full ResourceAddress+NFTLocalID
+		/// Will be displayd with full ResourceAddress+NFTLocalID
 		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		var address: String {

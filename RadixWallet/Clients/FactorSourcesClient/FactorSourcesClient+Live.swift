@@ -61,9 +61,9 @@ extension FactorSourcesClient: DependencyKey {
 				}
 			}
 
-			/// We only need to save olympia mnemonics into Profile, the Babylon ones
-			/// already exist in profile, and this function is used only to save the
-			/// imported mnemonic into keychain (done above).
+			// We only need to save olympia mnemonics into Profile, the Babylon ones
+			// already exist in profile, and this function is used only to save the
+			// imported mnemonic into keychain (done above).
 			let deviceFactorSources = try await getFactorSources()
 				.filter { $0.id == factorSourceID.asGeneral }
 				.map { try $0.extract(as: DeviceFactorSource.self) }
@@ -118,8 +118,8 @@ extension FactorSourcesClient: DependencyKey {
 								return nil
 							}
 							guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
-								/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
-								/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+								// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+								// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
 								return nil
 							}
 							return factorInstance.derivationPath.lastPathComponent

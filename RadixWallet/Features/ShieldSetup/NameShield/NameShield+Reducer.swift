@@ -2,9 +2,9 @@ import ComposableArchitecture
 
 // MARK: - NameShield
 @Reducer
-struct NameShield: FeatureReducer, Sendable {
+struct NameShield: FeatureReducer {
 	@ObservableState
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		@Shared(.shieldBuilder) var shieldBuilder
 
 		var inputtedName = ""
@@ -15,13 +15,13 @@ struct NameShield: FeatureReducer, Sendable {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case textFieldChanged(String)
 		case focusChanged(Bool)
 		case confirmButtonTapped(NonEmptyString)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case finished(SecurityStructureOfFactorSources)
 	}
 

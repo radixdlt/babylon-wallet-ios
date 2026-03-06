@@ -526,7 +526,7 @@ extension InteractionReview.Sections {
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: accountAddress)
 			let transfers = try await accountDeposits.asyncFlatMap {
-				let aux = try await transferInfo(
+				try await transferInfo(
 					resourceQuantifier: $0,
 					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
 					poolInteractions: poolContributions,
@@ -538,7 +538,6 @@ extension InteractionReview.Sections {
 					type: $0.transferType,
 					defaultDepositGuarantee: defaultDepositGuarantee
 				)
-				return aux
 			}
 			.map(\.asIdentified)
 

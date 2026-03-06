@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ChooseAccounts
-struct ChooseAccounts: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct ChooseAccounts: FeatureReducer {
+	struct State: Hashable {
 		let context: Context
 		let filteredAccounts: [AccountAddress]
 		let disabledAccounts: [AccountAddress]
@@ -43,22 +43,22 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case createAccountButtonTapped
 		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case loadAccountsResult(TaskResult<Accounts>)
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case createAccount(CreateAccountCoordinator.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case createAccount(CreateAccountCoordinator.Action)
 		}
 
@@ -152,7 +152,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 // MARK: - ChooseAccounts.State.Context
 extension ChooseAccounts.State {
-	enum Context: Sendable, Hashable {
+	enum Context: Hashable {
 		case assetTransfer
 		case permission(SelectionRequirement)
 		case applyShield

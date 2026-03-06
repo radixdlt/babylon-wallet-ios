@@ -8,7 +8,7 @@ extension ResourceBalance {
 }
 
 // MARK: - ResourceBalance
-enum ResourceBalance: Sendable, Hashable {
+enum ResourceBalance: Hashable {
 	case known(KnownResourceBalance)
 	case unknown
 
@@ -57,7 +57,7 @@ extension KnownResourceBalance {
 }
 
 // MARK: - KnownResourceBalance
-struct KnownResourceBalance: Sendable, Hashable {
+struct KnownResourceBalance: Hashable {
 	let resource: OnLedgerEntity.Resource
 	var details: Details
 
@@ -71,7 +71,7 @@ struct KnownResourceBalance: Sendable, Hashable {
 		self.isHidden = isHidden
 	}
 
-	enum Details: Sendable, Hashable {
+	enum Details: Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 		case poolUnit(PoolUnit)
@@ -79,13 +79,13 @@ struct KnownResourceBalance: Sendable, Hashable {
 		case stakeClaimNFT(StakeClaimNFT)
 	}
 
-	struct Fungible: Sendable, Hashable {
+	struct Fungible: Hashable {
 		let isXRD: Bool
 		var amount: ResourceAmount
 		var guarantee: TransactionGuarantee?
 	}
 
-	struct LiquidStakeUnit: Sendable, Hashable {
+	struct LiquidStakeUnit: Hashable {
 		let resource: OnLedgerEntity.Resource
 		var amount: ResourceAmount
 		let worth: ResourceAmount
@@ -93,8 +93,8 @@ struct KnownResourceBalance: Sendable, Hashable {
 		var guarantee: TransactionGuarantee?
 	}
 
-	enum NonFungible: Sendable, Hashable {
-		struct Token: Sendable, Hashable {
+	enum NonFungible: Hashable {
+		struct Token: Hashable {
 			let token: OnLedgerEntity.NonFungibleToken
 			let isPredicted: Bool
 
@@ -122,12 +122,12 @@ struct KnownResourceBalance: Sendable, Hashable {
 		}
 	}
 
-	struct PoolUnit: Sendable, Hashable {
+	struct PoolUnit: Hashable {
 		var details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		var guarantee: TransactionGuarantee?
 	}
 
-	struct StakeClaimNFT: Sendable, Hashable {
+	struct StakeClaimNFT: Hashable {
 		let validatorName: String?
 		let isPredicted: Bool
 		var stakeClaimTokens: Tokens
@@ -154,7 +154,7 @@ struct KnownResourceBalance: Sendable, Hashable {
 			)
 		}
 
-		struct Tokens: Sendable, Hashable {
+		struct Tokens: Hashable {
 			let canClaimTokens: Bool
 			let stakeClaims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>
 			var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?

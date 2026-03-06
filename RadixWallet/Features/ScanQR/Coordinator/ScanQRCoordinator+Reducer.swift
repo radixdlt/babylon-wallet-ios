@@ -2,9 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ScanQRCoordinator
-struct ScanQRCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
-		enum Step: Sendable, Hashable {
+struct ScanQRCoordinator: FeatureReducer {
+	struct State: Hashable {
+		enum Step: Hashable {
 			case cameraPermission(CameraPermission.State)
 			case scanQR(ScanQR.State)
 
@@ -24,16 +24,16 @@ struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case proceedWithScan
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case cameraPermission(CameraPermission.Action)
 		case scanQR(ScanQR.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 		case scanned(String)
 	}

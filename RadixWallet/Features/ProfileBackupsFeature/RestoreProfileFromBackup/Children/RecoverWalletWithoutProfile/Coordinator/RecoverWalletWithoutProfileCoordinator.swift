@@ -1,7 +1,7 @@
 // MARK: - RecoverWalletWithoutProfileCoordinator
 
-struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct RecoverWalletWithoutProfileCoordinator: FeatureReducer {
+	struct State: Hashable {
 		var root: Path.State?
 		var path: StackState<Path.State> = .init()
 
@@ -16,15 +16,15 @@ struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	struct Path: Sendable, Hashable, Reducer {
-		enum State: Sendable, Hashable {
+	struct Path: Hashable, Reducer {
+		enum State: Hashable {
 			case start(RecoverWalletWithoutProfileStart.State)
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
 			case importMnemonic(ImportMnemonic.State)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
 		}
 
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case start(RecoverWalletWithoutProfileStart.Action)
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
 			case importMnemonic(ImportMnemonic.Action)
@@ -51,11 +51,11 @@ struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	}
 
 	struct Destination: DestinationReducer {
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.State)
 		}
 
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.Action)
 		}
 
@@ -66,16 +66,16 @@ struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case createdPrivateHD(PrivateHierarchicalDeterministicFactorSource)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
@@ -85,8 +85,6 @@ struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.device) var device
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

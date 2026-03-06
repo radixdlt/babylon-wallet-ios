@@ -3,20 +3,22 @@ import Sargon
 import SwiftUI
 
 // MARK: - ResourcesListMode
-enum ResourcesListMode: Hashable, Sendable {
+enum ResourcesListMode: Hashable {
 	typealias ExceptionRule = DepositAddressExceptionRule
 	case allowDenyAssets(ExceptionRule)
 	case allowDepositors
 }
 
 // MARK: - ResourceViewState
-struct ResourceViewState: Hashable, Sendable, Identifiable {
-	enum Address: Hashable, Sendable {
+struct ResourceViewState: Hashable, Identifiable {
+	enum Address: Hashable {
 		case assetException(AssetException)
 		case allowedDepositor(ResourceOrNonFungible)
 	}
 
-	var id: Address { address }
+	var id: Address {
+		address
+	}
 
 	let iconURL: URL?
 	let name: String?
@@ -24,10 +26,10 @@ struct ResourceViewState: Hashable, Sendable, Identifiable {
 }
 
 // MARK: - ResourcesList
-struct ResourcesList: FeatureReducer, Sendable {
+struct ResourcesList: FeatureReducer {
 	// MARK: State
 
-	struct State: Hashable, Sendable {
+	struct State: Hashable {
 		let canModify: Bool
 		var mode: ResourcesListMode
 		var thirdPartyDeposits: ThirdPartyDeposits
@@ -49,18 +51,18 @@ struct ResourcesList: FeatureReducer, Sendable {
 
 	// MARK: Action
 
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(DepositAddressExceptionRule)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case updated(ThirdPartyDeposits)
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case resourceLoaded(OnLedgerEntity.Resource?, ResourceViewState.Address)
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
@@ -69,17 +71,17 @@ struct ResourcesList: FeatureReducer, Sendable {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
-			enum ConfirmDeletionAlert: Hashable, Sendable {
+			enum ConfirmDeletionAlert: Hashable {
 				case confirmTapped(ResourceViewState.Address)
 				case cancelTapped
 			}

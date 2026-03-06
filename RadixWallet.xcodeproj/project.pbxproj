@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		477F2B8D3DBE6C40B19BEA26 /* SignalingServersSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4019A6B9E4F6D77A74801C1C /* SignalingServersSettings+View.swift */; };
+		47B4C8D13A2E4F4B8C100001 /* SignalingServerDetails+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B4C8D13A2E4F4B8C200001 /* SignalingServerDetails+Reducer.swift */; };
+		47B4C8D13A2E4F4B8C100002 /* SignalingServerDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B4C8D13A2E4F4B8C200002 /* SignalingServerDetails+View.swift */; };
+		47B4C8D13A2E4F4B8C100003 /* SignalingServersSettingsFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B4C8D13A2E4F4B8C200003 /* SignalingServersSettingsFeatureTests.swift */; };
 		48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */; };
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
 		4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */; };
@@ -809,12 +813,10 @@
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
 		8308184E2B9F16AD002D8351 /* TokenPriceClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */; };
-		830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */; };
 		830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */; };
 		830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */; };
 		830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */; };
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
-		831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */; };
 		831F0CF22C25897500D6F5BF /* DappInteractionOriginVerification+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification+View.swift */; };
 		831F0CF42C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */; };
 		831F0CF62C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */; };
@@ -870,6 +872,23 @@
 		A04E36302E884E5E00895C35 /* EntityShieldDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04E362D2E884E5E00895C35 /* EntityShieldDetails.swift */; };
 		A04E36342E89BAEB00895C35 /* SigningTooManyFactorsSkipped.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04E36322E89BAEB00895C35 /* SigningTooManyFactorsSkipped.swift */; };
 		A04E36352E89BAEB00895C35 /* SigningTooManyFactorsSkipped+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04E36332E89BAEB00895C35 /* SigningTooManyFactorsSkipped+View.swift */; };
+		A0596FBF2F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A08BBA6A2DAE973700534B67 /* Sargon */; };
+		A0596FC02F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0FDC0152DB7BAE900F571BA /* Sargon */; };
+		A0596FC12F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A00697CE2DBA304F00810D36 /* Sargon */; };
+		A0596FC22F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A04207F32DE9DDB600FE2947 /* Sargon */; };
+		A0596FC32F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A06323E42DFAC29B00963A1F /* Sargon */; };
+		A0596FC42F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0777B472E253E1E00E82892 /* Sargon */; };
+		A0596FC52F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0F636BB2E3BA6890003B4C0 /* Sargon */; };
+		A0596FC62F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0830CCD2E428E8700DF1F08 /* Sargon */; };
+		A0596FC72F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0A53EB92E54DAA500BE36FE /* Sargon */; };
+		A0596FC82F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A070FA322E58482400CB9566 /* Sargon */; };
+		A0596FC92F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A029CF032E79492700F7F325 /* Sargon */; };
+		A0596FCA2F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0DA89132E96A2CF005254CB /* Sargon */; };
+		A0596FCB2F4A016300BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A06AD20D2F2A5403009004C5 /* Sargon */; };
+		A0596FCF2F4A01F700BE7543 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0596FCE2F4A01F700BE7543 /* Sargon */; };
+		A0596FD42F4A059500BE7543 /* P2PTransportProfilesClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0596FD22F4A059500BE7543 /* P2PTransportProfilesClient+Test.swift */; };
+		A0596FD52F4A059500BE7543 /* P2PTransportProfilesClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0596FD02F4A059500BE7543 /* P2PTransportProfilesClient+Interface.swift */; };
+		A0596FD62F4A059500BE7543 /* P2PTransportProfilesClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0596FD12F4A059500BE7543 /* P2PTransportProfilesClient+Live.swift */; };
 		A05AA1422E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */; };
 		A05AA1432E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */; };
 		A05AA1462E0AC13600316B83 /* DAppDirectory+Filtering+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05AA1452E0AC13600316B83 /* DAppDirectory+Filtering+View.swift */; };
@@ -914,6 +933,7 @@
 		A0BA90452E8167E600ED76E8 /* EditSecurityShieldCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BA90442E8167E600ED76E8 /* EditSecurityShieldCoordinator+View.swift */; };
 		A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673042DA6BD7F0071606B /* ScreenshotPreventing */; };
 		A0C673072DA6BD7F0071606B /* ScreenshotPreventingSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = A0C673062DA6BD7F0071606B /* ScreenshotPreventingSwiftUI */; };
+		A0CB3BDA2F59D640004D904F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = A0CB3BD92F59D640004D904F /* Sargon */; };
 		A0D201662E01489A009DA055 /* BlogPostCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201652E014893009DA055 /* BlogPostCard.swift */; };
 		A0D201692E029394009DA055 /* BlogPostsCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201672E029394009DA055 /* BlogPostsCarousel.swift */; };
 		A0D2016A2E029394009DA055 /* BlogPostsCarousel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D201682E029394009DA055 /* BlogPostsCarousel+View.swift */; };
@@ -941,6 +961,8 @@
 		A0F63EF62E3F9DDF0003B4C0 /* ArculusForgotPIN-InputSeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F63EF52E3F9DDF0003B4C0 /* ArculusForgotPIN-InputSeedPhrase+View.swift */; };
 		A0F63EF72E3F9DDF0003B4C0 /* ArculusForgotPIN-InputSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F63EF42E3F9DDF0003B4C0 /* ArculusForgotPIN-InputSeedPhrase.swift */; };
 		A0FFCE392E2B7D5E00C29802 /* NFCSessionClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0FFCE382E2B7D5700C29802 /* NFCSessionClient.swift */; };
+		A1B2C3D42F4B100100AAA001 /* RelayServicesSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F4B100100BBB001 /* RelayServicesSettings+Reducer.swift */; };
+		A1B2C3D42F4B100100AAA002 /* RelayServicesSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F4B100100BBB002 /* RelayServicesSettings+View.swift */; };
 		A408154C2C7E0D08005E65B9 /* CodableHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814312C7E0D08005E65B9 /* CodableHelper.swift */; };
 		A408154D2C7E0D08005E65B9 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814322C7E0D08005E65B9 /* Extensions.swift */; };
 		A408154E2C7E0D08005E65B9 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A40814332C7E0D08005E65B9 /* Models.swift */; };
@@ -1280,6 +1302,7 @@
 		A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */; };
 		A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */; };
 		A4F30C942C7CA71400F983D6 /* WithNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */; };
+		C9EE850CC0FEC284D889E837 /* SignalingServersSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595C13FB3D7F5C6F7FCE06F8 /* SignalingServersSettings+Reducer.swift */; };
 		E622FF902CE7984B00489BA5 /* DebugFactorInstancesCacheContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E622FF8F2CE7984B00489BA5 /* DebugFactorInstancesCacheContents+View.swift */; };
 		E622FF912CE7984B00489BA5 /* DebugFactorInstancesCacheContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E622FF8E2CE7984B00489BA5 /* DebugFactorInstancesCacheContents.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
@@ -1421,6 +1444,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4019A6B9E4F6D77A74801C1C /* SignalingServersSettings+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServersSettings+View.swift"; sourceTree = "<group>"; };
+		47B4C8D13A2E4F4B8C200001 /* SignalingServerDetails+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServerDetails+Reducer.swift"; sourceTree = "<group>"; };
+		47B4C8D13A2E4F4B8C200002 /* SignalingServerDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServerDetails+View.swift"; sourceTree = "<group>"; };
+		47B4C8D13A2E4F4B8C200003 /* SignalingServersSettingsFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingServersSettingsFeatureTests.swift; sourceTree = "<group>"; };
 		48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnFirstAppearViewModifier.swift; sourceTree = "<group>"; };
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+NetworkDefinition.swift"; sourceTree = "<group>"; };
@@ -2064,6 +2091,7 @@
 		48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AssetException.swift"; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
+		595C13FB3D7F5C6F7FCE06F8 /* SignalingServersSettings+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServersSettings+Reducer.swift"; sourceTree = "<group>"; };
 		5B03E3CE2CC1222D00E10A64 /* DisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayMode.swift; sourceTree = "<group>"; };
 		5B03E3D02CC127B100E10A64 /* RawManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawManifestView.swift; sourceTree = "<group>"; };
 		5B03E3D22CC141C200E10A64 /* InteractionReview+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview+Extra.swift"; sourceTree = "<group>"; };
@@ -2195,13 +2223,11 @@
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
 		8308184D2B9F16AD002D8351 /* TokenPriceClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Mock.swift"; sourceTree = "<group>"; };
-		830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStorageTests.swift; sourceTree = "<group>"; };
 		830EA9DA2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Interface.swift"; sourceTree = "<group>"; };
 		830EA9E22AEB8933004C8051 /* EntitiesHidingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitiesHidingTests.swift; sourceTree = "<group>"; };
 		830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultValueDecodable.swift; sourceTree = "<group>"; };
 		830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
-		831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixConnectMobileSessionStorage.swift; sourceTree = "<group>"; };
 		831F0CF12C25897500D6F5BF /* DappInteractionOriginVerification+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DappInteractionOriginVerification+View.swift"; sourceTree = "<group>"; };
 		831F0CF32C294BAA00D6F5BF /* DeepLinkHandlerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Live.swift"; sourceTree = "<group>"; };
 		831F0CF52C294C0D00D6F5BF /* DeepLinkHandlerClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeepLinkHandlerClient+Test.swift"; sourceTree = "<group>"; };
@@ -2255,6 +2281,9 @@
 		A04E362E2E884E5E00895C35 /* EntityShieldDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntityShieldDetails+View.swift"; sourceTree = "<group>"; };
 		A04E36322E89BAEB00895C35 /* SigningTooManyFactorsSkipped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningTooManyFactorsSkipped.swift; sourceTree = "<group>"; };
 		A04E36332E89BAEB00895C35 /* SigningTooManyFactorsSkipped+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SigningTooManyFactorsSkipped+View.swift"; sourceTree = "<group>"; };
+		A0596FD02F4A059500BE7543 /* P2PTransportProfilesClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "P2PTransportProfilesClient+Interface.swift"; sourceTree = "<group>"; };
+		A0596FD12F4A059500BE7543 /* P2PTransportProfilesClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "P2PTransportProfilesClient+Live.swift"; sourceTree = "<group>"; };
+		A0596FD22F4A059500BE7543 /* P2PTransportProfilesClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "P2PTransportProfilesClient+Test.swift"; sourceTree = "<group>"; };
 		A05AA1402E0AC06E00316B83 /* DAppsDirectory+AllDapps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+AllDapps.swift"; sourceTree = "<group>"; };
 		A05AA1412E0AC06E00316B83 /* DAppsDirectory+AllDapps+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppsDirectory+AllDapps+View.swift"; sourceTree = "<group>"; };
 		A05AA1442E0AC13600316B83 /* DAppDirectory+Filtering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DAppDirectory+Filtering.swift"; sourceTree = "<group>"; };
@@ -2324,6 +2353,8 @@
 		A0F63EF42E3F9DDF0003B4C0 /* ArculusForgotPIN-InputSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusForgotPIN-InputSeedPhrase.swift"; sourceTree = "<group>"; };
 		A0F63EF52E3F9DDF0003B4C0 /* ArculusForgotPIN-InputSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusForgotPIN-InputSeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A0FFCE382E2B7D5700C29802 /* NFCSessionClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCSessionClient.swift; sourceTree = "<group>"; };
+		A1B2C3D42F4B100100BBB001 /* RelayServicesSettings+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RelayServicesSettings+Reducer.swift"; sourceTree = "<group>"; };
+		A1B2C3D42F4B100100BBB002 /* RelayServicesSettings+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RelayServicesSettings+View.swift"; sourceTree = "<group>"; };
 		A40814312C7E0D08005E65B9 /* CodableHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CodableHelper.swift; sourceTree = "<group>"; };
 		A40814322C7E0D08005E65B9 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		A40814332C7E0D08005E65B9 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -2816,9 +2847,23 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0596FCB2F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FCA2F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC92F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC82F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC72F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC62F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC52F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC42F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC32F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC22F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC12F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FC02F4A016300BE7543 /* Sargon in Frameworks */,
+				A0596FBF2F4A016300BE7543 /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				A00B33422E5A4E7500528171 /* ArculusCSDK in Frameworks */,
 				A0323FD02DC0DCEB00CA31CE /* FirebaseCrashlytics in Frameworks */,
+				A0CB3BDA2F59D640004D904F /* Sargon in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
 				48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */,
@@ -2837,6 +2882,7 @@
 				A0C673052DA6BD7F0071606B /* ScreenshotPreventing in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
+				A0596FCF2F4A01F700BE7543 /* Sargon in Frameworks */,
 				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
@@ -2855,6 +2901,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2D16A253444284E75C2EA0A7 /* SignalingServersSettingsFeature */ = {
+			isa = PBXGroup;
+			children = (
+				47B4C8D13A2E4F4B8C200001 /* SignalingServerDetails+Reducer.swift */,
+				47B4C8D13A2E4F4B8C200002 /* SignalingServerDetails+View.swift */,
+				595C13FB3D7F5C6F7FCE06F8 /* SignalingServersSettings+Reducer.swift */,
+				4019A6B9E4F6D77A74801C1C /* SignalingServersSettings+View.swift */,
+			);
+			path = SignalingServersSettingsFeature;
+			sourceTree = "<group>";
+		};
+		47B4C8D13A2E4F4B8C300001 /* SignalingServersSettingsFeatureTests */ = {
+			isa = PBXGroup;
+			children = (
+				47B4C8D13A2E4F4B8C200003 /* SignalingServersSettingsFeatureTests.swift */,
+			);
+			path = SignalingServersSettingsFeatureTests;
+			sourceTree = "<group>";
+		};
 		481B43B12ADC7F1A007945C1 /* RadixWalletTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -3010,6 +3075,8 @@
 				48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */,
 				48CFBC6C2ADC10D800E77A5C /* AccountPreferencesFeature */,
 				48CFBC7D2ADC10D800E77A5C /* GatewaySettingsFeature */,
+				2D16A253444284E75C2EA0A7 /* SignalingServersSettingsFeature */,
+				A1B2C3D42F4B100100CCC001 /* RelayServicesSettingsFeature */,
 				48CFBC8B2ADC10D800E77A5C /* SplashFeature */,
 				48CFBC922ADC10D800E77A5C /* OnboardingFeature */,
 				48CFBC9A2ADC10D800E77A5C /* EditPersonaFeature */,
@@ -4643,6 +4710,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A0596FD32F4A059500BE7543 /* P2PTransportProfilesClient */,
 				A0B566E82ED75F96002655C0 /* AccessControllerClient */,
 				A089D4342E35342F00866A47 /* ArculusCardClient */,
 				A09F8FD22DEF4D8500DB5614 /* RadixNameServiceClient */,
@@ -6150,7 +6218,6 @@
 		830E43AD2C2D8B3800B6E95F /* Mobile */ = {
 			isa = PBXGroup;
 			children = (
-				830E43AE2C2D8B5100B6E95F /* SessionStorageTests.swift */,
 			);
 			path = Mobile;
 			sourceTree = "<group>";
@@ -6204,7 +6271,6 @@
 			isa = PBXGroup;
 			children = (
 				8381C8B22BC0619100A470B4 /* RadixConnectMobile.swift */,
-				831F0CEE2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift */,
 			);
 			path = Mobile;
 			sourceTree = "<group>";
@@ -6357,6 +6423,16 @@
 				A0A556142ECD99FE0097B7FA /* SigningConfirmShieldTimedRecovery+View.swift */,
 			);
 			path = Signing;
+			sourceTree = "<group>";
+		};
+		A0596FD32F4A059500BE7543 /* P2PTransportProfilesClient */ = {
+			isa = PBXGroup;
+			children = (
+				A0596FD02F4A059500BE7543 /* P2PTransportProfilesClient+Interface.swift */,
+				A0596FD12F4A059500BE7543 /* P2PTransportProfilesClient+Live.swift */,
+				A0596FD22F4A059500BE7543 /* P2PTransportProfilesClient+Test.swift */,
+			);
+			path = P2PTransportProfilesClient;
 			sourceTree = "<group>";
 		};
 		A05AA1482E0AE07600316B83 /* Filtering */ = {
@@ -6554,6 +6630,15 @@
 				A03194202E411A640015C231 /* ArculusForgotPIN-EnterNewPIN+View.swift */,
 			);
 			path = ForgotPIN;
+			sourceTree = "<group>";
+		};
+		A1B2C3D42F4B100100CCC001 /* RelayServicesSettingsFeature */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D42F4B100100BBB001 /* RelayServicesSettings+Reducer.swift */,
+				A1B2C3D42F4B100100BBB002 /* RelayServicesSettings+View.swift */,
+			);
+			path = RelayServicesSettingsFeature;
 			sourceTree = "<group>";
 		};
 		A40814352C7E0D08005E65B9 /* AUXILARY */ = {
@@ -7191,6 +7276,7 @@
 				E6DBA27D2ADEBFB200A38425 /* AccountDetailsFeatureTests */,
 				E6DBA2802ADEBFB200A38425 /* TransactionSigningFeatureTests */,
 				E6DBA2822ADEBFB200A38425 /* GatewaySettingsFeatureTests */,
+				47B4C8D13A2E4F4B8C300001 /* SignalingServersSettingsFeatureTests */,
 				E6DBA2882ADEBFB200A38425 /* TransactionReviewFeatureTests */,
 				E6DBA28D2ADEBFB300A38425 /* MainFeatureTests */,
 				E6DBA28F2ADEBFB300A38425 /* SplashFeatureTests */,
@@ -7894,7 +7980,8 @@
 				A029CF032E79492700F7F325 /* Sargon */,
 				A0DA89132E96A2CF005254CB /* Sargon */,
 				A06AD20D2F2A5403009004C5 /* Sargon */,
-				A03089512F42607300AD2D57 /* Sargon */,
+				A0596FCE2F4A01F700BE7543 /* Sargon */,
+				A0CB3BD92F59D640004D904F /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7958,7 +8045,7 @@
 				A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */,
 				A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				A00B33402E5A4E7500528171 /* XCLocalSwiftPackageReference "arculus-ios-csdk" */,
-				A03089502F42607300AD2D57 /* XCRemoteSwiftPackageReference "sargon" */,
+				A0CB3BD82F59D640004D904F /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8099,6 +8186,7 @@
 				E6DBA31E2ADEBFB300A38425 /* DataChannelMocks.swift in Sources */,
 				E6DBA3412ADEBFB300A38425 /* ValidationTests.swift in Sources */,
 				4827520C2BDA5CA5007854E0 /* GatewaySettingsFeatureTests.swift in Sources */,
+				47B4C8D13A2E4F4B8C100003 /* SignalingServersSettingsFeatureTests.swift in Sources */,
 				4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */,
 				E6DBA32A2ADEBFB300A38425 /* TestCase.swift in Sources */,
 				E6DBA3732ADEBFB300A38425 /* ROLAClientTests.swift in Sources */,
@@ -8126,7 +8214,6 @@
 				E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */,
 				8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */,
 				E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */,
-				830E43AF2C2D8B5100B6E95F /* SessionStorageTests.swift in Sources */,
 				482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */,
 				8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */,
 				E6DBA3472ADEBFB300A38425 /* HexStringToDataTests.swift in Sources */,
@@ -8822,6 +8909,9 @@
 				48D5F38E2BD8DDB9000DE964 /* DebugManageFactorSources.swift in Sources */,
 				A40816132C7E0D08005E65B9 /* StateEntityFungiblesPageRequestOptIns.swift in Sources */,
 				830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */,
+				A0596FD42F4A059500BE7543 /* P2PTransportProfilesClient+Test.swift in Sources */,
+				A0596FD52F4A059500BE7543 /* P2PTransportProfilesClient+Interface.swift in Sources */,
+				A0596FD62F4A059500BE7543 /* P2PTransportProfilesClient+Live.swift in Sources */,
 				48CFC4012ADC10D900E77A5C /* KeychainClient+Live.swift in Sources */,
 				A40815592C7E0D08005E65B9 /* AccountDepositPreValidationRequest.swift in Sources */,
 				A40815BA2C7E0D08005E65B9 /* NativeResourceTwoResourcePoolUnitValue.swift in Sources */,
@@ -9032,6 +9122,12 @@
 				A06323EA2DFC308200963A1F /* LearnAbout.swift in Sources */,
 				5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */,
 				5B758D582BCE7AEC00348722 /* Preferences.swift in Sources */,
+				47B4C8D13A2E4F4B8C100001 /* SignalingServerDetails+Reducer.swift in Sources */,
+				47B4C8D13A2E4F4B8C100002 /* SignalingServerDetails+View.swift in Sources */,
+				C9EE850CC0FEC284D889E837 /* SignalingServersSettings+Reducer.swift in Sources */,
+				477F2B8D3DBE6C40B19BEA26 /* SignalingServersSettings+View.swift in Sources */,
+				A1B2C3D42F4B100100AAA001 /* RelayServicesSettings+Reducer.swift in Sources */,
+				A1B2C3D42F4B100100AAA002 /* RelayServicesSettings+View.swift in Sources */,
 				48CFC6212ADC10DA00E77A5C /* AtLedgerState.swift in Sources */,
 				A40816082C7E0D08005E65B9 /* StateEntityDetailsResponseFungibleResourceDetails.swift in Sources */,
 				48CFC3F52ADC10D900E77A5C /* SignalingClientTypes.swift in Sources */,
@@ -9177,7 +9273,6 @@
 				4827521A2BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift in Sources */,
 				48D5F3992BD8DE0A000DE964 /* DebugInspectProfile+View.swift in Sources */,
 				48CFC4222ADC10DA00E77A5C /* BitArray+Extra.swift in Sources */,
-				831F0CEF2C25728E00D6F5BF /* RadixConnectMobileSessionStorage.swift in Sources */,
 				48CFC5872ADC10DA00E77A5C /* FaucetClient+Live.swift in Sources */,
 				48CFC2912ADC10D900E77A5C /* TransactionReviewNetworkFee+View.swift in Sources */,
 				A40815B62C7E0D08005E65B9 /* NativeResourcePackageOwnerBadgeValue.swift in Sources */,
@@ -9641,6 +9736,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.dev";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = "Debug-Dev";
 		};
@@ -9662,6 +9758,7 @@
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
@@ -9750,6 +9847,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.alpha";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = "Debug-Alpha";
 		};
@@ -9838,6 +9936,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.pre-alpha";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = "Debug-PreAlpha";
 		};
@@ -9916,6 +10015,7 @@
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Beta;
 		};
@@ -10144,14 +10244,6 @@
 				version = 1.3.2;
 			};
 		};
-		A03089502F42607300AD2D57 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 1.2.50;
-			};
-		};
 		A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -10166,6 +10258,14 @@
 			requirement = {
 				kind = revision;
 				revision = 783b968ed2c6a6318896589d108de1141d434939;
+			};
+		};
+		A0CB3BD82F59D640004D904F /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 1.2.52;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
@@ -10329,17 +10429,16 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};
-		A03089512F42607300AD2D57 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A03089502F42607300AD2D57 /* XCRemoteSwiftPackageReference "sargon" */;
-			productName = Sargon;
-		};
 		A0323FCF2DC0DCEB00CA31CE /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A0323FCE2DC0DCEB00CA31CE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
 		};
 		A04207F32DE9DDB600FE2947 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		A0596FCE2F4A01F700BE7543 /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Sargon;
 		};
@@ -10380,6 +10479,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A0C673032DA6BD7F0071606B /* XCRemoteSwiftPackageReference "ScreenshotPreventing-iOS" */;
 			productName = ScreenshotPreventingSwiftUI;
+		};
+		A0CB3BD92F59D640004D904F /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A0CB3BD82F59D640004D904F /* XCRemoteSwiftPackageReference "sargon" */;
+			productName = Sargon;
 		};
 		A0DA89132E96A2CF005254CB /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;

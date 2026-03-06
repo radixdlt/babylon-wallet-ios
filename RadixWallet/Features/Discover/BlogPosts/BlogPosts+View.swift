@@ -25,7 +25,6 @@ extension Discover.AllBlogPosts {
 			.radixToolbar(title: L10n.BlogPosts.title)
 		}
 
-		@ViewBuilder
 		func errorView(_ error: Error) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				Image(systemName: "arrow.clockwise")
@@ -46,7 +45,6 @@ extension Discover.AllBlogPosts {
 			.frame(maxWidth: .infinity)
 		}
 
-		@ViewBuilder
 		func loadingView() -> some SwiftUI.View {
 			VStack(spacing: .medium3) {
 				ForEach(0 ..< 20) { _ in
@@ -56,7 +54,6 @@ extension Discover.AllBlogPosts {
 			}
 		}
 
-		@ViewBuilder
 		func successView(_ posts: BlogPosts) -> some SwiftUI.View {
 			VStack(spacing: .medium3) {
 				ForEach(posts.posts, id: \.url) { post in

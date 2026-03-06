@@ -66,5 +66,5 @@ extension EditPersonaAddEntryKinds {
 	}
 }
 
-/// No `PreviewProvider` here ☹️
-/// Use the `PersonaDetailsPreview` scheme instead 🤠
+// No `PreviewProvider` here ☹️
+// Use the `PersonaDetailsPreview` scheme instead 🤠

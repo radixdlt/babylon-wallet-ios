@@ -20,7 +20,6 @@ extension DAppsDirectory.AllDapps {
 			}
 		}
 
-		@ViewBuilder
 		func headerView() -> some SwiftUI.View {
 			DAppsFiltering.View(store: store.scope(state: \.filtering, action: \.child.filtering))
 				.padding(.top, .small3)
@@ -63,7 +62,6 @@ extension DAppsDirectory.AllDapps {
 			}
 		}
 
-		@ViewBuilder
 		func loadedView(dAppsCategories: DAppsDirectory.DAppsCategories) -> some SwiftUI.View {
 			DAppsDirectory.loadedView(dAppsCategories: dAppsCategories) { dApp in
 				store.send(.view(.didSelectDapp(dApp.id)))

@@ -15,9 +15,9 @@ extension GatewayRow.State: Comparable {
 
 // MARK: - GatewayList
 @Reducer
-struct GatewayList: Sendable, FeatureReducer {
+struct GatewayList: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var gateways: IdentifiedArrayOf<GatewayRow.State>
 
 		init(
@@ -30,16 +30,16 @@ struct GatewayList: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case gateway(id: GatewayRow.State.ID, action: GatewayRow.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case removeGateway(GatewayRow.State)
 		case switchToGateway(Gateway)
 	}

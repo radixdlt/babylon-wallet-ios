@@ -79,7 +79,6 @@ extension AddAsset {
 }
 
 extension AddAsset.View {
-	@ViewBuilder
 	func titleView(_ text: String) -> some SwiftUI.View {
 		Text(text)
 			.multilineTextAlignment(.center)
@@ -87,7 +86,6 @@ extension AddAsset.View {
 			.foregroundColor(.primaryText)
 	}
 
-	@ViewBuilder
 	func instructionsView(_ text: String) -> some SwiftUI.View {
 		Text(text)
 			.lineLimit(nil)
@@ -97,7 +95,6 @@ extension AddAsset.View {
 			.fixedSize(horizontal: false, vertical: true)
 	}
 
-	@ViewBuilder
 	func resourceAddressView(_ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		AppTextField(
 			placeholder: L10n.AccountSettings.SpecificAssetsDeposits.addAnAssetInputHint,
@@ -126,7 +123,6 @@ extension AddAsset.View {
 		}
 	}
 
-	@ViewBuilder
 	func depositExceptionSelectionView(_ exception: ResourcesListMode.ExceptionRule, _ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		HStack(spacing: .small3) {
 			RadioButton(
@@ -140,7 +136,6 @@ extension AddAsset.View {
 		}
 	}
 
-	@ViewBuilder
 	func addAssetButton(_ viewStore: ViewStoreOf<AddAsset>) -> some SwiftUI.View {
 		WithControlRequirements(
 			viewStore.validatedResourceAddress,

@@ -1,36 +1,18 @@
 // MARK: - ScannedParsedOlympiaWalletToMigrate
-struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
+struct ScannedParsedOlympiaWalletToMigrate: Hashable {
 	let mnemonicWordCount: BIP39WordCount
 	let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 }
 
 // MARK: - MigrateOlympiaSoftwareAccountsToBabylonRequest
-struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable {
+struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Hashable {
 	let olympiaAccounts: Set<OlympiaAccountToMigrate>
 	let olympiaFactorSouceID: FactorSourceIDFromHash
 	let olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
-
-	init(
-		olympiaAccounts: Set<OlympiaAccountToMigrate>,
-		olympiaFactorSouceID: FactorSourceIDFromHash,
-		olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
-	) {
-		self.olympiaAccounts = olympiaAccounts
-		self.olympiaFactorSource = olympiaFactorSource
-		self.olympiaFactorSouceID = olympiaFactorSouceID
-	}
 }
 
 // MARK: - MigrateOlympiaHardwareAccountsToBabylonRequest
-struct MigrateOlympiaHardwareAccountsToBabylonRequest: Sendable, Hashable {
+struct MigrateOlympiaHardwareAccountsToBabylonRequest: Hashable {
 	let olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>
 	let ledgerFactorSourceID: FactorSourceIDFromHash
-
-	init(
-		olympiaAccounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
-		ledgerFactorSourceID: FactorSourceIDFromHash
-	) {
-		self.olympiaAccounts = olympiaAccounts
-		self.ledgerFactorSourceID = ledgerFactorSourceID
-	}
 }

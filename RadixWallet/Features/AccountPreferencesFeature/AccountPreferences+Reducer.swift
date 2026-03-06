@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountPreferences
-struct AccountPreferences: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct AccountPreferences: FeatureReducer {
+	struct State: Hashable {
 		enum SecurityState: Hashable {
 			case unsecurified(FactorSourcesList.Row)
 			case securified
@@ -12,8 +12,13 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		var account: Account
 		var securityState: SecurityState?
 		var faucetButtonState: ControlState
-		var address: AccountAddress { account.address }
-		var isOnMainnet: Bool { account.networkID == .mainnet }
+		var address: AccountAddress {
+			account.address
+		}
+
+		var isOnMainnet: Bool {
+			account.networkID == .mainnet
+		}
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -29,7 +34,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
@@ -40,7 +45,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case applyShieldButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case accountUpdated(Account)
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
@@ -49,7 +54,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		case securityStateDetermined(State.SecurityState)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case accountHidden
 		case goHomeAfterAccountDeleted
 	}
@@ -57,7 +62,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 	// MARK: - Destination
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Hashable, Sendable {
+		enum State: Hashable {
 			case updateAccountLabel(RenameLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
@@ -72,7 +77,7 @@ struct AccountPreferences: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Equatable, Sendable {
+		enum Action: Equatable {
 			case updateAccountLabel(RenameLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
@@ -128,8 +133,6 @@ struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)

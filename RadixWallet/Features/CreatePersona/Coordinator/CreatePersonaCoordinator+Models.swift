@@ -2,11 +2,11 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PersonaPrimacy
-enum PersonaPrimacy: Sendable, Hashable {
+enum PersonaPrimacy: Hashable {
 	case first(First)
 	case notFirst
 
-	enum First: Sendable, Hashable {
+	enum First: Hashable {
 		case onAnyNetwork
 		case justOnCurrentNetwork
 	}
@@ -46,22 +46,14 @@ extension PersonaPrimacy {
 }
 
 // MARK: - CreatePersonaConfig
-struct CreatePersonaConfig: Sendable, Hashable {
+struct CreatePersonaConfig: Hashable {
 	let personaPrimacy: PersonaPrimacy
 
 	let navigationButtonCTA: CreatePersonaNavigationButtonCTA
-
-	init(
-		personaPrimacy: PersonaPrimacy,
-		navigationButtonCTA: CreatePersonaNavigationButtonCTA
-	) {
-		self.personaPrimacy = personaPrimacy
-		self.navigationButtonCTA = navigationButtonCTA
-	}
 }
 
 // MARK: - CreatePersonaNavigationButtonCTA
-enum CreatePersonaNavigationButtonCTA: Sendable, Equatable {
+enum CreatePersonaNavigationButtonCTA: Equatable {
 	case goBackToPersonaListInSettings
 	case goBackToChoosePersonas
 }

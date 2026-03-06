@@ -1,5 +1,5 @@
 // MARK: - OnLedgerTag
-enum OnLedgerTag: Hashable, Sendable, Codable, Comparable {
+enum OnLedgerTag: Hashable, Codable, Comparable {
 	case officialRadix
 	case custom(NonEmptyString)
 }

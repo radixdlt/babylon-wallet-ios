@@ -1,6 +1,6 @@
 
 extension BitArray {
-	// https://stackoverflow.com/a/28930093/1311272
+	/// https://stackoverflow.com/a/28930093/1311272
 	func asBytesArray() -> [UInt8] {
 		let numBits = self.count
 		let numBytes = (numBits + 7) / 8
@@ -21,7 +21,9 @@ extension BitArray {
 		self.init(binaryString: data.binaryString)!
 	}
 
-	var binaryString: String { map { "\($0 == true ? 1 : 0)" }.joined() }
+	var binaryString: String {
+		map { "\($0 == true ? 1 : 0)" }.joined()
+	}
 }
 
 extension BitArray {

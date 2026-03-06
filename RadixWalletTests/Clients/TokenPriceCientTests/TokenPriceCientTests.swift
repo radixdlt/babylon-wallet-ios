@@ -19,35 +19,35 @@ final class TokenPriceCientTests: XCTestCase {
 		validateDecimalPriceConversion(10_000_000, expected: 10_000_000)
 	}
 
-	func test_withDecimalPlaces_1() {
-		validateDecimalPriceConversion(1.99, expected: try! Decimal192("1.99"))
+	func test_withDecimalPlaces_1() throws {
+		try validateDecimalPriceConversion(1.99, expected: Decimal192("1.99"))
 	}
 
-	func test_withDecimalPlaces_2() {
-		validateDecimalPriceConversion(1.000099, expected: try! Decimal192("1.000099"))
+	func test_withDecimalPlaces_2() throws {
+		try validateDecimalPriceConversion(1.000099, expected: Decimal192("1.000099"))
 	}
 
-	func test_belowOne_1() {
-		validateDecimalPriceConversion(0.99, expected: try! Decimal192(0.99))
+	func test_belowOne_1() throws {
+		try validateDecimalPriceConversion(0.99, expected: Decimal192(0.99))
 	}
 
-	func test_belowOne_2() {
-		validateDecimalPriceConversion(0.000099, expected: try! Decimal192("0.000099"))
+	func test_belowOne_2() throws {
+		try validateDecimalPriceConversion(0.000099, expected: Decimal192("0.000099"))
 	}
 
-	func test_closeToDecimal192Divisibility() {
+	func test_closeToDecimal192Divisibility() throws {
 		// 17 decimal places
-		validateDecimalPriceConversion(1.12345678901234567, expected: try! Decimal192("1.1234567890123457"))
+		try validateDecimalPriceConversion(1.12345678901234567, expected: Decimal192("1.1234567890123457"))
 	}
 
-	func test_maxDecimal192Divisibility() {
+	func test_maxDecimal192Divisibility() throws {
 		// 18 decimal places
-		validateDecimalPriceConversion(1.123456789012345678, expected: try! Decimal192("1.1234567890123457"))
+		try validateDecimalPriceConversion(1.123456789012345678, expected: Decimal192("1.1234567890123457"))
 	}
 
-	func test_overMaxDecimal192Divisibility() {
+	func test_overMaxDecimal192Divisibility() throws {
 		// 22 decimal places
-		validateDecimalPriceConversion(1.1234567890123456789012, expected: try! Decimal192("1.1234567890123457"))
+		try validateDecimalPriceConversion(1.1234567890123456789012, expected: Decimal192("1.1234567890123457"))
 	}
 
 	private func validateDecimalPriceConversion(

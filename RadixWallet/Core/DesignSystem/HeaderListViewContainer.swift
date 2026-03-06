@@ -61,25 +61,25 @@ struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresentable {
 							let headerHeight = context.coordinator.headerController.view.bounds.height
 							let offset = tableView.contentOffset.y
 
-							/// Threshold to avoid setting constraints too frequently
+							// Threshold to avoid setting constraints too frequently
 							let offsetThreshold: CGFloat = 0.5
 
 							if abs(offset) > offsetThreshold {
 								topConstraint.constant = min(max(0, topConstraint.constant - offset), headerHeight)
 							} else {
-								/// Threshold to control scroll sensitivity
+								// Threshold to control scroll sensitivity
 								let velocityThreshold: Double = 900
 								let velocity = tableView.panGestureRecognizer.velocity(in: tableView.superview).y
 
 								let shouldScrollUp = velocity < -velocityThreshold && topConstraint.constant > 0
 								let shouldScrollDown = velocity > velocityThreshold && topConstraint.constant < initialTopInset
 
-								/// Update the list view's top constraint animated
+								// Update the list view's top constraint animated
 								if shouldScrollUp || shouldScrollDown {
 									let newTopConstraintConstant = shouldScrollUp ? 0 : initialTopInset
 									topConstraint.constant = newTopConstraintConstant
 
-									/// Extend the list view's height to prevent it from shrinking mid-animation
+									// Extend the list view's height to prevent it from shrinking mid-animation
 									if shouldScrollDown {
 										context.coordinator.bottomConstraint?.constant = context.coordinator.listController.view.bounds.height
 									}
@@ -96,7 +96,7 @@ struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresentable {
 								}
 							}
 
-							/// Reset `contentOffset` in order to avoid scroll when `listView` is not fully expanded
+							// Reset `contentOffset` in order to avoid scroll when `listView` is not fully expanded
 							let shouldResetOffset = topConstraint.constant > 0
 								&& topConstraint.constant < headerHeight
 								&& abs(offset) > offsetThreshold
@@ -104,10 +104,10 @@ struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresentable {
 								tableView.contentOffset.y = 0
 							}
 
-							/// Set header alpha
+							// Set header alpha
 							var headerAlpha = 1 - (initialTopInset - topConstraint.constant) / initialTopInset
 
-							/// Make transition more prominent
+							// Make transition more prominent
 							if headerAlpha < 1 {
 								headerAlpha -= 0.2
 							}

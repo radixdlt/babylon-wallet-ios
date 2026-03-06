@@ -1,6 +1,6 @@
 // MARK: - StakeSummaryView
 struct StakeSummaryView: View {
-	struct ViewState: Hashable, Sendable {
+	struct ViewState: Hashable {
 		let staked: Loadable<ExactResourceAmount>
 		let unstaking: Loadable<ExactResourceAmount>
 		let readyToClaim: Loadable<ExactResourceAmount>
@@ -63,7 +63,6 @@ struct StakeSummaryView: View {
 }
 
 extension StakeSummaryView {
-	@ViewBuilder
 	private func summaryRow(
 		_ name: String,
 		amount: Loadable<ExactResourceAmount>

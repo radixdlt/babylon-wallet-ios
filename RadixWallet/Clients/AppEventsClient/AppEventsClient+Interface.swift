@@ -1,5 +1,5 @@
 // MARK: - AppEventsClient
-struct AppEventsClient: Sendable {
+struct AppEventsClient {
 	var handleEvent: HandleEvent
 	var events: Events
 }
@@ -18,7 +18,7 @@ extension DependencyValues {
 }
 
 // MARK: - AppEvent
-enum AppEvent: Sendable, Hashable {
+enum AppEvent: Hashable {
 	case appStarted
 	case walletCreated
 	case walletRestored

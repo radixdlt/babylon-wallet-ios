@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AccountDetails
-struct AccountDetails: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable, AccountWithInfoHolder {
+struct AccountDetails: FeatureReducer {
+	struct State: Hashable, AccountWithInfoHolder {
 		var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
 		var securityProblemsConfig: EntitySecurityProblemsView.Config
@@ -28,7 +28,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case backButtonTapped
 		case preferencesButtonTapped
@@ -40,15 +40,15 @@ struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case assets(AssetsView.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case accountUpdated(Account)
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims([AccountLockerClaimDetails])
@@ -57,7 +57,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case preferences(AccountPreferences.State)
 			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
@@ -72,7 +72,7 @@ struct AccountDetails: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case preferences(AccountPreferences.Action)
 			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
@@ -136,8 +136,6 @@ struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	private let accountPortfolioRefreshIntervalInSeconds = 60
-
-	init() {}
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.assets, action: \.child.assets) {

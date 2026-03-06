@@ -3,7 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - PersonaDetails
-struct PersonaDetails: Sendable, FeatureReducer {
+struct PersonaDetails: FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
@@ -12,11 +12,9 @@ struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-	init() {}
-
 	// MARK: - State
 
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		enum SecurityState: Hashable {
 			case unsecurified(FactorSourcesList.Row)
 			case securified
@@ -25,7 +23,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		var mode: Mode
 		var securityState: SecurityState?
 
-		enum Mode: Sendable, Hashable {
+		enum Mode: Hashable {
 			case general(dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
@@ -34,7 +32,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			)
 		}
 
-		struct DappInfo: Sendable, Hashable, Identifiable {
+		struct DappInfo: Hashable, Identifiable {
 			let id: AuthorizedDapp.ID
 			var thumbnail: URL?
 			let displayName: String
@@ -62,7 +60,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Action
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case appeared
 		case dAppTapped(AuthorizedDapp.ID)
 		case editPersonaTapped
@@ -75,13 +73,13 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		case viewShieldDetailsRowTapped
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case personaDeauthorized
 		case personaChanged(Persona.ID)
 		case personaHidden
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case reloaded(Persona, State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
@@ -95,7 +93,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
 			case factorSourceDetail(FactorSourceDetail.State)
@@ -110,7 +108,7 @@ struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case editPersona(EditPersona.Action)
 			case dAppDetails(DappDetails.Action)
 			case factorSourceDetail(FactorSourceDetail.Action)
@@ -124,12 +122,12 @@ struct PersonaDetails: Sendable, FeatureReducer {
 			case confirmHideAlert(ConfirmHideAlert)
 
 			@CasePathable
-			enum ConfirmForgetAlert: Sendable, Equatable {
+			enum ConfirmForgetAlert: Equatable {
 				case confirmTapped
 				case cancelTapped
 			}
 
-			enum ConfirmHideAlert: Sendable, Equatable {
+			enum ConfirmHideAlert: Equatable {
 				case confirmTapped
 				case cancelTapped
 			}

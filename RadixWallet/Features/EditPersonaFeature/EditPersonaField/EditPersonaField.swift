@@ -11,8 +11,8 @@ protocol EditPersonaFieldKindBehaviour: Sendable, Hashable, Comparable {
 }
 
 // MARK: - EditPersonaField
-struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendable, FeatureReducer, EmptyInitializable {
-	struct State: Sendable, Hashable {
+struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: FeatureReducer, EmptyInitializable {
+	struct State: Hashable {
 		let behaviour: Behaviour
 		let entryID: PersonaDataEntryID
 		let isRequestedByDapp: Bool
@@ -45,7 +45,7 @@ struct EditPersonaField<Behaviour: EditPersonaFieldKindBehaviour>: Sendable, Fea
 
 	init() {}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case inputFieldChanged(String)
 		case focusChanged(Bool)
 	}
@@ -132,7 +132,7 @@ extension EditPersonaStaticField.State {
 typealias EditPersonaDynamicField = EditPersonaField<DynamicFieldID>
 
 // MARK: - DynamicFieldID
-enum DynamicFieldID: Hashable, Sendable {
+enum DynamicFieldID: Hashable {
 	case givenNames
 	case nickName
 	case familyName
@@ -163,7 +163,9 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		}
 	}
 
-	var placeholder: String { "" }
+	var placeholder: String {
+		""
+	}
 
 	var contentType: UITextContentType? {
 		switch self {

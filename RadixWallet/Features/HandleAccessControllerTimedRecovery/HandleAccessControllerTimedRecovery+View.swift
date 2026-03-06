@@ -49,7 +49,6 @@ extension HandleAccessControllerTimedRecovery {
 			}
 		}
 
-		@ViewBuilder
 		private var timelineAndExplanationCard: some SwiftUI.View {
 			VStack(alignment: .leading) {
 				// Timeline Section
@@ -177,7 +176,6 @@ extension HandleAccessControllerTimedRecovery {
 			}
 		}
 
-		@ViewBuilder
 		private var impactSection: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium2) {
 				Text(L10n.HandleAccessControllerTimedRecovery.Impact.title)

@@ -5,9 +5,9 @@ enum ArculusChangePIN {}
 // MARK: ArculusChangePIN.EnterOldPIN
 extension ArculusChangePIN {
 	@Reducer
-	struct EnterOldPIN: Sendable, FeatureReducer {
+	struct EnterOldPIN: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let factorSource: ArculusCardFactorSource
 
 			var pinInput: ArculusPINInput.State = .init(shouldConfirmPIN: false)
@@ -18,31 +18,31 @@ extension ArculusChangePIN {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case pinAdded(String)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case finished
 		}
 
-		enum InternalAction: Sendable, Equatable {
+		enum InternalAction: Equatable {
 			case pinVerified
 		}
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case pinInput(ArculusPINInput.Action)
 		}
 
 		struct Destination: DestinationReducer {
 			@CasePathable
-			enum State: Sendable, Hashable {
+			enum State: Hashable {
 				case configureNewPIN(ArculusChangePIN.EnterNewPIN.State)
 			}
 
 			@CasePathable
-			enum Action: Sendable, Equatable {
+			enum Action: Equatable {
 				case configureNewPIN(ArculusChangePIN.EnterNewPIN.Action)
 			}
 

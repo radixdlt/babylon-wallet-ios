@@ -1,10 +1,6 @@
 // MARK: - BackButton
 struct BackButton: SwiftUI.View {
 	let action: () -> Void
-
-	init(action: @escaping () -> Void) {
-		self.action = action
-	}
 }
 
 extension BackButton {

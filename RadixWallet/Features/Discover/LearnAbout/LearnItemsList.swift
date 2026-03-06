@@ -1,9 +1,9 @@
 // MARK: - Discover.LearnItemsList
 extension Discover {
 	@Reducer
-	struct LearnItemsList: Sendable, FeatureReducer {
+	struct LearnItemsList: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			let learnItems: IdentifiedArrayOf<LearnItem>
 			var displayedItems: IdentifiedArrayOf<LearnItem>
 
@@ -23,7 +23,7 @@ extension Discover {
 
 		typealias Action = FeatureAction<Self>
 
-		enum ViewAction: Sendable, Equatable {
+		enum ViewAction: Equatable {
 			case learnItemTapped(LearnItem)
 		}
 
@@ -52,7 +52,7 @@ private func allLearnItems() -> IdentifiedArrayOf<Discover.LearnItemsList.LearnI
 
 // MARK: - Discover.LearnItemsList.LearnItem
 extension Discover.LearnItemsList {
-	struct LearnItem: Identifiable, Hashable, Equatable, Sendable {
+	struct LearnItem: Identifiable, Hashable, Equatable {
 		let id: InfoLinkSheet.GlossaryItem
 		let icon: ImageSource
 		let title: String

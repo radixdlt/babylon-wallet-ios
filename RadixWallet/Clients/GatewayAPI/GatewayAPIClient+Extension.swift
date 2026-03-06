@@ -151,7 +151,7 @@ extension GatewayAPIClient {
 // MARK: - Pagination
 extension GatewayAPIClient {
 	/// A page cursor is required to have the `nextPageCurosr` itself, as well the `ledgerState` of the previous page.
-	struct PageCursor: Hashable, Sendable {
+	struct PageCursor: Hashable {
 		let ledgerState: GatewayAPI.LedgerState
 		let nextPageCursor: String
 
@@ -161,7 +161,7 @@ extension GatewayAPIClient {
 		}
 	}
 
-	struct PaginatedResourceResponse<Resource: Sendable>: Sendable {
+	struct PaginatedResourceResponse<Resource: Sendable> {
 		let loadedItems: [Resource]
 		let totalCount: Int64?
 		let cursor: PageCursor?
@@ -185,12 +185,12 @@ extension GatewayAPIClient {
 		func fetchAllPaginatedItems(
 			collectedResources: PaginatedResourceResponse<Item>?
 		) async throws -> [Item] {
-			/// Finish when some items where loaded and the nextPageCursor is nil.
+			// Finish when some items where loaded and the nextPageCursor is nil.
 			if let collectedResources, collectedResources.cursor == nil {
 				return collectedResources.loadedItems
 			}
 
-			/// We can request here with nil nextPageCursor, as the first page will not have a cursor.
+			// We can request here with nil nextPageCursor, as the first page will not have a cursor.
 			let response = try await paginatedRequest(collectedResources?.cursor)
 			let oldItems = collectedResources?.loadedItems ?? []
 			let allItems = oldItems + response.loadedItems

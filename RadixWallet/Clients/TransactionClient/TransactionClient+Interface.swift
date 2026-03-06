@@ -1,5 +1,5 @@
 // MARK: - TransactionClient
-struct TransactionClient: Sendable, DependencyKey {
+struct TransactionClient: DependencyKey {
 	var getTransactionReview: GetTransactionReview
 	var buildTransactionIntent: BuildTransactionIntent
 	var notarizeTransaction: NotarizeTransaction
@@ -28,7 +28,7 @@ extension DependencyValues {
 
 // MARK: - TransactionClient.NotarizeTransactionRequest
 extension TransactionClient {
-	struct NotarizeTransactionRequest: Sendable {
+	struct NotarizeTransactionRequest {
 		let signedIntent: SignedIntent
 		let notary: Curve25519.Signing.PrivateKey
 	}

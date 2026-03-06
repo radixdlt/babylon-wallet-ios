@@ -197,7 +197,7 @@ extension Home.AccountRow.View {
 		}
 	}
 
-	// Crates the view of the account owned resources
+	/// Crates the view of the account owned resources
 	func ownedResourcesList(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
 		GeometryReader { proxy in
 			HStack(spacing: .small1) {

@@ -2,8 +2,8 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NewConnection
-struct NewConnection: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct NewConnection: FeatureReducer {
+	struct State: Hashable {
 		typealias ConnectionName = String
 
 		var root: Root.State
@@ -25,20 +25,20 @@ struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case ledgerConnectionIntroContinueTapped
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Equatable {
 		case root(Root.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Equatable {
 		case newConnection(P2PLink)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case linkConnectionDataFromStringResult(TaskResult<LinkConnectionQRData>)
 		case establishConnection(String)
 		case establishConnectionResult(TaskResult<P2PLink>)
@@ -46,9 +46,9 @@ struct NewConnection: Sendable, FeatureReducer {
 		case showErrorAlert(AlertState<Destination.Action.ErrorAlert>)
 	}
 
-	struct Root: Sendable, Hashable, Reducer {
+	struct Root: Hashable, Reducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case ledgerConnectionIntro
 			case localNetworkPermission(LocalNetworkPermission.State)
 			case scanQR(ScanQRCoordinator.State)
@@ -61,7 +61,7 @@ struct NewConnection: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case ledgerConnectionIntro(Never)
 			case localNetworkPermission(LocalNetworkPermission.Action)
 			case scanQR(ScanQRCoordinator.Action)
@@ -87,15 +87,15 @@ struct NewConnection: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case errorAlert(AlertState<Action.ErrorAlert>)
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case errorAlert(ErrorAlert)
 
-			enum ErrorAlert: Hashable, Sendable {
+			enum ErrorAlert: Hashable {
 				case dismissTapped
 			}
 		}
@@ -224,7 +224,7 @@ struct NewConnection: Sendable, FeatureReducer {
 		case let .root(.scanQR(.delegate(.scanned(qrString)))):
 			return .run { send in
 				if let _ = try? Exactly32Bytes(hex: qrString) {
-					/// User scanned an old format QR code
+					// User scanned an old format QR code
 					await send(.internal(.showErrorAlert(.oldFormatQRCode)))
 					return
 				}

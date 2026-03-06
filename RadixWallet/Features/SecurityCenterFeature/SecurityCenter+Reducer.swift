@@ -1,8 +1,8 @@
 import ComposableArchitecture
 
 // MARK: - SecurityCenter
-struct SecurityCenter: Sendable, FeatureReducer {
-	struct State: Sendable, Hashable {
+struct SecurityCenter: FeatureReducer {
+	struct State: Hashable {
 		var isStokenet: Bool = false
 		var problems: [SecurityProblem] = []
 		var actionsRequired: Set<SecurityProblemKind> {
@@ -17,7 +17,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 
 	struct Destination: DestinationReducer {
 		@CasePathable
-		enum State: Sendable, Hashable {
+		enum State: Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
 			case deviceFactorSources(FactorSourcesList.State)
@@ -28,7 +28,7 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		}
 
 		@CasePathable
-		enum Action: Sendable, Equatable {
+		enum Action: Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
 			case deviceFactorSources(FactorSourcesList.Action)
@@ -63,13 +63,13 @@ struct SecurityCenter: Sendable, FeatureReducer {
 		}
 	}
 
-	enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Equatable {
 		case task
 		case problemTapped(SecurityProblem)
 		case cardTapped(SecurityProblemKind)
 	}
 
-	enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Equatable {
 		case setProblems([SecurityProblem])
 		case setIsStokenet(Bool)
 	}

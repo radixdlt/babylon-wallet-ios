@@ -112,7 +112,6 @@ extension CustomizeFees {
 			.destinations(with: store)
 		}
 
-		@ViewBuilder
 		func infoView(_ viewState: CustomizeFees.ViewState) -> some SwiftUI.View {
 			VStack {
 				Text(viewState.title)
@@ -131,7 +130,6 @@ extension CustomizeFees {
 			}
 		}
 
-		@ViewBuilder
 		func feePayerView(_ viewState: CustomizeFees.ViewState) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
 				HStack {

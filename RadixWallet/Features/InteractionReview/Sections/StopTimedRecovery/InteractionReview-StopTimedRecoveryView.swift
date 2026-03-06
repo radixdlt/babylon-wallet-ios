@@ -60,7 +60,7 @@ extension InteractionReview {
 
 // MARK: - InteractionReview.StopTimedRecoveryView.ViewState
 extension InteractionReview.StopTimedRecoveryView {
-	struct ViewState: Sendable, Hashable {
+	struct ViewState: Hashable {
 		let entity: AccountOrPersona
 	}
 }

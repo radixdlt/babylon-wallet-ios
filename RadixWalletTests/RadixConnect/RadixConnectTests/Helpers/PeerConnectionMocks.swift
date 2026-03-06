@@ -10,7 +10,10 @@ final class MockPeerConnectionFactory: PeerConnectionFactory {
 		self.clients = clients
 	}
 
-	func makePeerConnectionClient(for clientID: RemoteClientID) throws -> PeerConnectionClient {
+	func makePeerConnectionClient(
+		for clientID: RemoteClientID,
+		using _: [P2PIceServer]
+	) throws -> PeerConnectionClient {
 		clients.first { $0.id.rawValue == clientID.rawValue }!
 	}
 }

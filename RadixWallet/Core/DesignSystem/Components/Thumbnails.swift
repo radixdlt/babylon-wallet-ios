@@ -7,7 +7,7 @@ struct Thumbnail: View {
 	private let url: URL?
 	private let size: HitTargetSize
 
-	enum ContentType: Sendable, Hashable {
+	enum ContentType: Hashable {
 		case token(Token)
 		case poolUnit
 		case lsu
@@ -18,7 +18,7 @@ struct Thumbnail: View {
 		case pool
 		case validator
 
-		enum Token: Sendable, Hashable {
+		enum Token: Hashable {
 			case xrd
 			case other
 		}
@@ -92,7 +92,7 @@ struct Thumbnail: View {
 }
 
 extension Thumbnail {
-	enum FungibleContent: Sendable, Hashable {
+	enum FungibleContent: Hashable {
 		case token(TokenContent)
 		case poolUnit(URL?)
 		case lsu(URL?)
@@ -114,7 +114,7 @@ extension Thumbnail {
 		}
 	}
 
-	enum TokenContent: Sendable, Hashable {
+	enum TokenContent: Hashable {
 		case xrd
 		case other(URL?)
 
@@ -133,7 +133,7 @@ extension Thumbnail {
 		}
 	}
 
-	enum NonFungibleContent: Sendable, Hashable {
+	enum NonFungibleContent: Hashable {
 		case nft(URL?)
 		case stakeClaimNFT(URL?)
 
@@ -359,11 +359,9 @@ extension ImagePipeline {
 		let dataCache = try! DataCache(name: "ImagesCache")
 		dataCache.sizeLimit = 100 * 1024 * 1024
 
-		let pipeline = ImagePipeline { config in
+		return ImagePipeline { config in
 			config.dataCache = dataCache
 			config.imageCache = ImageCache.shared
 		}
-
-		return pipeline
 	}()
 }

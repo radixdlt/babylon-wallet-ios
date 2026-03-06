@@ -4,10 +4,6 @@ struct SeparatorEdgeSet: OptionSet {
 	static let bottom = Self(rawValue: 1 << 1)
 
 	let rawValue: UInt8
-
-	init(rawValue: UInt8) {
-		self.rawValue = rawValue
-	}
 }
 
 extension View {

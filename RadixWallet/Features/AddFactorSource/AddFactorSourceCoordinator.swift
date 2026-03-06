@@ -2,15 +2,15 @@ import ComposableArchitecture
 import Sargon
 
 extension AddFactorSource {
-	enum Context: Sendable, Hashable {
+	enum Context: Hashable {
 		case newFactorSource
 		case recoverFactorSource(isOlympia: Bool)
 	}
 
 	@Reducer
-	struct Coordinator: Sendable, FeatureReducer {
+	struct Coordinator: FeatureReducer {
 		@ObservableState
-		struct State: Sendable, Hashable {
+		struct State: Hashable {
 			enum Mode {
 				case preselectedKind(FactorSourceKind)
 				case toSelectFromKinds([FactorSourceKind])
@@ -53,13 +53,13 @@ extension AddFactorSource {
 		struct Root {
 			@CasePathable
 			@ObservableState
-			enum State: Hashable, Sendable {
+			enum State: Hashable {
 				case selectKind(AddFactorSource.SelectKind.State)
 				case intro(AddFactorSource.Intro.State)
 			}
 
 			@CasePathable
-			enum Action: Equatable, Sendable {
+			enum Action: Equatable {
 				case selectKind(AddFactorSource.SelectKind.Action)
 				case intro(AddFactorSource.Intro.Action)
 			}
@@ -78,12 +78,12 @@ extension AddFactorSource {
 		typealias Action = FeatureAction<Self>
 
 		@CasePathable
-		enum ChildAction: Sendable, Equatable {
+		enum ChildAction: Equatable {
 			case root(Root.Action)
 			case path(StackActionOf<Path>)
 		}
 
-		enum DelegateAction: Sendable, Equatable {
+		enum DelegateAction: Equatable {
 			case finished(FactorSource)
 		}
 
@@ -136,7 +136,7 @@ extension AddFactorSource.Coordinator.Path.State: Hashable {}
 extension AddFactorSource.Coordinator.Path.Action: Equatable {}
 
 // MARK: - FactorSourceStrategy
-struct FactorSourceStrategy: Sendable, Hashable {
+struct FactorSourceStrategy: Hashable {
 	let kind: FactorSourceKind
 	let context: AddFactorSource.Context
 

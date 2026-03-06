@@ -1,8 +1,8 @@
 // MARK: - RenameLabel
 @Reducer
-struct RenameLabel: Sendable, FeatureReducer {
+struct RenameLabel: FeatureReducer {
 	@ObservableState
-	struct State: Sendable, Hashable {
+	struct State: Hashable {
 		var kind: Kind
 		var label: String
 		var sanitizedLabel: NonEmptyString?
@@ -18,19 +18,19 @@ struct RenameLabel: Sendable, FeatureReducer {
 	typealias Action = FeatureAction<Self>
 
 	@CasePathable
-	enum ViewAction: Equatable, Sendable {
+	enum ViewAction: Equatable {
 		case closeButtonTapped
 		case labelChanged(String)
 		case updateTapped(NonEmptyString)
 		case focusChanged(Bool)
 	}
 
-	enum InternalAction: Equatable, Sendable {
+	enum InternalAction: Equatable {
 		case handleSuccess
 		case handleFactorSourceUpdate(FactorSource)
 	}
 
-	enum DelegateAction: Equatable, Sendable {
+	enum DelegateAction: Equatable {
 		case labelUpdated(State.Kind)
 	}
 
@@ -134,7 +134,7 @@ extension RenameLabel.State {
 		case valid
 	}
 
-	enum Kind: Sendable, Hashable {
+	enum Kind: Hashable {
 		case account(Account)
 		case connector(P2PLink)
 		case factorSource(FactorSource, name: String)

@@ -72,28 +72,37 @@ extension InteractionReview {
 }
 
 extension InteractionReview.DepositExceptionsView {
-	struct ViewState: Sendable, Hashable {
+	struct ViewState: Hashable {
 		var changes: IdentifiedArrayOf<Change>
 	}
 
-	struct Change: Sendable, Identifiable, Hashable {
-		var id: AccountAddress.ID { account.address.id }
+	struct Change: Identifiable, Hashable {
+		var id: AccountAddress.ID {
+			account.address.id
+		}
+
 		let account: Account
 		let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
 		let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
 
-		struct ResourcePreferenceChange: Sendable, Identifiable, Hashable {
-			var id: OnLedgerEntity.Resource.ID { resource.id }
+		struct ResourcePreferenceChange: Identifiable, Hashable {
+			var id: OnLedgerEntity.Resource.ID {
+				resource.id
+			}
+
 			let resource: OnLedgerEntity.Resource
 			let change: ResourcePreferenceUpdate
 		}
 
-		struct AllowedDepositorChange: Sendable, Identifiable, Hashable {
-			var id: OnLedgerEntity.Resource.ID { resource.id }
+		struct AllowedDepositorChange: Identifiable, Hashable {
+			var id: OnLedgerEntity.Resource.ID {
+				resource.id
+			}
+
 			let resource: OnLedgerEntity.Resource
 			let change: Change
 
-			enum Change: Sendable, Hashable {
+			enum Change: Hashable {
 				case added
 				case removed
 			}
