@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 
 // MARK: - SecurityCenter
 struct SecurityCenter: FeatureReducer {
@@ -20,6 +21,9 @@ struct SecurityCenter: FeatureReducer {
 		enum State: Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
+			case mfaFactorInstance(MfaFactorInstance.State)
+			case selectFactorSource(SelectFactorSource.State)
+			case addressDetails(AddressDetails.State)
 			case deviceFactorSources(FactorSourcesList.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
@@ -31,6 +35,9 @@ struct SecurityCenter: FeatureReducer {
 		enum Action: Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
+			case mfaFactorInstance(MfaFactorInstance.Action)
+			case selectFactorSource(SelectFactorSource.Action)
+			case addressDetails(AddressDetails.Action)
 			case deviceFactorSources(FactorSourcesList.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
@@ -44,6 +51,15 @@ struct SecurityCenter: FeatureReducer {
 			}
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
+			}
+			Scope(state: \.mfaFactorInstance, action: \.mfaFactorInstance) {
+				MfaFactorInstance()
+			}
+			Scope(state: \.selectFactorSource, action: \.selectFactorSource) {
+				SelectFactorSource()
+			}
+			Scope(state: \.addressDetails, action: \.addressDetails) {
+				AddressDetails()
 			}
 			Scope(state: \.deviceFactorSources, action: \.deviceFactorSources) {
 				FactorSourcesList()
@@ -67,11 +83,13 @@ struct SecurityCenter: FeatureReducer {
 		case task
 		case problemTapped(SecurityProblem)
 		case cardTapped(SecurityProblemKind)
+		case mfaFactorInstanceTapped
 	}
 
 	enum InternalAction: Equatable {
 		case setProblems([SecurityProblem])
 		case setIsStokenet(Bool)
+		case mfaSignatureResourceLoaded(NonFungibleGlobalId)
 	}
 
 	var body: some ReducerOf<Self> {
@@ -85,6 +103,7 @@ struct SecurityCenter: FeatureReducer {
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -127,6 +146,10 @@ struct SecurityCenter: FeatureReducer {
 				state.destination = .configurationBackup(.init())
 				return .none
 			}
+
+		case .mfaFactorInstanceTapped:
+			state.destination = .mfaFactorInstance(.init())
+			return .none
 		}
 	}
 
@@ -138,11 +161,28 @@ struct SecurityCenter: FeatureReducer {
 		case let .setIsStokenet(isStokenet):
 			state.isStokenet = isStokenet
 			return .none
+		case let .mfaSignatureResourceLoaded(globalId):
+			state.destination = .addressDetails(.init(address: .nonFungibleGlobalID(globalId)))
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
+		case .mfaFactorInstance(.delegate(.continueTapped)):
+			state.destination = .selectFactorSource(.init(context: .mfaFactorInstance))
+			return .none
+		case let .selectFactorSource(.delegate(.selectedFactorSource(factorSource, _))):
+			return .run { send in
+				let mfaFactorInstance = try await SargonOs.shared.getNewMfaFactorInstance(factorSource: factorSource.asGeneral)
+				let globalId = switch mfaFactorInstance.factorInstance.badge {
+				case let .virtual(.hierarchicalDeterministic(key)):
+					try key.nonFungibleGlobalId()
+				}
+				await send(.internal(.mfaSignatureResourceLoaded(globalId)))
+			} catch: { err, _ in
+				errorQueue.schedule(err)
+			}
 		case .importMnemonics(.delegate(.finishedEarly)),
 		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
 			state.destination = nil
@@ -166,6 +206,67 @@ struct SecurityCenter: FeatureReducer {
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setProblems(problems)))
+			}
+		}
+	}
+}
+
+// MARK: - MfaFactorInstance
+@Reducer
+struct MfaFactorInstance {
+	@ObservableState
+	struct State: Hashable {
+		struct ActiveUsage: Hashable {
+			let signatureResource: NonFungibleGlobalId
+			let accountAddresses: [AccountAddress]
+		}
+
+		var activeUsages: [ActiveUsage] = []
+		var isLoadingCurrentUsage: Bool = false
+	}
+
+	enum Action: Equatable {
+		case appeared
+		case currentUsageLoaded([State.ActiveUsage])
+		case continueTapped
+		case delegate(DelegateAction)
+	}
+
+	enum DelegateAction: Equatable {
+		case continueTapped
+	}
+
+	@Dependency(\.errorQueue) var errorQueue
+
+	var body: some ReducerOf<Self> {
+		Reduce { state, action in
+			switch action {
+			case .appeared:
+				state.isLoadingCurrentUsage = true
+				return .run { send in
+					let used = try await SargonOs.shared.usedMfaSignatureResourcesWithAccountsCurrentNetwork()
+					let usages = used.map { usedResource in
+						State.ActiveUsage(
+							signatureResource: usedResource.nonFungibleGlobalId,
+							accountAddresses: usedResource.accountAddresses
+						)
+					}
+					await send(.currentUsageLoaded(usages))
+				} catch: { error, send in
+					await send(.currentUsageLoaded([]))
+					errorQueue.schedule(error)
+				}
+
+			case let .currentUsageLoaded(currentUsages):
+				state.activeUsages = currentUsages
+				state.isLoadingCurrentUsage = false
+				return .none
+
+			case .continueTapped:
+				return .send(.delegate(.continueTapped))
+
+			case .delegate:
+				return .none
 			}
 		}
 	}

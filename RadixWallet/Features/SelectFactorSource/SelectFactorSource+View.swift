@@ -125,6 +125,8 @@ extension SelectFactorSource {
 				"Choose the security factor you will use to create the new Persona."
 			case .accountRecovery:
 				"Choose the security factor you will use to Recover Accounts"
+			case .mfaFactorInstance:
+				"Choose the security factor you will use to derive a new MFA signature resource instance."
 			}
 		}
 	}

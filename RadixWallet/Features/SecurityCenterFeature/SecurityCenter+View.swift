@@ -53,6 +53,10 @@ extension SecurityCenter {
 									store.send(.view(.cardTapped(type)))
 								}
 							}
+
+							MfaFactorInstanceCard {
+								store.send(.view(.mfaFactorInstanceTapped))
+							}
 						}
 					}
 					.padding(.top, .small2)
@@ -211,6 +215,109 @@ extension SecurityCenter {
 			}
 		}
 	}
+
+	struct MfaFactorInstanceCard: SwiftUI.View {
+		let action: () -> Void
+
+		var body: some SwiftUI.View {
+			Card(action: action) {
+				HStack(spacing: .zero) {
+					Image(.signingKey)
+						.frame(width: 80, height: 80)
+						.padding(.trailing, .medium3)
+
+					VStack(alignment: .leading, spacing: .small3) {
+						Text(L10n.FactorSources.Detail.mfaSignatureResourceTitle)
+							.foregroundStyle(Color.primaryText)
+							.textStyle(.body1Header)
+
+						Text(L10n.FactorSources.Detail.mfaSignatureResourceSubtitle)
+							.multilineTextAlignment(.leading)
+							.lineSpacing(-.small3)
+							.foregroundStyle(Color.secondaryText)
+							.textStyle(.body2Regular)
+					}
+
+					Spacer(minLength: .zero)
+				}
+				.padding(.vertical, .medium2)
+				.padding(.leading, .medium2)
+				.padding(.trailing, .medium3)
+			}
+		}
+	}
+}
+
+// MARK: - MfaFactorInstance.View
+extension MfaFactorInstance {
+	struct View: SwiftUI.View {
+		let store: StoreOf<MfaFactorInstance>
+
+		var body: some SwiftUI.View {
+			WithPerceptionTracking {
+				VStack(spacing: .medium3) {
+					Text(L10n.FactorSources.Detail.mfaSignatureResourceSubtitle)
+						.multilineTextAlignment(.center)
+						.textStyle(.body1Regular)
+						.foregroundStyle(.primaryText)
+
+					VStack(alignment: .leading, spacing: .small2) {
+						Text("Currently active signature resources")
+							.textStyle(.body1Header)
+							.foregroundStyle(.primaryText)
+
+						if store.isLoadingCurrentUsage {
+							HStack {
+								ProgressView()
+								Spacer(minLength: .zero)
+							}
+						} else if !store.activeUsages.isEmpty {
+							ForEach(Array(store.activeUsages.enumerated()), id: \.offset) { index, currentUsage in
+								VStack(alignment: .leading, spacing: .small3) {
+									KeyValueView(axis: .vertical, key: "Signature Resource #\(index + 1)") {
+										AddressView(
+											.address(.nonFungibleGlobalID(currentUsage.signatureResource)),
+											isTappable: false
+										)
+									}
+
+									ForEach(Array(currentUsage.accountAddresses.enumerated()), id: \.offset) { accountIndex, accountAddress in
+										KeyValueView(axis: .vertical, key: "Used by Account #\(accountIndex + 1)") {
+											AddressView(
+												.address(.account(accountAddress)),
+												isTappable: false
+											)
+										}
+									}
+								}
+								.padding(.bottom, .small2)
+							}
+						} else {
+							Text("No active signature resource found.")
+								.textStyle(.body1Regular)
+								.foregroundStyle(.secondaryText)
+						}
+					}
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.padding(.medium2)
+					.background(Color.white)
+					.roundedCorners(radius: .small1)
+
+					Button("Get new instance") {
+						store.send(.continueTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+				}
+				.onFirstAppear {
+					store.send(.appeared)
+				}
+				.padding(.medium3)
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+				.background(.secondaryBackground)
+				.radixToolbar(title: L10n.FactorSources.Detail.mfaSignatureResourceTitle)
+			}
+		}
+	}
 }
 
 private extension StoreOf<SecurityCenter> {
@@ -228,6 +335,9 @@ private extension View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
+			.mfaFactorInstance(with: destinationStore)
+			.selectFactorSource(with: destinationStore)
+			.addressDetails(with: destinationStore)
 			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.securityShieldsSetup(with: destinationStore)
@@ -244,6 +354,24 @@ private extension View {
 	private func securityFactors(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityFactors, action: \.securityFactors)) {
 			SecurityFactors.View(store: $0)
+		}
+	}
+
+	private func mfaFactorInstance(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.mfaFactorInstance, action: \.mfaFactorInstance)) {
+			MfaFactorInstance.View(store: $0)
+		}
+	}
+
+	private func selectFactorSource(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.selectFactorSource, action: \.selectFactorSource)) {
+			SelectFactorSource.View(store: $0)
+		}
+	}
+
+	private func addressDetails(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addressDetails, action: \.addressDetails)) {
+			AddressDetails.View(store: $0)
 		}
 	}
 
