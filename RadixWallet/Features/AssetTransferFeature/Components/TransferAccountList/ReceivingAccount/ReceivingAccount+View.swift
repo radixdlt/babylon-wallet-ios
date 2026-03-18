@@ -39,7 +39,7 @@ extension ReceivingAccount.View {
 	private func account(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
 		Group {
 			if let recipient = viewStore.recipient {
-				AccountCard(kind: .display(addCornerRadius: false), recipient: recipient) {
+				AccountCard(kind: .display(addCornerRadius: false), recipient: recipient, addressBookName: viewStore.addressBookName) {
 					removeAccountButton(viewStore)
 						.foregroundColor(.white)
 						.padding(.leading, .medium3)

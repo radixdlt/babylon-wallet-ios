@@ -111,6 +111,12 @@ extension Preferences.View {
 				icon: .asset(.depositGuarantees),
 				action: .depositGuaranteesButtonTapped
 			),
+			.model(
+				title: L10n.Preferences.AddressBook.title,
+				subtitle: L10n.Preferences.AddressBook.subtitle,
+				icon: .systemImage("book.closed.fill"),
+				action: .addressBookButtonTapped
+			),
 			.header(L10n.Preferences.displayPreferences),
 			.model(
 				title: L10n.Preferences.HiddenEntities.title,
@@ -197,6 +203,7 @@ private extension View {
 		return depositGuarantees(with: destinationStore)
 			.hiddenEntities(with: destinationStore)
 			.hiddenAssets(with: destinationStore)
+			.addressBook(with: destinationStore)
 			.themeSelection(with: destinationStore)
 			.gateways(with: destinationStore)
 			.signalingServers(with: destinationStore)
@@ -218,6 +225,12 @@ private extension View {
 	private func hiddenAssets(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.hiddenAssets, action: \.hiddenAssets)) {
 			HiddenAssets.View(store: $0)
+		}
+	}
+
+	private func addressBook(with destinationStore: PresentationStoreOf<Preferences.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.addressBook, action: \.addressBook)) {
+			AddressBook.View(store: $0)
 		}
 	}
 

@@ -17,6 +17,7 @@ struct Preferences: FeatureReducer {
 		case depositGuaranteesButtonTapped
 		case hiddenEntitiesButtonTapped
 		case hiddenAssetsButtonTapped
+		case addressBookButtonTapped
 		case themeSelectionButtonTapped
 		case gatewaysButtonTapped
 		case signalingServersButtonTapped
@@ -38,6 +39,7 @@ struct Preferences: FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case hiddenEntities(HiddenEntities.State)
 			case hiddenAssets(HiddenAssets.State)
+			case addressBook(AddressBook.State)
 			case themeSelection(ThemeSelection.State)
 			case gateways(GatewaySettings.State)
 			case signalingServers(SignalingServersSettings.State)
@@ -49,6 +51,7 @@ struct Preferences: FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case hiddenEntities(HiddenEntities.Action)
 			case hiddenAssets(HiddenAssets.Action)
+			case addressBook(AddressBook.Action)
 			case themeSelection(ThemeSelection.Action)
 			case gateways(GatewaySettings.Action)
 			case signalingServers(SignalingServersSettings.Action)
@@ -64,6 +67,9 @@ struct Preferences: FeatureReducer {
 			}
 			Scope(state: \.hiddenAssets, action: \.hiddenAssets) {
 				HiddenAssets()
+			}
+			Scope(state: \.addressBook, action: \.addressBook) {
+				AddressBook()
 			}
 			Scope(state: \.themeSelection, action: \.themeSelection) {
 				ThemeSelection()
@@ -113,6 +119,10 @@ struct Preferences: FeatureReducer {
 
 		case .hiddenAssetsButtonTapped:
 			state.destination = .hiddenAssets(.init())
+			return .none
+
+		case .addressBookButtonTapped:
+			state.destination = .addressBook(.init())
 			return .none
 
 		case .themeSelectionButtonTapped:

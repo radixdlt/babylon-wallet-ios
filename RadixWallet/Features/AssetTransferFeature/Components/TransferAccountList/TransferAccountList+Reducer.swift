@@ -81,6 +81,7 @@ struct TransferAccountList: FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.addressBookClient) var addressBookClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -140,6 +141,12 @@ struct TransferAccountList: FeatureReducer {
 		switch presentedAction {
 		case let .chooseTransferReceiver(.delegate(.handleResult(recipient))):
 			state.receivingAccounts[id: id]?.recipient = recipient
+			if case let .addressOfExternalAccount(address) = recipient {
+				let entry = try? addressBookClient.entryByAddress(address)
+				state.receivingAccounts[id: id]?.addressBookName = entry?.name.value
+			} else {
+				state.receivingAccounts[id: id]?.addressBookName = nil
+			}
 			state.destination = nil
 			return signaturesStatusEffect(state, receivingAccountId: id)
 

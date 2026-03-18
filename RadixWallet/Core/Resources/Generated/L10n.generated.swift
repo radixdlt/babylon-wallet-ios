@@ -899,6 +899,40 @@ internal enum L10n {
       internal static let noTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_noTokens", fallback: "You have no tokens")
     }
   }
+  internal enum AddressBook {
+    /// Address Book
+    internal static let title = L10n.tr("Localizable", "addressBook_title", fallback: "Address Book")
+    /// Save addresses with names for easy access
+    internal static let subtitle = L10n.tr("Localizable", "addressBook_subtitle", fallback: "Save addresses with names for easy access")
+    /// No saved addresses yet
+    internal static let emptyState = L10n.tr("Localizable", "addressBook_emptyState", fallback: "No saved addresses yet")
+    /// Edit
+    internal static let edit = L10n.tr("Localizable", "addressBook_edit", fallback: "Edit")
+    /// Delete
+    internal static let delete = L10n.tr("Localizable", "addressBook_delete", fallback: "Delete")
+    /// Delete Saved Address?
+    internal static let deleteAlertTitle = L10n.tr("Localizable", "addressBook_deleteAlert_title", fallback: "Delete Saved Address?")
+    /// Are you sure you want to remove this saved address?
+    internal static let deleteAlertMessage = L10n.tr("Localizable", "addressBook_deleteAlert_message", fallback: "Are you sure you want to remove this saved address?")
+    internal enum EntryForm {
+      /// Account Address
+      internal static let addressPlaceholder = L10n.tr("Localizable", "addressBook_entryForm_addressPlaceholder", fallback: "Account Address")
+      /// Name
+      internal static let namePlaceholder = L10n.tr("Localizable", "addressBook_entryForm_namePlaceholder", fallback: "Name")
+      /// Note (optional)
+      internal static let notePlaceholder = L10n.tr("Localizable", "addressBook_entryForm_notePlaceholder", fallback: "Note (optional)")
+      /// Add Address
+      internal static let addTitle = L10n.tr("Localizable", "addressBook_entryForm_addTitle", fallback: "Add Address")
+      /// Edit Address
+      internal static let editTitle = L10n.tr("Localizable", "addressBook_entryForm_editTitle", fallback: "Edit Address")
+      /// Invalid account address
+      internal static let invalidAddress = L10n.tr("Localizable", "addressBook_entryForm_invalidAddress", fallback: "Invalid account address")
+      /// Cannot Save This Address
+      internal static let ownAccountAlertTitle = L10n.tr("Localizable", "addressBook_entryForm_ownAccountAlert_title", fallback: "Cannot Save This Address")
+      /// This address belongs to one of your accounts and cannot be added to Address Book.
+      internal static let ownAccountAlertMessage = L10n.tr("Localizable", "addressBook_entryForm_ownAccountAlert_message", fallback: "This address belongs to one of your accounts and cannot be added to Address Book.")
+    }
+  }
   internal enum AssetTransfer {
     /// Scan a QR code of a Radix Account address from another wallet or an exchange.
     internal static let qrScanInstructions = L10n.tr("Localizable", "assetTransfer_qrScanInstructions", fallback: "Scan a QR code of a Radix Account address from another wallet or an exchange.")
@@ -945,6 +979,16 @@ internal enum L10n {
       internal static let navigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_navigationTitle", fallback: "Choose Transfer Recipient")
       /// Scan QR Code
       internal static let scanQRNavigationTitle = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle", fallback: "Scan QR Code")
+      /// My Accounts
+      internal static let myAccounts = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_myAccounts", fallback: "My Accounts")
+      /// Address Book
+      internal static let addressBook = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_addressBook", fallback: "Address Book")
+      /// Saved as: %@
+      internal static func savedAs(_ p1: String) -> String {
+        return L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_savedAs", String(describing: p1), fallback: "Saved as: %@")
+      }
+      /// Save to Address Book
+      internal static let saveToAddressBook = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_saveToAddressBook", fallback: "Save to Address Book")
     }
     internal enum DepositStatus {
       /// Recipient does not accept these tokens
@@ -4064,6 +4108,12 @@ internal enum L10n {
       internal static let subtitle = L10n.tr("Localizable", "preferences_hiddenAssets_subtitle", fallback: "Manage hidden Tokens, NFTs, and other asset types")
       /// Hidden Assets
       internal static let title = L10n.tr("Localizable", "preferences_hiddenAssets_title", fallback: "Hidden Assets")
+    }
+    internal enum AddressBook {
+      /// Manage your saved external addresses
+      internal static let subtitle = L10n.tr("Localizable", "preferences_addressBook_subtitle", fallback: "Manage your saved external addresses")
+      /// Address Book
+      internal static let title = L10n.tr("Localizable", "preferences_addressBook_title", fallback: "Address Book")
     }
     internal enum HiddenEntities {
       /// Manage hidden Personas and Accounts

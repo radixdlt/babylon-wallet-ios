@@ -52,6 +52,36 @@ extension ChooseTransferRecipient.State {
 		return recipient
 	}
 
+	var validatedManualAccountAddress: AccountAddress? {
+		guard case let .valid(.accountAddress(address)) = validatedManualRecipientValidation else {
+			return nil
+		}
+		return address
+	}
+
+	var matchingAddressBookEntryForManualAddress: AddressBookEntry? {
+		guard let address = validatedManualAccountAddress else {
+			return nil
+		}
+		return addressBookEntries.first(where: { $0.address == address })
+	}
+
+	var canStoreValidatedManualRecipientInAddressBook: Bool {
+		guard let address = validatedManualAccountAddress else {
+			return false
+		}
+		guard matchingAddressBookEntryForManualAddress == nil else {
+			return false
+		}
+		return !chooseAccounts.availableAccounts.contains(where: { $0.address == address })
+	}
+
+	var selectableAddressBookEntries: [AddressBookEntry] {
+		addressBookEntries.filter { entry in
+			!chooseAccounts.filteredAccounts.contains(entry.address)
+		}
+	}
+
 	var canSelectOwnAccount: Bool {
 		manualTransferRecipient.isEmpty
 	}
@@ -85,6 +115,7 @@ extension ChooseTransferRecipient {
 	struct View: SwiftUI.View {
 		@Perception.Bindable private var store: StoreOf<ChooseTransferRecipient>
 		@FocusState private var focusedField: Bool
+		@Environment(\.colorScheme) private var colorScheme
 
 		init(store: StoreOf<ChooseTransferRecipient>) {
 			self.store = store
@@ -94,27 +125,39 @@ extension ChooseTransferRecipient {
 			WithPerceptionTracking {
 				NavigationStack {
 					ScrollView {
-						Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
-							.textStyle(.body1Regular)
-							.foregroundColor(.primaryText)
+						VStack(spacing: .zero) {
+							VStack(spacing: .medium2) {
+								Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
+									.textStyle(.body1Regular)
+									.foregroundColor(.primaryText)
+									.padding(.vertical, .medium3)
+
+								addressField
+								manualAddressBookStatus
+							}
+							.padding([.horizontal, .bottom], .medium3)
+
+							Picker("", selection: $store.selectedTab.sending(\.view.tabChanged)) {
+								Text(L10n.AssetTransfer.ChooseReceivingAccount.myAccounts)
+									.tag(ChooseTransferRecipient.RecipientTab.myAccounts)
+								Text(L10n.AssetTransfer.ChooseReceivingAccount.addressBook)
+									.tag(ChooseTransferRecipient.RecipientTab.addressBook)
+							}
+							.pickerStyle(.segmented)
+							.padding(.horizontal, .medium3)
 							.padding(.vertical, .medium3)
 
-						VStack(spacing: .medium2) {
-							addressField
-
-							if !store.chooseAccounts.availableAccounts.isEmpty {
-								Divider()
-
-								Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)
+							if store.selectedTab == .myAccounts {
+								ChooseAccounts.View(
+									store: store.scope(state: \.chooseAccounts, action: \.child.chooseAccounts)
+								)
+								.opacity(store.canSelectOwnAccount ? 1.0 : 0.6)
+								.disabled(!store.canSelectOwnAccount)
+								.padding(.horizontal, .medium3)
+							} else {
+								addressBookList
 							}
-
-							ChooseAccounts.View(
-								store: store.scope(state: \.chooseAccounts, action: \.child.chooseAccounts)
-							)
-							.opacity(store.canSelectOwnAccount ? 1.0 : 0.6)
-							.disabled(!store.canSelectOwnAccount)
 						}
-						.padding([.horizontal, .bottom], .medium3)
 					}
 					.background(.primaryBackground)
 					.destinations(with: store)
@@ -122,7 +165,57 @@ extension ChooseTransferRecipient {
 					.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle) {
 						store.send(.view(.closeButtonTapped))
 					}
+					.onAppear {
+						store.send(.view(.appeared))
+					}
 				}
+			}
+		}
+
+		@ViewBuilder
+		private var addressBookList: some SwiftUI.View {
+			if store.selectableAddressBookEntries.isEmpty {
+				Text(L10n.AddressBook.emptyState)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.secondaryText)
+					.multilineTextAlignment(.center)
+					.padding(.medium3)
+			} else {
+				LazyVStack(spacing: .small2) {
+					ForEachStatic(store.selectableAddressBookEntries) { entry in
+						Button {
+							store.send(.view(.addressBookEntrySelected(entry)))
+						} label: {
+							HStack {
+								VStack(alignment: .leading, spacing: .small3) {
+									Text(entry.name.value)
+										.textStyle(.body1Header)
+										.foregroundColor(.primaryText)
+									AddressView(.address(.account(entry.address)))
+										.foregroundColor(.secondaryText)
+									if let note = entry.note, !note.isEmpty {
+										Text(note)
+											.textStyle(.body2Regular)
+											.foregroundColor(.secondaryText)
+											.multilineTextAlignment(.leading)
+											.lineLimit(2)
+									}
+								}
+								Spacer()
+								RadioButton(
+									appearance: colorScheme == .light ? .dark : .light,
+									isSelected: false
+								)
+							}
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.contentShape(Rectangle())
+							.padding(.medium3)
+						}
+						.buttonStyle(.plain)
+						.addressBookEntrySurface(interactive: true)
+					}
+				}
+				.padding(.horizontal, .medium3)
 			}
 		}
 
@@ -146,6 +239,35 @@ extension ChooseTransferRecipient {
 			.autocorrectionDisabled()
 			.textInputAutocapitalization(.never)
 			.keyboardType(.alphabet)
+		}
+
+		@ViewBuilder
+		private var manualAddressBookStatus: some SwiftUI.View {
+			if let entry = store.matchingAddressBookEntryForManualAddress {
+				HStack {
+					Text(L10n.AssetTransfer.ChooseReceivingAccount.savedAs(entry.name.value))
+						.textStyle(.body2Regular)
+						.foregroundColor(.secondaryText)
+					Spacer(minLength: .zero)
+				}
+				.padding(.horizontal, .small1)
+			} else if store.canStoreValidatedManualRecipientInAddressBook {
+				Button {
+					store.send(.view(.storeManualRecipientInAddressBookToggled))
+				} label: {
+					HStack(spacing: .small2) {
+						CheckmarkView(
+							appearance: colorScheme == .light ? .dark : .light,
+							isChecked: store.storeManualRecipientInAddressBook
+						)
+						Text(L10n.AssetTransfer.ChooseReceivingAccount.saveToAddressBook)
+							.textStyle(.body2Regular)
+							.foregroundColor(.primaryText)
+						Spacer(minLength: .zero)
+					}
+				}
+				.buttonStyle(.plain)
+			}
 		}
 
 		private var chooseButton: some SwiftUI.View {
@@ -178,10 +300,25 @@ private extension StoreOf<ChooseTransferRecipient> {
 private extension View {
 	func destinations(with store: StoreOf<ChooseTransferRecipient>) -> some View {
 		let destinationStore = store.destination
-		return navigationDestination(store: destinationStore.scope(state: \.scanTransferRecipient, action: \.scanTransferRecipient)) {
+		return scanQRCode(with: destinationStore)
+			.addAddressBookEntry(with: destinationStore)
+			.domainResolutionErrorAlert(with: destinationStore)
+	}
+
+	private func scanQRCode(with destinationStore: PresentationStoreOf<ChooseTransferRecipient.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.scanTransferRecipient, action: \.scanTransferRecipient)) {
 			ScanQRCoordinator.View(store: $0)
 				.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, alwaysVisible: false)
 		}
-		.alert(store: destinationStore.scope(state: \.domainResolutionErrorAlert, action: \.domainResolutionErrorAlert))
+	}
+
+	private func addAddressBookEntry(with destinationStore: PresentationStoreOf<ChooseTransferRecipient.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addAddressBookEntry, action: \.addAddressBookEntry)) {
+			AddressBookEntryForm.View(store: $0)
+		}
+	}
+
+	private func domainResolutionErrorAlert(with destinationStore: PresentationStoreOf<ChooseTransferRecipient.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.domainResolutionErrorAlert, action: \.domainResolutionErrorAlert))
 	}
 }

@@ -8,6 +8,7 @@ struct FactorSourceCard: View {
 	private let mode: Mode
 	private let dataSource: FactorSourceCardDataSource
 	private var isExpanded: Bool
+	private let surface: Surface
 
 	var onAction: ((Action) -> Void)? = nil
 
@@ -62,9 +63,8 @@ struct FactorSourceCard: View {
 				)
 			}
 		}
-		.background(.primaryBackground)
-		.roundedCorners(radius: .small1)
-		.cardShadow
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.factorSourceCardSurface(surface)
 		.animation(.default, value: dataSource.messages.count)
 	}
 
@@ -201,6 +201,7 @@ extension FactorSourceCard {
 		mode: Mode,
 		messages: [FactorSourceCardDataSource.Message] = [],
 		isExpanded: Bool = false,
+		surface: Surface = .card,
 		onAction: ((Action) -> Void)? = nil
 	) {
 		switch kind {
@@ -215,6 +216,7 @@ extension FactorSourceCard {
 					messages: messages
 				),
 				isExpanded: isExpanded,
+				surface: surface,
 				onAction: onAction
 			)
 		case let .instance(factorSource, instanceKind):
@@ -230,6 +232,7 @@ extension FactorSourceCard {
 						messages: messages
 					),
 					isExpanded: isExpanded,
+					surface: surface,
 					onAction: onAction
 				)
 			case .extended:
@@ -243,6 +246,7 @@ extension FactorSourceCard {
 						messages: messages
 					),
 					isExpanded: isExpanded,
+					surface: surface,
 					onAction: onAction
 				)
 			case let .withEntities(linkedEntities):
@@ -257,6 +261,7 @@ extension FactorSourceCard {
 						linkedEntities: linkedEntities
 					),
 					isExpanded: isExpanded,
+					surface: surface,
 					onAction: onAction
 				)
 			}
@@ -290,6 +295,11 @@ extension FactorSourceCard {
 		}
 	}
 
+	enum Surface {
+		case card
+		case glass(interactive: Bool)
+	}
+
 	enum SelectionType {
 		case radioButton
 		case checkmark
@@ -298,6 +308,20 @@ extension FactorSourceCard {
 	enum Action {
 		case removeTapped
 		case messageTapped
+	}
+}
+
+private extension View {
+	@ViewBuilder
+	func factorSourceCardSurface(_ surface: FactorSourceCard.Surface) -> some View {
+		switch surface {
+		case .card:
+			background(.primaryBackground)
+				.roundedCorners(radius: .small1)
+				.cardShadow
+		case let .glass(interactive):
+			glassCardSurface(interactive: interactive)
+		}
 	}
 }
 
