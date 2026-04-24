@@ -915,8 +915,8 @@ internal enum L10n {
     /// Are you sure you want to remove this saved address?
     internal static let deleteAlertMessage = L10n.tr("Localizable", "addressBook_deleteAlert_message", fallback: "Are you sure you want to remove this saved address?")
     internal enum EntryForm {
-      /// Account Address
-      internal static let addressPlaceholder = L10n.tr("Localizable", "addressBook_entryForm_addressPlaceholder", fallback: "Account Address")
+      /// Address
+      internal static let addressPlaceholder = L10n.tr("Localizable", "addressBook_entryForm_addressPlaceholder", fallback: "Address")
       /// Name
       internal static let namePlaceholder = L10n.tr("Localizable", "addressBook_entryForm_namePlaceholder", fallback: "Name")
       /// Note (optional)
@@ -925,8 +925,8 @@ internal enum L10n {
       internal static let addTitle = L10n.tr("Localizable", "addressBook_entryForm_addTitle", fallback: "Add Address")
       /// Edit Address
       internal static let editTitle = L10n.tr("Localizable", "addressBook_entryForm_editTitle", fallback: "Edit Address")
-      /// Invalid account address
-      internal static let invalidAddress = L10n.tr("Localizable", "addressBook_entryForm_invalidAddress", fallback: "Invalid account address")
+      /// Invalid address
+      internal static let invalidAddress = L10n.tr("Localizable", "addressBook_entryForm_invalidAddress", fallback: "Invalid address")
       /// Cannot Save This Address
       internal static let ownAccountAlertTitle = L10n.tr("Localizable", "addressBook_entryForm_ownAccountAlert_title", fallback: "Cannot Save This Address")
       /// This address belongs to one of your accounts and cannot be added to Address Book.
@@ -4416,6 +4416,10 @@ internal enum L10n {
     internal enum Account {
       /// Scan a QR code of a Radix Account address from another wallet or an exchange, or a QR code of an XRD domain.
       internal static let instructions = L10n.tr("Localizable", "scanQR_account_instructions", fallback: "Scan a QR code of a Radix Account address from another wallet or an exchange, or a QR code of an XRD domain.")
+    }
+    internal enum Address {
+      /// Scan a QR code of a Radix address.
+      internal static let instructions = L10n.tr("Localizable", "scanQR_address_instructions", fallback: "Scan a QR code of a Radix address.")
     }
     internal enum ConnectorExtension {
       /// Go to **wallet.radixdlt.com** in your desktop browser.

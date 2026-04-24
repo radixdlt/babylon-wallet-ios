@@ -292,8 +292,10 @@ private extension View {
 	}
 
 	private func selectFactorSource(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.selectFactorSource, action: \.selectFactorSource)) {
-			SelectFactorSource.View(store: $0)
+		sheet(store: destinationStore.scope(state: \.selectFactorSource, action: \.selectFactorSource)) { store in
+			NavigationStack {
+				SelectFactorSource.View(store: store)
+			}
 		}
 	}
 

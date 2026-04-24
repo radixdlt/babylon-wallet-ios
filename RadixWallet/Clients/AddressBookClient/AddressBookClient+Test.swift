@@ -2,7 +2,7 @@ import Sargon
 
 extension AddressBookClient: TestDependencyKey {
 	static let previewValue = Self(
-		addEntry: { _, _, _ in true },
+		addEntry: { _, _, _ in },
 		entryByAddress: { _ in throw NoopError() },
 		entriesOnCurrentNetwork: { [] },
 		deleteEntry: { _ in true },

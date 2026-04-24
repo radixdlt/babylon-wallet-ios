@@ -78,7 +78,10 @@ extension ChooseTransferRecipient.State {
 
 	var selectableAddressBookEntries: [AddressBookEntry] {
 		addressBookEntries.filter { entry in
-			!chooseAccounts.filteredAccounts.contains(entry.address)
+			guard case let .account(address) = entry.address else {
+				return false
+			}
+			return !chooseAccounts.filteredAccounts.contains(address)
 		}
 	}
 
@@ -191,8 +194,10 @@ extension ChooseTransferRecipient {
 									Text(entry.name.value)
 										.textStyle(.body1Header)
 										.foregroundColor(.primaryText)
-									AddressView(.address(.account(entry.address)))
-										.foregroundColor(.secondaryText)
+									if case let .account(address) = entry.address {
+										AddressView(.address(.account(address)))
+											.foregroundColor(.secondaryText)
+									}
 									if let note = entry.note, !note.isEmpty {
 										Text(note)
 											.textStyle(.body2Regular)

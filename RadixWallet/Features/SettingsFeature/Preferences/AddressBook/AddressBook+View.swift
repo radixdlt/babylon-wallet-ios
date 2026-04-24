@@ -44,20 +44,13 @@ extension AddressBook {
 		}
 
 		private var emptyState: some SwiftUI.View {
-			VStack(spacing: .medium3) {
-				Text(L10n.AddressBook.emptyState)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.secondaryText)
-					.multilineTextAlignment(.center)
-
-				Button(L10n.AddressBook.EntryForm.addTitle) {
-					store.send(.view(.addButtonTapped))
-				}
-				.buttonStyle(.secondaryRectangular(shouldExpand: false))
-			}
-			.frame(maxWidth: .infinity)
-			.padding(.medium3)
-			.addressBookEntrySurface()
+			Text(L10n.AddressBook.emptyState)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.secondaryText)
+				.multilineTextAlignment(.center)
+				.frame(maxWidth: .infinity)
+				.padding(.medium3)
+				.addressBookEntrySurface()
 		}
 
 		private func entryRow(_ entry: AddressBookEntry) -> some SwiftUI.View {
@@ -67,10 +60,7 @@ extension AddressBook {
 					.foregroundColor(.primaryText)
 
 				HStack(spacing: .small2) {
-					AddressView(.address(.account(entry.address)))
-						.foregroundColor(.secondaryText)
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.layoutPriority(1)
+					addressView(entry.address)
 
 					HStack(spacing: .small1) {
 						actionButton(asset: AssetResource.create, accessibilityLabel: L10n.AddressBook.edit) {
@@ -94,6 +84,23 @@ extension AddressBook {
 			}
 			.padding(.medium3)
 			.addressBookEntrySurface()
+		}
+
+		@ViewBuilder
+		private func addressView(_ address: Address) -> some SwiftUI.View {
+			if let identifiableAddress = LedgerIdentifiable.Address(address: address) {
+				AddressView(.address(identifiableAddress))
+					.foregroundColor(.secondaryText)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.layoutPriority(1)
+			} else {
+				Text(address.formatted(.default))
+					.textStyle(.body1Regular)
+					.foregroundColor(.secondaryText)
+					.lineLimit(1)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.layoutPriority(1)
+			}
 		}
 
 		@ViewBuilder

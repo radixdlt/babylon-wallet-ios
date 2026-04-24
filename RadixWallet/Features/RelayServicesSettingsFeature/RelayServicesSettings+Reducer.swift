@@ -7,8 +7,8 @@ struct RelayServicesSettings: FeatureReducer {
 	@ObservableState
 	struct State: Hashable {
 		struct Row: Hashable, Identifiable {
-			typealias ID = URL
-			var id: URL {
+			typealias ID = RelayServiceUrl
+			var id: RelayServiceUrl {
 				service.url
 			}
 
@@ -28,8 +28,8 @@ struct RelayServicesSettings: FeatureReducer {
 	enum ViewAction: Equatable {
 		case task
 		case addServiceButtonTapped
-		case rowTapped(URL)
-		case rowRemoveTapped(URL)
+		case rowTapped(RelayServiceUrl)
+		case rowRemoveTapped(RelayServiceUrl)
 	}
 
 	enum InternalAction: Equatable {
@@ -51,7 +51,7 @@ struct RelayServicesSettings: FeatureReducer {
 			case removeService(RemoveServiceAlert)
 
 			enum RemoveServiceAlert: Hashable {
-				case removeButtonTapped(URL)
+				case removeButtonTapped(RelayServiceUrl)
 				case cancelButtonTapped
 			}
 		}
@@ -125,13 +125,13 @@ struct RelayServicesSettings: FeatureReducer {
 				if lhsName != rhsName {
 					return lhsName < rhsName
 				}
-				return lhs.url.absoluteString < rhs.url.absoluteString
+				return lhs.url < rhs.url
 			}
 
 			state.rows = .init(uniqueElements: sorted.map { service in
 				.init(
 					service: service,
-					isSelected: service.url.absoluteString == services.current.url.absoluteString,
+					isSelected: service.url == services.current.url,
 					canBeDeleted: all.count > 1
 				)
 			})
@@ -206,7 +206,7 @@ struct RelayServicesSettings: FeatureReducer {
 }
 
 extension AlertState<RelayServicesSettings.Destination.Action.RemoveServiceAlert> {
-	static func removeService(id: URL) -> AlertState {
+	static func removeService(id: RelayServiceUrl) -> AlertState {
 		AlertState {
 			TextState("Remove relay service?")
 		} actions: {
@@ -237,7 +237,7 @@ struct AddNewRelayService: FeatureReducer {
 		var relayURL: String = ""
 		var errorText: String?
 		var addButtonState: ControlState = .disabled
-		var parsedRelayURL: URL?
+		var parsedRelayURL: RelayServiceUrl?
 	}
 
 	typealias Action = FeatureAction<Self>
@@ -294,7 +294,7 @@ struct AddNewRelayService: FeatureReducer {
 					.getPreferences()
 					.relayServices
 					.all
-					.contains(where: { $0.url.absoluteString == parsedRelayURL.absoluteString })
+					.contains(where: { $0.url == parsedRelayURL })
 				if hasService {
 					await send(.internal(.showDuplicateURLError))
 					return
@@ -359,7 +359,7 @@ private extension AddNewRelayService {
 		state.addButtonState = .enabled
 	}
 
-	func relayURL(from input: String) -> URL? {
+	func relayURL(from input: String) -> RelayServiceUrl? {
 		let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !trimmed.isEmpty else { return nil }
 
@@ -375,7 +375,7 @@ private extension AddNewRelayService {
 			["http", "https"].contains(scheme)
 		else { return nil }
 
-		return url
+		return url.absoluteString
 	}
 }
 
@@ -386,7 +386,7 @@ private extension SavedRelayServices {
 
 	@discardableResult
 	mutating func append(_ service: RelayService) -> Bool {
-		guard !all.contains(where: { $0.url.absoluteString == service.url.absoluteString }) else {
+		guard !all.contains(where: { $0.url == service.url }) else {
 			return false
 		}
 		other.append(service)
@@ -396,21 +396,21 @@ private extension SavedRelayServices {
 	@discardableResult
 	mutating func remove(_ service: RelayService) -> Bool {
 		let oldCount = other.count
-		other.removeAll(where: { $0.url.absoluteString == service.url.absoluteString })
+		other.removeAll(where: { $0.url == service.url })
 		return oldCount != other.count
 	}
 
 	@discardableResult
 	mutating func changeCurrent(to service: RelayService) -> Bool {
-		guard current.url.absoluteString != service.url.absoluteString else {
+		guard current.url != service.url else {
 			return false
 		}
 
 		let oldCurrent = current
-		other.removeAll(where: { $0.url.absoluteString == service.url.absoluteString })
+		other.removeAll(where: { $0.url == service.url })
 		current = service
 
-		if !other.contains(where: { $0.url.absoluteString == oldCurrent.url.absoluteString }) {
+		if !other.contains(where: { $0.url == oldCurrent.url }) {
 			other.append(oldCurrent)
 		}
 		return true

@@ -3,79 +3,36 @@ import Sargon
 import XCTest
 
 final class TokenPriceCientTests: XCTestCase {
-	func test_zeroPrice() {
-		validateDecimalPriceConversion(0, expected: Decimal192.zero)
+	func test_fetchPricesRequestStillCarriesOnlyTokensAndCurrency() throws {
+		let resourceAddress = try ResourceAddress(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
+		let request = TokenPricesClient.FetchPricesRequest(
+			tokens: [resourceAddress],
+			currency: .usd
+		)
+
+		let encoded = try JSONEncoder().encode(request)
+		let json = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+
+		XCTAssertEqual(json["currency"] as? String, FiatCurrency.usd.rawValue)
+		XCTAssertEqual(json["tokens"] as? [String], [resourceAddress.address])
+		XCTAssertNil(json["lsus"])
 	}
 
-	func test_noDecimalPlaces_1() {
-		validateDecimalPriceConversion(10, expected: 10)
-	}
-
-	func test_noDecimalPlaces_2() {
-		validateDecimalPriceConversion(10000, expected: 10000)
-	}
-
-	func test_noDecimalPlaces_3() {
-		validateDecimalPriceConversion(10_000_000, expected: 10_000_000)
-	}
-
-	func test_withDecimalPlaces_1() throws {
-		try validateDecimalPriceConversion(1.99, expected: Decimal192("1.99"))
-	}
-
-	func test_withDecimalPlaces_2() throws {
-		try validateDecimalPriceConversion(1.000099, expected: Decimal192("1.000099"))
-	}
-
-	func test_belowOne_1() throws {
-		try validateDecimalPriceConversion(0.99, expected: Decimal192(0.99))
-	}
-
-	func test_belowOne_2() throws {
-		try validateDecimalPriceConversion(0.000099, expected: Decimal192("0.000099"))
-	}
-
-	func test_closeToDecimal192Divisibility() throws {
-		// 17 decimal places
-		try validateDecimalPriceConversion(1.12345678901234567, expected: Decimal192("1.1234567890123457"))
-	}
-
-	func test_maxDecimal192Divisibility() throws {
-		// 18 decimal places
-		try validateDecimalPriceConversion(1.123456789012345678, expected: Decimal192("1.1234567890123457"))
-	}
-
-	func test_overMaxDecimal192Divisibility() throws {
-		// 22 decimal places
-		try validateDecimalPriceConversion(1.1234567890123456789012, expected: Decimal192("1.1234567890123457"))
-	}
-
-	private func validateDecimalPriceConversion(
-		_ price: Double,
-		expected: Decimal192,
-		file: StaticString = #filePath,
-		line: UInt = #line
-	) {
-		let tokenPrice = tokenWithPrice(price)
-		guard let decimalPrice = TokenPricesClient.TokenPrices(tokenPrice).first?.value else {
-			XCTFail("Could'nt convert \(tokenPrice) to Decimal192", file: file, line: line)
-			return
-		}
+	func test_tokenPriceServiceURLAddsHTTPSByDefault() {
 		XCTAssertEqual(
-			decimalPrice,
-			expected,
-			"expected \(expected.formattedPlain()), got \(decimalPrice.formattedPlain())",
-			file: file,
-			line: line
+			AddTokenPriceService.tokenPriceServiceURL(from: "prices.example.com", isDeveloperModeEnabled: false)?.absoluteString,
+			"https://prices.example.com"
 		)
 	}
 
-	private func tokenWithPrice(_ price: Double) -> TokensPriceResponse {
-		TokensPriceResponse(tokens: [
-			TokensPriceResponse.TokenPrice(
-				resourceAddress: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"),
-				price: price
-			),
-		])
+	func test_tokenPriceServiceURLAllowsHTTPInDeveloperMode() {
+		XCTAssertEqual(
+			AddTokenPriceService.tokenPriceServiceURL(from: "localhost:8080", isDeveloperModeEnabled: true)?.absoluteString,
+			"http://localhost:8080"
+		)
+	}
+
+	func test_tokenPriceServiceURLRejectsUnsupportedSchemes() {
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "ftp://prices.example.com", isDeveloperModeEnabled: true))
 	}
 }

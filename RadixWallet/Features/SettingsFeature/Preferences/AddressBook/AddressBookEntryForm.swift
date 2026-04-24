@@ -8,7 +8,7 @@ struct AddressBookEntryForm: FeatureReducer {
 	struct State: Hashable {
 		enum Mode: Hashable {
 			case add
-			case addWithAddress(AccountAddress)
+			case addWithAddress(Address)
 			case edit(AddressBookEntry)
 		}
 
@@ -38,11 +38,11 @@ struct AddressBookEntryForm: FeatureReducer {
 			}
 		}
 
-		var validatedAddress: AccountAddress? {
-			try? AccountAddress(validatingAddress: address.trimmingWhitespacesAndNewlines())
+		var validatedAddress: Address? {
+			try? Address(validatingAddress: address.trimmingWhitespacesAndNewlines())
 		}
 
-		var addressToSave: AccountAddress? {
+		var addressToSave: Address? {
 			switch mode {
 			case .add:
 				validatedAddress
@@ -160,7 +160,7 @@ struct AddressBookEntryForm: FeatureReducer {
 			return .none
 
 		case .scanQRCodeTapped:
-			state.destination = .scanQR(.init(kind: .account))
+			state.destination = .scanQR(.init(kind: .address))
 			return .none
 
 		case .saveButtonTapped:
@@ -176,9 +176,9 @@ struct AddressBookEntryForm: FeatureReducer {
 					false
 				}
 
-				if shouldRejectOwnedAddress {
+				if shouldRejectOwnedAddress, case let .account(accountAddress) = address {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-					if accounts.contains(where: { $0.address == address }) {
+					if accounts.contains(where: { $0.address == accountAddress }) {
 						await send(.internal(.ownAccountAddressNotAllowed))
 						return
 					}

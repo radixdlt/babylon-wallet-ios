@@ -154,7 +154,7 @@ struct ChooseTransferRecipient: FeatureReducer {
 				   state.validatedManualAccountAddress == address
 				{
 					state.pendingExternalAccountAddressToSelect = address
-					state.destination = .addAddressBookEntry(.init(mode: .addWithAddress(address)))
+					state.destination = .addAddressBookEntry(.init(mode: .addWithAddress(address.asGeneral)))
 					return .none
 				}
 
@@ -178,7 +178,10 @@ struct ChooseTransferRecipient: FeatureReducer {
 			return .none
 
 		case let .addressBookEntrySelected(entry):
-			return .send(.delegate(.handleResult(.addressOfExternalAccount(value: entry.address))))
+			guard case let .account(address) = entry.address else {
+				return .none
+			}
+			return .send(.delegate(.handleResult(.addressOfExternalAccount(value: address))))
 
 		case .storeManualRecipientInAddressBookToggled:
 			state.storeManualRecipientInAddressBook.toggle()

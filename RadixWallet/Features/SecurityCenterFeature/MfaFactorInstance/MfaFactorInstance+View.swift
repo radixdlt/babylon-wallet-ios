@@ -12,11 +12,6 @@ extension MfaFactorInstance {
 				ScrollView {
 					VStack(spacing: .medium3) {
 						activeResourcesSection
-
-						Button("Get new instance") {
-							store.send(.continueTapped)
-						}
-						.buttonStyle(.primaryRectangular)
 					}
 					.padding(.medium3)
 				}
@@ -27,6 +22,16 @@ extension MfaFactorInstance {
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 				.background(.secondaryBackground)
 				.radixToolbar(title: L10n.FactorSources.Detail.mfaSignatureResourceTitle)
+				.toolbar {
+					ToolbarItem(placement: .topBarTrailing) {
+						Button {
+							store.send(.continueTapped)
+						} label: {
+							Image(systemName: "plus")
+						}
+						.accessibilityLabel("Get new instance")
+					}
+				}
 			}
 			.destinations(with: store)
 		}

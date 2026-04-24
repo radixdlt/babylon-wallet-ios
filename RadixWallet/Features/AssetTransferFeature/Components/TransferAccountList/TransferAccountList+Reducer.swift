@@ -142,7 +142,7 @@ struct TransferAccountList: FeatureReducer {
 		case let .chooseTransferReceiver(.delegate(.handleResult(recipient))):
 			state.receivingAccounts[id: id]?.recipient = recipient
 			if case let .addressOfExternalAccount(address) = recipient {
-				let entry = try? addressBookClient.entryByAddress(address)
+				let entry = try? addressBookClient.entryByAddress(address.asGeneral)
 				state.receivingAccounts[id: id]?.addressBookName = entry?.name.value
 			} else {
 				state.receivingAccounts[id: id]?.addressBookName = nil

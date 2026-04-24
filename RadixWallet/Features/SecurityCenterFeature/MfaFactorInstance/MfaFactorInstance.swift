@@ -135,7 +135,7 @@ struct MfaFactorInstance {
 				State.UsedByAccount(
 					address: address,
 					profileAccount: profileAccounts[id: address],
-					addressBookName: addressBookEntriesByAddress[address]?.name.value
+					addressBookName: addressBookEntriesByAddress[address.asGeneral]?.name.value
 				)
 			}
 

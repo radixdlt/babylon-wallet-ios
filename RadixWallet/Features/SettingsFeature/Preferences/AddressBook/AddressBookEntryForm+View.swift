@@ -56,8 +56,15 @@ extension AddressBookEntryForm {
 			if !store.isAddressEditable {
 				if let address = store.addressToSave {
 					HStack {
-						AddressView(.address(.account(address)))
-							.foregroundColor(.secondaryText)
+						if let identifiableAddress = LedgerIdentifiable.Address(address: address) {
+							AddressView(.address(identifiableAddress))
+								.foregroundColor(.secondaryText)
+						} else {
+							Text(address.formatted(.default))
+								.textStyle(.body1Regular)
+								.foregroundColor(.secondaryText)
+								.lineLimit(1)
+						}
 						Spacer(minLength: .zero)
 					}
 					.padding(.horizontal, .small1)
@@ -67,11 +74,10 @@ extension AddressBookEntryForm {
 					placeholder: L10n.AddressBook.EntryForm.addressPlaceholder,
 					text: $store.address.sending(\.view.addressChanged),
 					hint: store.addressHint,
-					accessory: {
+					innerAccessory: {
 						Button(asset: AssetResource.qrCodeScanner) {
 							store.send(.view(.scanQRCodeTapped))
 						}
-						.buttonStyle(.plain)
 					}
 				)
 				.autocorrectionDisabled()

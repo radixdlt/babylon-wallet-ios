@@ -27,9 +27,9 @@ final class AddressBookFeatureTests: TestCase {
 
 	func test_editSaveUsesOriginalAddressAndTrimsFields() async throws {
 		var entry = newAddressBookEntrySample()
-		entry.address = .sample
+		entry.address = ResourceAddress.sample.asGeneral
 
-		let updatedEntry = ActorIsolated<(AccountAddress, DisplayName, String?)?>(nil)
+		let updatedEntry = ActorIsolated<(Address, DisplayName, String?)?>(nil)
 		let store = TestStore(
 			initialState: AddressBookEntryForm.State(mode: .edit(entry)),
 			reducer: AddressBookEntryForm.init
@@ -58,6 +58,35 @@ final class AddressBookFeatureTests: TestCase {
 		XCTAssertEqual(saved.2, "Friend from exchange")
 	}
 
+	func test_addSaveWithNonAccountAddressPersistsGenericAddress() async throws {
+		let savedEntry = ActorIsolated<(Address, DisplayName, String?)?>(nil)
+		let store = TestStore(
+			initialState: AddressBookEntryForm.State(mode: .add),
+			reducer: AddressBookEntryForm.init
+		) {
+			$0.addressBookClient.addEntry = { address, name, note in
+				await savedEntry.setValue((address, name, note))
+			}
+		}
+
+		await store.send(.view(.addressChanged(ResourceAddress.sample.address))) {
+			$0.address = ResourceAddress.sample.address
+		}
+		await store.send(.view(.nameChanged("  XRD  "))) {
+			$0.name = "  XRD  "
+		}
+		await store.send(.view(.noteChanged("  Token resource  "))) {
+			$0.note = "  Token resource  "
+		}
+		await store.send(.view(.saveButtonTapped))
+		await store.receive(.delegate(.saved))
+
+		let saved = try await XCTUnwrap(savedEntry.value)
+		XCTAssertEqual(saved.0, ResourceAddress.sample.asGeneral)
+		XCTAssertEqual(saved.1, DisplayName(value: "XRD"))
+		XCTAssertEqual(saved.2, "Token resource")
+	}
+
 	func test_addSaveWithOwnedAccountShowsAlertAndDoesNotPersist() async {
 		let addEntryWasCalled = ActorIsolated(false)
 		let store = TestStore(
@@ -67,7 +96,6 @@ final class AddressBookFeatureTests: TestCase {
 			$0.accountsClient.getAccountsOnCurrentNetwork = { [.sample] }
 			$0.addressBookClient.addEntry = { _, _, _ in
 				await addEntryWasCalled.setValue(true)
-				return true
 			}
 		}
 
@@ -84,5 +112,27 @@ final class AddressBookFeatureTests: TestCase {
 			return XCTFail("Expected own-account alert destination")
 		}
 		await XCTAssertFalse(addEntryWasCalled.value)
+	}
+
+	func test_transferRecipientAddressBookEntriesAreLimitedToAccountAddresses() {
+		var accountEntry = newAddressBookEntrySample()
+		accountEntry.address = AccountAddress.sampleOther.asGeneral
+
+		var ownAccountEntry = newAddressBookEntrySampleOther()
+		ownAccountEntry.address = AccountAddress.sample.asGeneral
+
+		var resourceEntry = newAddressBookEntrySample()
+		resourceEntry.address = ResourceAddress.sample.asGeneral
+
+		var state = ChooseTransferRecipient.State(
+			networkID: .mainnet,
+			chooseAccounts: .init(
+				context: .assetTransfer,
+				filteredAccounts: [AccountAddress.sample]
+			)
+		)
+		state.addressBookEntries = [accountEntry, ownAccountEntry, resourceEntry]
+
+		XCTAssertEqual(state.selectableAddressBookEntries, [accountEntry])
 	}
 }

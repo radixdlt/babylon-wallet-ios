@@ -10,11 +10,11 @@ struct AddressBookClient {
 }
 
 extension AddressBookClient {
-	typealias AddEntry = @Sendable (AccountAddress, DisplayName, String?) async throws -> Bool
-	typealias EntryByAddress = @Sendable (AccountAddress) throws -> AddressBookEntry
+	typealias AddEntry = @Sendable (Address, DisplayName, String?) async throws -> Void
+	typealias EntryByAddress = @Sendable (Address) throws -> AddressBookEntry
 	typealias EntriesOnCurrentNetwork = @Sendable () throws -> [AddressBookEntry]
-	typealias DeleteEntry = @Sendable (AccountAddress) async throws -> Bool
-	typealias UpdateEntry = @Sendable (AccountAddress, DisplayName, String?) async throws -> Bool
+	typealias DeleteEntry = @Sendable (Address) async throws -> Bool
+	typealias UpdateEntry = @Sendable (Address, DisplayName, String?) async throws -> Bool
 }
 
 extension DependencyValues {

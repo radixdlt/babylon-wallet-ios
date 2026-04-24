@@ -54,7 +54,7 @@ struct AddressBook: FeatureReducer {
 		}
 
 		enum DeleteAlert: Hashable {
-			case confirmTapped(AccountAddress)
+			case confirmTapped(Address)
 			case cancelTapped
 		}
 	}
