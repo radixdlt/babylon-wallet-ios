@@ -1,6 +1,11 @@
+import Sargon
+
 // MARK: - TokenPricesClient
 struct TokenPricesClient: DependencyKey {
 	let getTokenPrices: GetTokenPrices
+	let getTokenPriceServices: GetTokenPriceServices
+	let addTokenPriceService: AddTokenPriceService
+	let deleteTokenPriceService: DeleteTokenPriceService
 }
 
 extension TokenPricesClient {
@@ -11,4 +16,7 @@ extension TokenPricesClient {
 	}
 
 	typealias GetTokenPrices = @Sendable (FetchPricesRequest, _ refresh: Bool) async throws -> TokenPrices
+	typealias GetTokenPriceServices = @Sendable () throws -> [TokenPriceService]
+	typealias AddTokenPriceService = @Sendable (URL) async throws -> Bool
+	typealias DeleteTokenPriceService = @Sendable (URL) async throws -> Bool
 }

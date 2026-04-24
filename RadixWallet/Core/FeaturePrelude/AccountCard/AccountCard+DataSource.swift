@@ -53,8 +53,13 @@ extension AccountCard where Trailing == EmptyView, Bottom == EmptyView {
 		case let .user(account):
 			self.init(kind: kind, account: account)
 
-		case let .external(accountAddress, _):
-			self.init(kind: kind, account: accountAddress.asDataSource)
+		case let .external(accountAddress, _, addressBookName):
+			let dataSource = AccountCardDataSource(
+				title: addressBookName ?? L10n.InteractionReview.externalAccountName,
+				ledgerIdentifiable: .address(.account(accountAddress)),
+				gradient: .external
+			)
+			self.init(kind: kind, account: dataSource)
 		}
 	}
 }
@@ -74,6 +79,24 @@ extension AccountCard where Bottom == EmptyView {
 		self.init(
 			kind: kind,
 			account: recipient.asDataSource,
+			trailing: trailing,
+			bottom: { EmptyView() }
+		)
+	}
+
+	init(kind: Kind = .display, recipient: TransferRecipient, addressBookName: String?, @ViewBuilder trailing: () -> Trailing) {
+		let dataSource: AccountCardDataSource = if case let .addressOfExternalAccount(address) = recipient, let name = addressBookName {
+			AccountCardDataSource(
+				title: name,
+				ledgerIdentifiable: .address(.account(address)),
+				gradient: .external
+			)
+		} else {
+			recipient.asDataSource
+		}
+		self.init(
+			kind: kind,
+			account: dataSource,
 			trailing: trailing,
 			bottom: { EmptyView() }
 		)

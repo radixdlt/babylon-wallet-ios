@@ -112,6 +112,7 @@ private extension ScanQR.Kind {
 	var instructions: String {
 		switch self {
 		case .connectorExtension: L10n.ScanQR.ConnectorExtension.instructions
+		case .address: L10n.ScanQR.Address.instructions
 		case .account: L10n.ScanQR.Account.instructions
 		case .importOlympia: L10n.ScanQR.ImportOlympia.instructions
 		}
@@ -119,14 +120,14 @@ private extension ScanQR.Kind {
 
 	var scanMode: ScanMode {
 		switch self {
-		case .connectorExtension, .account, .importOlympia:
+		case .connectorExtension, .address, .account, .importOlympia:
 			.oncePerCode
 		}
 	}
 
 	var disclosure: Disclosure? {
 		switch self {
-		case .account, .importOlympia:
+		case .address, .account, .importOlympia:
 			nil
 		case .connectorExtension:
 			.init(

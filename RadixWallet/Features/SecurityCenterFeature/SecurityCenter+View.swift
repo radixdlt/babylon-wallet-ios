@@ -53,6 +53,10 @@ extension SecurityCenter {
 									store.send(.view(.cardTapped(type)))
 								}
 							}
+
+							MfaFactorInstanceCard {
+								store.send(.view(.mfaFactorInstanceTapped))
+							}
 						}
 					}
 					.padding(.top, .small2)
@@ -211,6 +215,37 @@ extension SecurityCenter {
 			}
 		}
 	}
+
+	struct MfaFactorInstanceCard: SwiftUI.View {
+		let action: () -> Void
+
+		var body: some SwiftUI.View {
+			Card(action: action) {
+				HStack(spacing: .zero) {
+					Image(.signingKey)
+						.frame(width: 80, height: 80)
+						.padding(.trailing, .medium3)
+
+					VStack(alignment: .leading, spacing: .small3) {
+						Text(L10n.FactorSources.Detail.mfaSignatureResourceTitle)
+							.foregroundStyle(Color.primaryText)
+							.textStyle(.body1Header)
+
+						Text(L10n.FactorSources.Detail.mfaSignatureResourceSubtitle)
+							.multilineTextAlignment(.leading)
+							.lineSpacing(-.small3)
+							.foregroundStyle(Color.secondaryText)
+							.textStyle(.body2Regular)
+					}
+
+					Spacer(minLength: .zero)
+				}
+				.padding(.vertical, .medium2)
+				.padding(.leading, .medium2)
+				.padding(.trailing, .medium3)
+			}
+		}
+	}
 }
 
 private extension StoreOf<SecurityCenter> {
@@ -228,6 +263,9 @@ private extension View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
+			.mfaFactorInstance(with: destinationStore)
+			.selectFactorSource(with: destinationStore)
+			.addressDetails(with: destinationStore)
 			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.securityShieldsSetup(with: destinationStore)
@@ -244,6 +282,26 @@ private extension View {
 	private func securityFactors(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityFactors, action: \.securityFactors)) {
 			SecurityFactors.View(store: $0)
+		}
+	}
+
+	private func mfaFactorInstance(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.mfaFactorInstance, action: \.mfaFactorInstance)) {
+			MfaFactorInstance.View(store: $0)
+		}
+	}
+
+	private func selectFactorSource(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.selectFactorSource, action: \.selectFactorSource)) { store in
+			NavigationStack {
+				SelectFactorSource.View(store: store)
+			}
+		}
+	}
+
+	private func addressDetails(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addressDetails, action: \.addressDetails)) {
+			AddressDetails.View(store: $0)
 		}
 	}
 

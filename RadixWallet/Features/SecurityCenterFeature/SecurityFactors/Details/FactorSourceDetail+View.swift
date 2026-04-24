@@ -27,7 +27,6 @@ extension FactorSourceDetail {
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
 					deviceSeedPhraseRow(device),
-					signatureNftRow(),
 					// .header(L10n.FactorSources.Detail.test),
 					// spotCheckRow(viewStore),
 				]
@@ -35,7 +34,6 @@ extension FactorSourceDetail {
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
-					signatureNftRow(),
 					//					.header(L10n.FactorSources.Detail.test),
 					//					spotCheckRow(viewStore),
 				]
@@ -45,18 +43,15 @@ extension FactorSourceDetail {
 					renameRow(),
 					changePinRow(),
 					forgotPinRow(),
-					signatureNftRow(),
 				]
 			case .offDeviceMnemonic:
 				[
 					.header(L10n.FactorSources.Detail.manage),
 					renameRow(),
-					signatureNftRow(),
 				]
 			default:
 				[
 					.header(L10n.FactorSources.Detail.manage),
-					signatureNftRow(),
 				]
 			}
 		}
@@ -67,15 +62,6 @@ extension FactorSourceDetail {
 				subtitle: L10n.FactorSources.Detail.rename,
 				icon: .asset(.create),
 				action: .renameTapped
-			)
-		}
-
-		private func signatureNftRow() -> SettingsRow<FactorSourceDetail>.Kind {
-			.model(
-				title: L10n.FactorSources.Detail.mfaSignatureResourceTitle,
-				subtitle: L10n.FactorSources.Detail.mfaSignatureResourceSubtitle,
-				icon: .asset(.signingKey),
-				action: .signatureNftTapped
 			)
 		}
 

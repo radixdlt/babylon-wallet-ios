@@ -7,6 +7,11 @@ import SwiftUI
 struct ChooseTransferRecipient: FeatureReducer {
 	static let xrdDomainsHelp = URL(string: "https://docs.xrd.domains/#/wiki/records/namelets")!
 
+	enum RecipientTab: Hashable {
+		case myAccounts
+		case addressBook
+	}
+
 	@ObservableState
 	struct State: Hashable {
 		var chooseAccounts: ChooseAccounts.State
@@ -24,6 +29,10 @@ struct ChooseTransferRecipient: FeatureReducer {
 
 		var manualTransferRecipientFocused: Bool = false
 		var isDeterminingRnsDomainRecipient: Bool = false
+		var selectedTab: RecipientTab = .myAccounts
+		var addressBookEntries: [AddressBookEntry] = []
+		var storeManualRecipientInAddressBook: Bool = false
+		var pendingExternalAccountAddressToSelect: AccountAddress?
 
 		let networkID: NetworkID
 
@@ -40,15 +49,20 @@ struct ChooseTransferRecipient: FeatureReducer {
 
 	@CasePathable
 	enum ViewAction: Equatable {
+		case appeared
 		case scanQRCode
 		case closeButtonTapped
 		case manualTransferRecipientChanged(String)
 		case focusChanged(Bool)
 		case chooseButtonTapped(Either<Account, State.ManualTransferRecipient>)
+		case tabChanged(RecipientTab)
+		case addressBookEntrySelected(AddressBookEntry)
+		case storeManualRecipientInAddressBookToggled
 	}
 
 	enum InternalAction: Equatable {
 		case rnsDomainConfiguredRecieverResult(TaskResult<RnsDomainConfiguredReceiver>)
+		case loadedAddressBookEntries([AddressBookEntry])
 	}
 
 	@CasePathable
@@ -65,12 +79,14 @@ struct ChooseTransferRecipient: FeatureReducer {
 		@CasePathable
 		enum State: Hashable {
 			case scanTransferRecipient(ScanQRCoordinator.State)
+			case addAddressBookEntry(AddressBookEntryForm.State)
 			case domainResolutionErrorAlert(AlertState<DomainResolutionErrorAlert>)
 		}
 
 		@CasePathable
 		enum Action: Equatable {
 			case scanTransferRecipient(ScanQRCoordinator.Action)
+			case addAddressBookEntry(AddressBookEntryForm.Action)
 			case domainResolutionErrorAlert(DomainResolutionErrorAlert)
 		}
 
@@ -78,12 +94,16 @@ struct ChooseTransferRecipient: FeatureReducer {
 			Scope(state: \.scanTransferRecipient, action: \.scanTransferRecipient) {
 				ScanQRCoordinator()
 			}
+			Scope(state: \.addAddressBookEntry, action: \.addAddressBookEntry) {
+				AddressBookEntryForm()
+			}
 		}
 	}
 
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.radixNameService) var radixNameService
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.addressBookClient) var addressBookClient
 
 	var body: some ReducerOf<Self> {
 		Scope(state: \.chooseAccounts, action: \.child.chooseAccounts) {
@@ -100,6 +120,12 @@ struct ChooseTransferRecipient: FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .appeared:
+			return .run { send in
+				let entries = ((try? addressBookClient.entriesOnCurrentNetwork()) ?? []).sortedForDisplay()
+				await send(.internal(.loadedAddressBookEntries(entries)))
+			}
+
 		case .scanQRCode:
 			state.destination = .scanTransferRecipient(.init(kind: .account))
 			return .none
@@ -109,6 +135,9 @@ struct ChooseTransferRecipient: FeatureReducer {
 
 		case let .manualTransferRecipientChanged(address):
 			state.manualTransferRecipient = address
+			if !state.canStoreValidatedManualRecipientInAddressBook {
+				state.storeManualRecipientInAddressBook = false
+			}
 			return .none
 
 		case let .focusChanged(isFocused):
@@ -120,6 +149,15 @@ struct ChooseTransferRecipient: FeatureReducer {
 			case let .left(account):
 				return .send(.delegate(.handleResult(.profileAccount(value: account.forDisplay))))
 			case let .right(.accountAddress(address)):
+				if state.storeManualRecipientInAddressBook,
+				   state.canStoreValidatedManualRecipientInAddressBook,
+				   state.validatedManualAccountAddress == address
+				{
+					state.pendingExternalAccountAddressToSelect = address
+					state.destination = .addAddressBookEntry(.init(mode: .addWithAddress(address.asGeneral)))
+					return .none
+				}
+
 				if let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
 					return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.forDisplay))))
 				} else {
@@ -134,11 +172,29 @@ struct ChooseTransferRecipient: FeatureReducer {
 					return await send(.internal(.rnsDomainConfiguredRecieverResult(result)))
 				}
 			}
+
+		case let .tabChanged(tab):
+			state.selectedTab = tab
+			return .none
+
+		case let .addressBookEntrySelected(entry):
+			guard case let .account(address) = entry.address else {
+				return .none
+			}
+			return .send(.delegate(.handleResult(.addressOfExternalAccount(value: address))))
+
+		case .storeManualRecipientInAddressBookToggled:
+			state.storeManualRecipientInAddressBook.toggle()
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .loadedAddressBookEntries(entries):
+			state.addressBookEntries = entries
+			return .none
+
 		case let .rnsDomainConfiguredRecieverResult(.success(recipient)):
 			state.isDeterminingRnsDomainRecipient = false
 			if let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == recipient.receiver }) {
@@ -174,9 +230,23 @@ struct ChooseTransferRecipient: FeatureReducer {
 				await openURL(Self.xrdDomainsHelp)
 			}
 
+		case .addAddressBookEntry(.delegate(.saved)):
+			guard let address = state.pendingExternalAccountAddressToSelect else {
+				state.destination = nil
+				return .none
+			}
+			state.pendingExternalAccountAddressToSelect = nil
+			state.destination = nil
+			return .send(.delegate(.handleResult(.addressOfExternalAccount(value: address))))
+
 		default:
 			return .none
 		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		state.pendingExternalAccountAddressToSelect = nil
+		return .none
 	}
 }
 

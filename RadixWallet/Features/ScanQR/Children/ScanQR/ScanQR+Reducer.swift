@@ -74,6 +74,7 @@ struct ScanQR: FeatureReducer {
 extension ScanQR {
 	enum Kind: Hashable {
 		case connectorExtension
+		case address
 		case account
 		case importOlympia
 	}

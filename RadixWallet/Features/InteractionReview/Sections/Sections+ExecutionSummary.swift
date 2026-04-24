@@ -356,7 +356,8 @@ extension InteractionReview.Sections {
 				if let userAccount {
 					return .user(userAccount)
 				} else {
-					return .external(address, approved: false)
+					let entry = try? addressBookClient.entryByAddress(address.asGeneral)
+					return .external(address, approved: false, addressBookName: entry?.name.value)
 				}
 			}
 	}

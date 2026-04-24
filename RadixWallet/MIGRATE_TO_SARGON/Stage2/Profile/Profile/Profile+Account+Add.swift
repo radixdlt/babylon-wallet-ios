@@ -35,6 +35,8 @@ extension Profile {
 				personas: [],
 				authorizedDapps: [],
 				resourcePreferences: [],
+				addressBook: [],
+				tokenPriceServices: [],
 				mfaFactorInstances: []
 			)
 			var identifiedNetworks = networks.asIdentified()

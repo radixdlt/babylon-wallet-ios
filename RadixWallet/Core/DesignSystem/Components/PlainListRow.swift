@@ -127,7 +127,7 @@ struct PlainListRow<Icon: View, Accessory: View, Bottom: View>: View {
 		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, viewState.rowCoreViewState.horizontalPadding)
-		.frame(minHeight: .plainListRowMinHeight)
+		.frame(minHeight: viewState.rowCoreViewState.minHeight)
 		.background(viewState.rowCoreViewState.context == .personaDetails ? Color.secondaryBackground : Color.primaryBackground)
 		.foregroundStyle(Color.primaryText)
 		.contentShape(Rectangle())
@@ -298,9 +298,9 @@ private extension PlainListRowCore.ViewState {
 
 	var subtitleLineLimit: Int {
 		switch context {
-		case .toggle, .hiddenPersona, .compactPersona:
+		case .toggle, .settings, .hiddenPersona, .compactPersona:
 			2
-		case .settings, .dappAndPersona, .personaDetails:
+		case .dappAndPersona, .personaDetails:
 			3
 		}
 	}
@@ -310,7 +310,7 @@ private extension PlainListRowCore.ViewState {
 		case .toggle:
 			.zero
 		case .settings:
-			.medium1
+			.medium3
 		case .dappAndPersona, .hiddenPersona:
 			.medium3
 		case .compactPersona:
@@ -328,6 +328,15 @@ private extension PlainListRowCore.ViewState {
 			.medium1
 		case .personaDetails:
 			.zero
+		}
+	}
+
+	var minHeight: CGFloat? {
+		switch context {
+		case .settings:
+			nil
+		default:
+			.plainListRowMinHeight
 		}
 	}
 
