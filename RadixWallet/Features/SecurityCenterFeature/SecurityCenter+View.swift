@@ -223,6 +223,11 @@ extension SecurityCenter {
 			Card(action: action) {
 				HStack(spacing: .zero) {
 					Image(.signingKey)
+						.resizable()
+						.renderingMode(.template)
+						.scaledToFit()
+						.frame(width: 64, height: 64)
+						.foregroundStyle(.iconSecondary)
 						.frame(width: 80, height: 80)
 						.padding(.trailing, .medium3)
 
@@ -264,7 +269,6 @@ private extension View {
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
 			.mfaFactorInstance(with: destinationStore)
-			.selectFactorSource(with: destinationStore)
 			.addressDetails(with: destinationStore)
 			.deviceFactorSources(with: destinationStore)
 			.importMnemonics(with: destinationStore)
@@ -288,14 +292,6 @@ private extension View {
 	private func mfaFactorInstance(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.mfaFactorInstance, action: \.mfaFactorInstance)) {
 			MfaFactorInstance.View(store: $0)
-		}
-	}
-
-	private func selectFactorSource(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.selectFactorSource, action: \.selectFactorSource)) { store in
-			NavigationStack {
-				SelectFactorSource.View(store: store)
-			}
 		}
 	}
 

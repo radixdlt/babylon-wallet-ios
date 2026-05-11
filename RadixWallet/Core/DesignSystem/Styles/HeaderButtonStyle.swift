@@ -4,6 +4,12 @@ extension ButtonStyle where Self == HeaderButtonStyle {
 	}
 }
 
+extension View {
+	func glassToolbarIconButtonSurface() -> some View {
+		modifier(GlassToolbarIconButtonSurface())
+	}
+}
+
 // MARK: - HeaderButtonStyle
 struct HeaderButtonStyle: ButtonStyle {
 	func makeBody(configuration: ButtonStyle.Configuration) -> some View {
@@ -26,6 +32,21 @@ private struct GlassHeaderButtonBackground: ViewModifier {
 		} else {
 			content
 				.background(.backgroundTransparent)
+		}
+	}
+}
+
+// MARK: - GlassToolbarIconButtonSurface
+private struct GlassToolbarIconButtonSurface: ViewModifier {
+	func body(content: Content) -> some View {
+		if #available(iOS 26, *) {
+			content
+				.background(.clear, in: Circle())
+				.glassEffect(.clear.interactive(), in: .circle)
+		} else {
+			content
+				.background(.tertiaryBackground.opacity(0.7), in: Circle())
+				.overlay(Circle().stroke(.border.opacity(0.7), lineWidth: 1))
 		}
 	}
 }

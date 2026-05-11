@@ -32,6 +32,26 @@ final class TokenPriceCientTests: XCTestCase {
 		)
 	}
 
+	func test_tokenPriceServiceURLRejectsLocalhostOutsideDeveloperMode() {
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "localhost:8080", isDeveloperModeEnabled: false))
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "https://localhost:8080", isDeveloperModeEnabled: false))
+	}
+
+	func test_tokenPriceServiceURLRejectsIPAddressesOutsideDeveloperMode() {
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "127.0.0.1", isDeveloperModeEnabled: false))
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "https://192.168.0.10", isDeveloperModeEnabled: false))
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "https://[2001:db8::1]", isDeveloperModeEnabled: false))
+	}
+
+	func test_tokenPriceServiceURLRejectsCustomPortsOutsideDeveloperMode() {
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "prices.example.com:8443", isDeveloperModeEnabled: false))
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "https://prices.example.com:8443", isDeveloperModeEnabled: false))
+	}
+
+	func test_tokenPriceServiceURLRejectsHTTPOutsideDeveloperMode() {
+		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "http://prices.example.com", isDeveloperModeEnabled: false))
+	}
+
 	func test_tokenPriceServiceURLRejectsUnsupportedSchemes() {
 		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "ftp://prices.example.com", isDeveloperModeEnabled: true))
 	}

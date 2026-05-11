@@ -33,7 +33,14 @@ extension AddressBook {
 							store.send(.view(.addButtonTapped))
 						} label: {
 							Image(systemName: "plus")
+								.frame(.smallest)
+								.foregroundColor(.primaryText)
+								.frame(.toolbarButtonHeight)
+								.glassToolbarIconButtonSurface()
 						}
+						.buttonStyle(.plain)
+						.contentShape(Circle())
+						.accessibilityLabel(L10n.AddressBook.EntryForm.addTitle)
 					}
 				}
 				.task {

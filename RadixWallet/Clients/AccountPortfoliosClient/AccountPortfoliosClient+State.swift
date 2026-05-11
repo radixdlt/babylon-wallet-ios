@@ -397,7 +397,10 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 // MARK: - Account portfolio fiat worth
 extension AccountPortfoliosClient.AccountPortfolio {
 	var totalFiatWorth: Loadable<FiatWorth> {
-		poolUnitDetails.concat3(stakeUnitDetails, nonFungibleIds).map { poolUnitDetails, stakeUnitDetails, nonFungibleValues in
+		poolUnitDetails.concat3(
+			stakeUnitDetails,
+			nonFungibleIds.errorFallback([])
+		).map { poolUnitDetails, stakeUnitDetails, nonFungibleValues in
 			let totalFiatWorth = account.fungibleResources.fiatWorth + stakeUnitDetails.fiatWorth + poolUnitDetails.fiatWorth + nonFungibleValues.fiatWorth
 			return .init(isVisible: isCurrencyAmountVisible, worth: totalFiatWorth, currency: fiatCurrency)
 		}

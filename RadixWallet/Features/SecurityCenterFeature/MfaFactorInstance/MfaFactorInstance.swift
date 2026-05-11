@@ -28,18 +28,23 @@ struct MfaFactorInstance {
 		@CasePathable
 		enum State: Hashable {
 			case factorSourceDetail(FactorSourceDetail.State)
+			case selectFactorSource(SelectFactorSource.State)
 			case addressDetails(AddressDetails.State)
 		}
 
 		@CasePathable
 		enum Action: Equatable {
 			case factorSourceDetail(FactorSourceDetail.Action)
+			case selectFactorSource(SelectFactorSource.Action)
 			case addressDetails(AddressDetails.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: \.factorSourceDetail, action: \.factorSourceDetail) {
 				FactorSourceDetail()
+			}
+			Scope(state: \.selectFactorSource, action: \.selectFactorSource) {
+				SelectFactorSource()
 			}
 			Scope(state: \.addressDetails, action: \.addressDetails) {
 				AddressDetails()
@@ -50,16 +55,11 @@ struct MfaFactorInstance {
 	enum Action: Equatable {
 		case appeared
 		case currentUsageLoaded(Loadable<[State.ActiveUsage]>)
-		case signatureResourceTapped(NonFungibleGlobalId)
 		case factorSourceIntegrityLoaded(FactorSourceIntegrity)
 		case factorSourceTapped(FactorSource)
+		case mfaSignatureResourceLoaded(NonFungibleGlobalId)
 		case continueTapped
 		case destination(PresentationAction<Destination.Action>)
-		case delegate(DelegateAction)
-	}
-
-	enum DelegateAction: Equatable {
-		case continueTapped
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -91,10 +91,7 @@ struct MfaFactorInstance {
 				return .none
 
 			case .continueTapped:
-				return .send(.delegate(.continueTapped))
-
-			case let .signatureResourceTapped(globalId):
-				state.destination = .addressDetails(.init(address: .nonFungibleGlobalID(globalId)))
+				state.destination = .selectFactorSource(.init(context: .mfaFactorInstance))
 				return .none
 
 			case let .factorSourceIntegrityLoaded(integrity):
@@ -109,10 +106,23 @@ struct MfaFactorInstance {
 					errorQueue.schedule(error)
 				}
 
-			case .destination:
+			case let .mfaSignatureResourceLoaded(globalId):
+				state.destination = .addressDetails(.init(address: .nonFungibleGlobalID(globalId)))
 				return .none
 
-			case .delegate:
+			case let .destination(.presented(.selectFactorSource(.delegate(.selectedFactorSource(factorSource, _))))):
+				return .run { send in
+					let mfaFactorInstance = try await SargonOs.shared.getNewMfaFactorInstance(factorSource: factorSource.asGeneral)
+					let globalId = switch mfaFactorInstance.factorInstance.badge {
+					case let .virtual(.hierarchicalDeterministic(key)):
+						try key.nonFungibleGlobalId()
+					}
+					await send(.mfaSignatureResourceLoaded(globalId))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
+
+			case .destination:
 				return .none
 			}
 		}

@@ -28,7 +28,13 @@ extension MfaFactorInstance {
 							store.send(.continueTapped)
 						} label: {
 							Image(systemName: "plus")
+								.frame(.smallest)
+								.foregroundColor(.primaryText)
+								.frame(.toolbarButtonHeight)
+								.glassToolbarIconButtonSurface()
 						}
+						.buttonStyle(.plain)
+						.contentShape(Circle())
 						.accessibilityLabel("Get new instance")
 					}
 				}
@@ -64,9 +70,6 @@ private extension MfaFactorInstance.View {
 							ActiveUsageCard(
 								index: index,
 								usage: usage,
-								onSignatureResourceTap: {
-									store.send(.signatureResourceTapped(usage.signatureResource))
-								},
 								onFactorSourceTap: { factorSource in
 									store.send(.factorSourceTapped(factorSource))
 								}
@@ -82,7 +85,7 @@ private extension MfaFactorInstance.View {
 	}
 
 	var emptyState: some View {
-		Text("No active signature resource found.")
+		Text("A signature resource will appear here once it is used to securify an account.")
 			.textStyle(.body1Regular)
 			.foregroundStyle(.secondaryText)
 			.padding(.medium2)
@@ -95,15 +98,13 @@ private extension MfaFactorInstance.View {
 private struct ActiveUsageCard: View {
 	let index: Int
 	let usage: MfaFactorInstance.State.ActiveUsage
-	let onSignatureResourceTap: () -> Void
 	let onFactorSourceTap: (FactorSource) -> Void
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: .small3) {
 			SignatureResourceCard(
 				index: index,
-				usage: usage,
-				action: onSignatureResourceTap
+				usage: usage
 			)
 
 			if !usage.accounts.isEmpty {
@@ -150,33 +151,27 @@ private struct ActiveUsageCard: View {
 private struct SignatureResourceCard: View {
 	let index: Int
 	let usage: MfaFactorInstance.State.ActiveUsage
-	let action: () -> Void
 
 	var body: some View {
-		Button(action: action) {
-			HStack(spacing: .small2) {
-				Thumbnail(.nft, url: nil, size: .small)
+		HStack(spacing: .small2) {
+			Thumbnail(.nft, url: nil, size: .small)
 
-				VStack(alignment: .leading, spacing: .small3) {
-					Text("Signature Resource #\(index + 1)")
-						.textStyle(.body1Header)
-						.foregroundColor(.primaryText)
-						.lineLimit(1)
+			VStack(alignment: .leading, spacing: .small3) {
+				Text("Signature Resource #\(index + 1)")
+					.textStyle(.body1Header)
+					.foregroundColor(.primaryText)
+					.lineLimit(1)
 
-					Text(usage.signatureResource.nonFungibleLocalId.formatted())
-						.textStyle(.body2Regular)
-						.foregroundColor(.secondaryText)
-						.lineLimit(1)
-				}
-
-				Spacer(minLength: .zero)
+				AddressView(.address(.nonFungibleGlobalID(usage.signatureResource)))
+					.textStyle(.body2Regular)
+					.foregroundColor(.secondaryText)
 			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.contentShape(Rectangle())
-			.padding(.medium2)
-			.addressBookEntrySurface(interactive: true)
+
+			Spacer(minLength: .zero)
 		}
-		.buttonStyle(.plain)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.medium2)
+		.addressBookEntrySurface()
 	}
 }
 
@@ -219,12 +214,22 @@ private extension View {
 	func destinations(with store: StoreOf<MfaFactorInstance>) -> some View {
 		let destinationStore = store.destination
 		return factorSourceDetail(with: destinationStore)
+			.selectFactorSource(with: destinationStore)
 			.addressDetails(with: destinationStore)
 	}
 
 	private func factorSourceDetail(with destinationStore: PresentationStoreOf<MfaFactorInstance.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.factorSourceDetail, action: \.factorSourceDetail)) { store in
 			FactorSourceDetail.View(store: store)
+		}
+	}
+
+	private func selectFactorSource(with destinationStore: PresentationStoreOf<MfaFactorInstance.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.selectFactorSource, action: \.selectFactorSource)) { store in
+			SelectFactorSource.View(store: store)
+				.withNavigationBar {
+					destinationStore.send(.dismiss)
+				}
 		}
 	}
 

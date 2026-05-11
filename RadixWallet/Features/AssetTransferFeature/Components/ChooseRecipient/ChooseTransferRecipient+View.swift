@@ -139,6 +139,7 @@ extension ChooseTransferRecipient {
 								manualAddressBookStatus
 							}
 							.padding([.horizontal, .bottom], .medium3)
+							.background(.primaryBackground)
 
 							Picker("", selection: $store.selectedTab.sending(\.view.tabChanged)) {
 								Text(L10n.AssetTransfer.ChooseReceivingAccount.myAccounts)
@@ -162,7 +163,7 @@ extension ChooseTransferRecipient {
 							}
 						}
 					}
-					.background(.primaryBackground)
+					.background(.secondaryBackground)
 					.destinations(with: store)
 					.footer { chooseButton }
 					.radixToolbar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle) {
