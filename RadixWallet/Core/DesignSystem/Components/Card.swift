@@ -108,6 +108,37 @@ extension View {
 	var cardShadow: some View {
 		shadow(color: .shadow.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
+
+	func glassCardSurface(interactive: Bool = false) -> some View {
+		modifier(GlassCardSurface(interactive: interactive))
+	}
+
+	func addressBookEntrySurface(interactive: Bool = false) -> some View {
+		glassCardSurface(interactive: interactive)
+	}
+}
+
+// MARK: - GlassCardSurface
+struct GlassCardSurface: ViewModifier {
+	let interactive: Bool
+
+	func body(content: Content) -> some View {
+		if #available(iOS 26, *) {
+			content
+				.background(.clear, in: RoundedRectangle(cornerRadius: .medium3))
+				.applyIf(interactive) { view in
+					view.glassEffect(.regular.interactive(), in: .rect(cornerRadius: .medium3))
+				}
+				.applyIf(!interactive) { view in
+					view.glassEffect(.regular, in: .rect(cornerRadius: .medium3))
+				}
+		} else {
+			content
+				.background(.primaryBackground)
+				.clipShape(RoundedRectangle(cornerRadius: .medium3))
+				.cardShadow
+		}
+	}
 }
 
 // MARK: - SpeechbubbleShape

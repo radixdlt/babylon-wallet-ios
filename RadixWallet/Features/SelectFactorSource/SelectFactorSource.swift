@@ -7,6 +7,7 @@ struct SelectFactorSource: FeatureReducer {
 			case createAccount
 			case createPersona
 			case accountRecovery(isOlympia: Bool)
+			case mfaFactorInstance
 		}
 
 		let context: Context
@@ -19,7 +20,7 @@ struct SelectFactorSource: FeatureReducer {
 
 		var kinds: [FactorSourceKind] {
 			switch context {
-			case .createAccount, .createPersona, .accountRecovery(false):
+			case .createAccount, .createPersona, .accountRecovery(false), .mfaFactorInstance:
 				[.device, .ledgerHqHardwareWallet, .arculusCard, .offDeviceMnemonic]
 			case .accountRecovery(true):
 				[.device, .ledgerHqHardwareWallet]
@@ -149,7 +150,7 @@ struct SelectFactorSource: FeatureReducer {
 
 		case .addSecurityFactorTapped:
 			let context: AddFactorSource.Context = switch state.context {
-			case .createAccount, .createPersona: .newFactorSource
+			case .createAccount, .createPersona, .mfaFactorInstance: .newFactorSource
 			case let .accountRecovery(isOlympia): .recoverFactorSource(isOlympia: isOlympia)
 			}
 
@@ -171,7 +172,7 @@ struct SelectFactorSource: FeatureReducer {
 		case let .setEntities(entities):
 			state.entities = entities.filter { entity in
 				switch state.context {
-				case .createAccount, .createPersona, .accountRecovery(false):
+				case .createAccount, .createPersona, .accountRecovery(false), .mfaFactorInstance:
 					entity.integrity.factorSource.supportsBabylon
 				case .accountRecovery(true):
 					entity.integrity.factorSource.supportsOlympia

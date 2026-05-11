@@ -807,6 +807,13 @@
 		5BEB9CD52C6F6CC9001FD9D4 /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */; };
 		5BFA4FBA2C736B740030B517 /* HiddenAssets+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */; };
 		5BFA4FBB2C736B740030B517 /* HiddenAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA4FB92C736B740030B517 /* HiddenAssets.swift */; };
+		A0ADBC001AD00000ADBC0005 /* AddressBookClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC0002 /* AddressBookClient+Interface.swift */; };
+		A0ADBC001AD00000ADBC0006 /* AddressBookClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC0003 /* AddressBookClient+Live.swift */; };
+		A0ADBC001AD00000ADBC0007 /* AddressBookClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC0004 /* AddressBookClient+Test.swift */; };
+		A0ADBC001AD00000ADBC000D /* AddressBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC0009 /* AddressBook.swift */; };
+		A0ADBC001AD00000ADBC000E /* AddressBook+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC000A /* AddressBook+View.swift */; };
+		A0ADBC001AD00000ADBC000F /* AddressBookEntryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC000B /* AddressBookEntryForm.swift */; };
+		A0ADBC001AD00000ADBC0010 /* AddressBookEntryForm+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0ADBC001AD00000ADBC000C /* AddressBookEntryForm+View.swift */; };
 		5BFED68B2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFED68A2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift */; };
 		5BFED68C2D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFED6892D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
@@ -1254,6 +1261,8 @@
 		A43F1E232BC72884001DD3FA /* AnyRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E222BC72884001DD3FA /* AnyRange.swift */; };
 		A43F1E262BC96F18001DD3FA /* SecurityCenter+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */; };
 		A43F1E282BC96F27001DD3FA /* SecurityCenter+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */; };
+		A0C31A002EDB8C7B00E00001 /* MfaFactorInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C31A022EDB8C7B00E00001 /* MfaFactorInstance.swift */; };
+		A0C31A012EDB8C7B00E00001 /* MfaFactorInstance+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C31A032EDB8C7B00E00001 /* MfaFactorInstance+View.swift */; };
 		A462B5792B8210A400C26D20 /* TransactionHistoryClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */; };
 		A462B57A2B8210A600C26D20 /* TransactionHistoryClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */; };
 		A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */; };
@@ -1342,6 +1351,7 @@
 		E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */; };
 		E6DBA32E2ADEBFB300A38425 /* SettingsViewStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2792ADEBFB200A38425 /* SettingsViewStateTests.swift */; };
 		E6DBA3312ADEBFB300A38425 /* AccountDetailsFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA27E2ADEBFB200A38425 /* AccountDetailsFeatureTests.swift */; };
+		A1B2C3D42F0A000100112233 /* AddressBookFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D32F0A000100112233 /* AddressBookFeatureTests.swift */; };
 		E6DBA3332ADEBFB300A38425 /* TransactionSigningFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2812ADEBFB200A38425 /* TransactionSigningFeatureTests.swift */; };
 		E6DBA33B2ADEBFB300A38425 /* MainFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA28E2ADEBFB300A38425 /* MainFeatureTests.swift */; };
 		E6DBA33E2ADEBFB300A38425 /* DappInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2942ADEBFB300A38425 /* DappInteractorTests.swift */; };
@@ -1447,7 +1457,7 @@
 		4019A6B9E4F6D77A74801C1C /* SignalingServersSettings+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServersSettings+View.swift"; sourceTree = "<group>"; };
 		47B4C8D13A2E4F4B8C200001 /* SignalingServerDetails+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServerDetails+Reducer.swift"; sourceTree = "<group>"; };
 		47B4C8D13A2E4F4B8C200002 /* SignalingServerDetails+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignalingServerDetails+View.swift"; sourceTree = "<group>"; };
-		47B4C8D13A2E4F4B8C200003 /* SignalingServersSettingsFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalingServersSettingsFeatureTests.swift; sourceTree = "<group>"; };
+		47B4C8D13A2E4F4B8C200003 /* SignalingServersSettingsFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../SignalingServersSettingsFeatureTests.swift; sourceTree = "<group>"; };
 		48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnFirstAppearViewModifier.swift; sourceTree = "<group>"; };
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+NetworkDefinition.swift"; sourceTree = "<group>"; };
@@ -2217,6 +2227,13 @@
 		5BEB9CD42C6F6CC9001FD9D4 /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		5BFA4FB82C736B740030B517 /* HiddenAssets+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HiddenAssets+View.swift"; sourceTree = "<group>"; };
 		5BFA4FB92C736B740030B517 /* HiddenAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenAssets.swift; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC0002 /* AddressBookClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressBookClient+Interface.swift"; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC0003 /* AddressBookClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressBookClient+Live.swift"; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC0004 /* AddressBookClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressBookClient+Test.swift"; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC0009 /* AddressBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBook.swift; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC000A /* AddressBook+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressBook+View.swift"; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC000B /* AddressBookEntryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressBookEntryForm.swift; sourceTree = "<group>"; };
+		A0ADBC001AD00000ADBC000C /* AddressBookEntryForm+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddressBookEntryForm+View.swift"; sourceTree = "<group>"; };
 		5BFED6892D4A8C6D00380E7D /* PasswordFactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordFactorSourceAccess.swift; sourceTree = "<group>"; };
 		5BFED68A2D4A8C6D00380E7D /* PasswordFactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PasswordFactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
@@ -2646,6 +2663,8 @@
 		A43F1E222BC72884001DD3FA /* AnyRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRange.swift; sourceTree = "<group>"; };
 		A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenter+Reducer.swift"; sourceTree = "<group>"; };
 		A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenter+View.swift"; sourceTree = "<group>"; };
+		A0C31A022EDB8C7B00E00001 /* MfaFactorInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MfaFactorInstance.swift; sourceTree = "<group>"; };
+		A0C31A032EDB8C7B00E00001 /* MfaFactorInstance+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MfaFactorInstance+View.swift"; sourceTree = "<group>"; };
 		A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Live.swift"; sourceTree = "<group>"; };
 		A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Mock.swift"; sourceTree = "<group>"; };
 		A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2737,6 +2756,7 @@
 		E6DBA2792ADEBFB200A38425 /* SettingsViewStateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewStateTests.swift; sourceTree = "<group>"; };
 		E6DBA27C2ADEBFB200A38425 /* AppFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFeatureTests.swift; sourceTree = "<group>"; };
 		E6DBA27E2ADEBFB200A38425 /* AccountDetailsFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountDetailsFeatureTests.swift; sourceTree = "<group>"; };
+		A1B2C3D32F0A000100112233 /* AddressBookFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ../AddressBookFeatureTests.swift; sourceTree = "<group>"; };
 		E6DBA2812ADEBFB200A38425 /* TransactionSigningFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionSigningFeatureTests.swift; sourceTree = "<group>"; };
 		E6DBA2832ADEBFB200A38425 /* GatewaySettingsFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GatewaySettingsFeatureTests.swift; sourceTree = "<group>"; };
 		E6DBA2892ADEBFB200A38425 /* CustomizeFeePayerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomizeFeePayerTests.swift; sourceTree = "<group>"; };
@@ -4710,6 +4730,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A0ADBC001AD00000ADBC0001 /* AddressBookClient */,
 				A0596FD32F4A059500BE7543 /* P2PTransportProfilesClient */,
 				A0B566E82ED75F96002655C0 /* AccessControllerClient */,
 				A089D4342E35342F00866A47 /* ArculusCardClient */,
@@ -5972,6 +5993,7 @@
 				48CFBD8F2ADC10D800E77A5C /* DefaultDepositGuarantees */,
 				5B135B372C7636B6004AAD2E /* HiddenEntities */,
 				5BFA4FB72C736B500030B517 /* HiddenAssets */,
+				A0ADBC001AD00000ADBC0008 /* AddressBook */,
 				A0D742A62DD478BD0062DB01 /* ThemeSelection */,
 			);
 			path = Preferences;
@@ -6206,6 +6228,17 @@
 			path = HiddenAssets;
 			sourceTree = "<group>";
 		};
+		A0ADBC001AD00000ADBC0008 /* AddressBook */ = {
+			isa = PBXGroup;
+			children = (
+				A0ADBC001AD00000ADBC0009 /* AddressBook.swift */,
+				A0ADBC001AD00000ADBC000A /* AddressBook+View.swift */,
+				A0ADBC001AD00000ADBC000B /* AddressBookEntryForm.swift */,
+				A0ADBC001AD00000ADBC000C /* AddressBookEntryForm+View.swift */,
+			);
+			path = AddressBook;
+			sourceTree = "<group>";
+		};
 		5BFED6882D4A8C4E00380E7D /* Password */ = {
 			isa = PBXGroup;
 			children = (
@@ -6433,6 +6466,16 @@
 				A0596FD22F4A059500BE7543 /* P2PTransportProfilesClient+Test.swift */,
 			);
 			path = P2PTransportProfilesClient;
+			sourceTree = "<group>";
+		};
+		A0ADBC001AD00000ADBC0001 /* AddressBookClient */ = {
+			isa = PBXGroup;
+			children = (
+				A0ADBC001AD00000ADBC0002 /* AddressBookClient+Interface.swift */,
+				A0ADBC001AD00000ADBC0003 /* AddressBookClient+Live.swift */,
+				A0ADBC001AD00000ADBC0004 /* AddressBookClient+Test.swift */,
+			);
+			path = AddressBookClient;
 			sourceTree = "<group>";
 		};
 		A05AA1482E0AE07600316B83 /* Filtering */ = {
@@ -6963,10 +7006,20 @@
 			children = (
 				A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */,
 				A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */,
+				A0C31A042EDB8C7B00E00001 /* MfaFactorInstance */,
 				E775A1BF2D004FBC00E72DB9 /* ConfigurationBackup */,
 				5B6499B42BCFD0C7000F2176 /* SecurityFactors */,
 			);
 			path = SecurityCenterFeature;
+			sourceTree = "<group>";
+		};
+		A0C31A042EDB8C7B00E00001 /* MfaFactorInstance */ = {
+			isa = PBXGroup;
+			children = (
+				A0C31A022EDB8C7B00E00001 /* MfaFactorInstance.swift */,
+				A0C31A032EDB8C7B00E00001 /* MfaFactorInstance+View.swift */,
+			);
+			path = MfaFactorInstance;
 			sourceTree = "<group>";
 		};
 		A462B5752B820D1200C26D20 /* TransactionHistoryClient */ = {
@@ -7271,6 +7324,7 @@
 				5B8F77112CDA41DC00154A76 /* PreAuthorizationReviewTests */,
 				83EE474E2AF027CE00155F03 /* AssetTransferTests */,
 				8328806A2AE6724B0014FBF3 /* AccountPreferencesTests */,
+				A1B2C3D22F0A000100112233 /* AddressBookFeatureTests */,
 				E6DBA2782ADEBFB200A38425 /* SettingsFeatureTests */,
 				E6DBA27B2ADEBFB200A38425 /* AppFeatureTests */,
 				E6DBA27D2ADEBFB200A38425 /* AccountDetailsFeatureTests */,
@@ -7285,6 +7339,14 @@
 				E62BB7622AEA856300D46DAC /* ImportMnemonicGridTests.swift */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		A1B2C3D22F0A000100112233 /* AddressBookFeatureTests */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D32F0A000100112233 /* AddressBookFeatureTests.swift */,
+			);
+			path = AddressBookFeatureTests;
 			sourceTree = "<group>";
 		};
 		E6DBA2782ADEBFB200A38425 /* SettingsFeatureTests */ = {
@@ -8220,6 +8282,7 @@
 				E6DBA3332ADEBFB300A38425 /* TransactionSigningFeatureTests.swift in Sources */,
 				E6DBA36D2ADEBFB300A38425 /* KeychainHolderTests.swift in Sources */,
 				E6DBA3872ADEBFB300A38425 /* LedgerModelTests.swift in Sources */,
+				A1B2C3D42F0A000100112233 /* AddressBookFeatureTests.swift in Sources */,
 				E6DBA3312ADEBFB300A38425 /* AccountDetailsFeatureTests.swift in Sources */,
 				E6DBA32E2ADEBFB300A38425 /* SettingsViewStateTests.swift in Sources */,
 				E6DBA36F2ADEBFB300A38425 /* OnLedgerEntitiesClientTests.swift in Sources */,
@@ -8326,6 +8389,13 @@
 				E79DD1C02CE756C400B1EB86 /* DeleteAccountCoordinator+View.swift in Sources */,
 				5BFA4FBA2C736B740030B517 /* HiddenAssets+View.swift in Sources */,
 				5BFA4FBB2C736B740030B517 /* HiddenAssets.swift in Sources */,
+				A0ADBC001AD00000ADBC0005 /* AddressBookClient+Interface.swift in Sources */,
+				A0ADBC001AD00000ADBC0006 /* AddressBookClient+Live.swift in Sources */,
+				A0ADBC001AD00000ADBC0007 /* AddressBookClient+Test.swift in Sources */,
+				A0ADBC001AD00000ADBC000D /* AddressBook.swift in Sources */,
+				A0ADBC001AD00000ADBC000E /* AddressBook+View.swift in Sources */,
+				A0ADBC001AD00000ADBC000F /* AddressBookEntryForm.swift in Sources */,
+				A0ADBC001AD00000ADBC0010 /* AddressBookEntryForm+View.swift in Sources */,
 				A4DCCC502C2DA32C00438A7B /* HomeCardsClient+Interface.swift in Sources */,
 				48CFC4162ADC10DA00E77A5C /* PasteboardClient+Test.swift in Sources */,
 				A40815BF2C7E0D08005E65B9 /* NetworkConfigurationResponse.swift in Sources */,
@@ -9223,6 +9293,7 @@
 				A0F636C52E3BA9580003B4C0 /* ArculusChangePIN-EnterOldPIN.swift in Sources */,
 				A0F636C62E3BA9580003B4C0 /* ArculusChangePIN-EnterOldPIN+View.swift in Sources */,
 				A43F1E282BC96F27001DD3FA /* SecurityCenter+View.swift in Sources */,
+				A0C31A012EDB8C7B00E00001 /* MfaFactorInstance+View.swift in Sources */,
 				A462B5B42B8F25BC00C26D20 /* ResourceBalance.swift in Sources */,
 				E7392AD62D6CD02A002FABDA /* AddFactorSource-InputSeedPhrase+View.swift in Sources */,
 				E79DD1B12CE365CF00B1EB86 /* ChooseReceivingAccountOnDelete+Reducer.swift in Sources */,
@@ -9316,6 +9387,7 @@
 				A40815DB2C7E0D08005E65B9 /* ProgrammaticScryptoSborValueMap.swift in Sources */,
 				A408161B2C7E0D08005E65B9 /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
 				A43F1E262BC96F18001DD3FA /* SecurityCenter+Reducer.swift in Sources */,
+				A0C31A002EDB8C7B00E00001 /* MfaFactorInstance.swift in Sources */,
 				A0E77D7F2ED091A00092D8DA /* HandleAccessControllerTimedRecovery.swift in Sources */,
 				A0E77D802ED091A00092D8DA /* HandleAccessControllerTimedRecovery+View.swift in Sources */,
 				48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */,
@@ -10265,7 +10337,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 1.2.52;
+				version = 1.2.57;
 			};
 		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {

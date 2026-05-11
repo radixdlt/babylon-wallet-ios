@@ -42,7 +42,7 @@ extension PollPreAuthorizationStatus {
 						case .expired:
 							expiredBottom(showBrowserMessage: viewStore.isDeepLink)
 						case .success:
-							successBottom(showBrowserMessage: viewStore.isDeepLink)
+							successBottom()
 						}
 					}
 					.multilineTextAlignment(.center)
@@ -94,16 +94,13 @@ extension PollPreAuthorizationStatus {
 			}
 		}
 
-		@ViewBuilder
-		private func successBottom(showBrowserMessage: Bool) -> some SwiftUI.View {
-			if showBrowserMessage {
-				Text(L10n.MobileConnect.interactionSuccess)
-					.textStyle(.body1Regular)
-					.foregroundStyle(.primaryText)
-					.padding(.medium1)
-					.frame(maxWidth: .infinity)
-					.background(.secondaryBackground)
-			}
+		private func successBottom() -> some SwiftUI.View {
+			Text(L10n.MobileConnect.interactionSuccess)
+				.textStyle(.body1Regular)
+				.foregroundStyle(.primaryText)
+				.padding(.medium1)
+				.frame(maxWidth: .infinity)
+				.background(.secondaryBackground)
 		}
 	}
 }

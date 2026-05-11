@@ -9,6 +9,7 @@ struct ReceivingAccount: FeatureReducer {
 		let id = ID()
 
 		var recipient: TransferRecipient?
+		var addressBookName: String?
 		var assets: IdentifiedArrayOf<ResourceAsset.State>
 		var canBeRemoved: Bool
 
@@ -18,6 +19,7 @@ struct ReceivingAccount: FeatureReducer {
 			canBeRemovedWhenEmpty: Bool
 		) {
 			self.recipient = recipient
+			self.addressBookName = nil
 			self.assets = assets
 			self.canBeRemoved = canBeRemovedWhenEmpty
 		}

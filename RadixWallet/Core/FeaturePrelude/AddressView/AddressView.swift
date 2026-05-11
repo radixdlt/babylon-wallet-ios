@@ -85,6 +85,7 @@ extension AddressView {
 
 			Text(formattedText)
 				.lineLimit(1)
+				.multilineTextAlignment(.leading)
 
 			if !isImageHidden {
 				if let imageColor {

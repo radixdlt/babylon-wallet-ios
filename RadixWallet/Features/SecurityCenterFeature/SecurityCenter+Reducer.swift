@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 
 // MARK: - SecurityCenter
 struct SecurityCenter: FeatureReducer {
@@ -20,6 +21,8 @@ struct SecurityCenter: FeatureReducer {
 		enum State: Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
+			case mfaFactorInstance(MfaFactorInstance.State)
+			case addressDetails(AddressDetails.State)
 			case deviceFactorSources(FactorSourcesList.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case securityShieldsSetup(ShieldSetupCoordinator.State)
@@ -31,6 +34,8 @@ struct SecurityCenter: FeatureReducer {
 		enum Action: Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
+			case mfaFactorInstance(MfaFactorInstance.Action)
+			case addressDetails(AddressDetails.Action)
 			case deviceFactorSources(FactorSourcesList.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case securityShieldsSetup(ShieldSetupCoordinator.Action)
@@ -44,6 +49,12 @@ struct SecurityCenter: FeatureReducer {
 			}
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
+			}
+			Scope(state: \.mfaFactorInstance, action: \.mfaFactorInstance) {
+				MfaFactorInstance()
+			}
+			Scope(state: \.addressDetails, action: \.addressDetails) {
+				AddressDetails()
 			}
 			Scope(state: \.deviceFactorSources, action: \.deviceFactorSources) {
 				FactorSourcesList()
@@ -67,6 +78,7 @@ struct SecurityCenter: FeatureReducer {
 		case task
 		case problemTapped(SecurityProblem)
 		case cardTapped(SecurityProblemKind)
+		case mfaFactorInstanceTapped
 	}
 
 	enum InternalAction: Equatable {
@@ -85,6 +97,7 @@ struct SecurityCenter: FeatureReducer {
 
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -127,6 +140,10 @@ struct SecurityCenter: FeatureReducer {
 				state.destination = .configurationBackup(.init())
 				return .none
 			}
+
+		case .mfaFactorInstanceTapped:
+			state.destination = .mfaFactorInstance(.init())
+			return .none
 		}
 	}
 

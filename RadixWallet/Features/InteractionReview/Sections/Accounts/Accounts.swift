@@ -116,13 +116,13 @@ typealias RadixAccount = Account
 extension InteractionReview {
 	enum ReviewAccount: Hashable {
 		case user(RadixAccount)
-		case external(AccountAddress, approved: Bool)
+		case external(AccountAddress, approved: Bool, addressBookName: String? = nil)
 
 		var address: AccountAddress {
 			switch self {
 			case let .user(account):
 				account.address
-			case let .external(address, _):
+			case let .external(address, _, _):
 				address
 			}
 		}
@@ -131,7 +131,7 @@ extension InteractionReview {
 			switch self {
 			case .user:
 				false
-			case let .external(_, approved):
+			case let .external(_, approved, _):
 				approved
 			}
 		}

@@ -5,7 +5,7 @@ extension RelayServicesSettings.State.Row {
 	var rowCoreViewState: PlainListRowCore.ViewState {
 		.init(
 			title: service.name,
-			detail: service.url.absoluteString
+			detail: service.url
 		)
 	}
 }

@@ -114,6 +114,7 @@ extension InteractionReview {
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.addressBookClient) var addressBookClient
 		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.errorQueue) var errorQueue
