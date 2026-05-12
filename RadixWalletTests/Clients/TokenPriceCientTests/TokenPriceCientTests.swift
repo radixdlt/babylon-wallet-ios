@@ -1,3 +1,4 @@
+import ComposableArchitecture
 @testable import Radix_Wallet_Dev
 import Sargon
 import XCTest
@@ -54,5 +55,41 @@ final class TokenPriceCientTests: XCTestCase {
 
 	func test_tokenPriceServiceURLRejectsUnsupportedSchemes() {
 		XCTAssertNil(AddTokenPriceService.tokenPriceServiceURL(from: "ftp://prices.example.com", isDeveloperModeEnabled: true))
+	}
+
+	@MainActor
+	func test_deleteTappedDoesNotPresentAlertForOnlyTokenPriceService() async throws {
+		let service = try TokenPriceService(baseUrl: XCTUnwrap(URL(string: "https://prices.example.com")))
+		var state = TokenPriceServicesSettings.State()
+		state.rows = .init(uniqueElements: [.init(service: service)])
+		let store = TestStore(
+			initialState: state,
+			reducer: TokenPriceServicesSettings.init
+		)
+
+		await store.send(.view(.deleteTapped(service.baseUrl)))
+	}
+
+	@MainActor
+	func test_removeConfirmationDoesNotDeleteOnlyTokenPriceService() async throws {
+		let service = try TokenPriceService(baseUrl: XCTUnwrap(URL(string: "https://prices.example.com")))
+		let didDelete = ActorIsolated(false)
+		var state = TokenPriceServicesSettings.State()
+		state.rows = .init(uniqueElements: [.init(service: service)])
+		state.destination = .deleteAlert(.removeService(baseURL: service.baseUrl))
+		let store = TestStore(
+			initialState: state,
+			reducer: TokenPriceServicesSettings.init
+		) {
+			$0.tokenPricesClient.deleteTokenPriceService = { _ in
+				await didDelete.setValue(true)
+				return true
+			}
+		}
+
+		await store.send(.destination(.presented(.deleteAlert(.removeButtonTapped(service.baseUrl))))) {
+			$0.destination = nil
+		}
+		await XCTFalse(didDelete.value)
 	}
 }

@@ -238,6 +238,9 @@ struct TokenPriceServicesSettings: FeatureReducer {
 
 		var rows: IdentifiedArrayOf<Row> = []
 		var isDeveloperModeEnabled: Bool
+		var canDeleteServices: Bool {
+			rows.count > 1
+		}
 
 		@Presents
 		var destination: Destination.State? = nil
@@ -309,6 +312,9 @@ struct TokenPriceServicesSettings: FeatureReducer {
 			return .none
 
 		case let .deleteTapped(baseURL):
+			guard state.canDeleteServices else {
+				return .none
+			}
 			state.destination = .deleteAlert(.removeService(baseURL: baseURL))
 			return .none
 		}
@@ -337,6 +343,10 @@ struct TokenPriceServicesSettings: FeatureReducer {
 			return loadServices()
 
 		case let .deleteAlert(.removeButtonTapped(baseURL)):
+			guard state.canDeleteServices else {
+				state.destination = nil
+				return .none
+			}
 			return .run { send in
 				let result = await TaskResult {
 					let deleted = try await tokenPricesClient.deleteTokenPriceService(baseURL)

@@ -333,11 +333,13 @@ extension TokenPriceServicesSettings {
 					.lineLimit(2)
 					.frame(maxWidth: .infinity, alignment: .leading)
 
-				Button(asset: AssetResource.trash) {
-					store.send(.view(.deleteTapped(row.service.baseUrl)))
+				if store.canDeleteServices {
+					Button(asset: AssetResource.trash) {
+						store.send(.view(.deleteTapped(row.service.baseUrl)))
+					}
+					.buttonStyle(.plain)
+					.accessibilityLabel("Remove Token Price Service")
 				}
-				.buttonStyle(.plain)
-				.accessibilityLabel("Remove Token Price Service")
 			}
 			.padding(.medium3)
 			.addressBookEntrySurface()
