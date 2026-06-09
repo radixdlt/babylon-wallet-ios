@@ -6,11 +6,11 @@ extension RadixNameServiceClient: DependencyKey {
 
 		return Self(
 			resolveReceiverAccountForDomain: { domain in
-				let network = await gatewaysClient.getCurrentNetworkID()
+				let gateway = await gatewaysClient.getCurrentGateway()
 
 				let rns = try RadixNameService(
 					networkingDriver: URLSession.shared,
-					networkId: network
+					gateway: gateway
 				)
 
 				return try await rns.resolveReceiverAccountForDomain(domain: domain)

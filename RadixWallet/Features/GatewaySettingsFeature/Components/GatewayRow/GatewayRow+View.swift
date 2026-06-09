@@ -89,19 +89,13 @@ struct GatewayRow_Preview: PreviewProvider {
 
 extension GatewayRow.State {
 	static let previewValue1 = Self(
-		gateway: .nebunet,
+		gateway: .mainnet,
 		isSelected: true,
 		canBeDeleted: false
 	)
 
 	static let previewValue2 = Self(
-		gateway: .hammunet,
-		isSelected: false,
-		canBeDeleted: true
-	)
-
-	static let previewValue3 = Self(
-		gateway: .enkinet,
+		gateway: .stokenet,
 		isSelected: false,
 		canBeDeleted: true
 	)

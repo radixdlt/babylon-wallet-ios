@@ -63,7 +63,7 @@ extension ChooseTransferRecipient.State {
 		guard let address = validatedManualAccountAddress else {
 			return nil
 		}
-		return addressBookEntries.first(where: { $0.address == address })
+		return addressBookEntries.first(where: { $0.address == address.asGeneral })
 	}
 
 	var canStoreValidatedManualRecipientInAddressBook: Bool {

@@ -401,7 +401,10 @@ extension AccountPortfoliosClient.AccountPortfolio {
 			stakeUnitDetails,
 			nonFungibleIds.errorFallback([])
 		).map { poolUnitDetails, stakeUnitDetails, nonFungibleValues in
-			let totalFiatWorth = account.fungibleResources.fiatWorth + stakeUnitDetails.fiatWorth + poolUnitDetails.fiatWorth + nonFungibleValues.fiatWorth
+			let totalFiatWorth = account.fungibleResources.fiatWorth +
+				stakeUnitDetails.fiatWorth +
+				poolUnitDetails.fiatWorth +
+				nonFungibleValues.fiatWorth.unknownFallback()
 			return .init(isVisible: isCurrencyAmountVisible, worth: totalFiatWorth, currency: fiatCurrency)
 		}
 		.errorFallback(.unknownWorth(isVisible: isCurrencyAmountVisible, currency: fiatCurrency))

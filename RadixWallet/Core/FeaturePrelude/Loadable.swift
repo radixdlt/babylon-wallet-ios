@@ -188,7 +188,7 @@ extension Loadable {
 
     func errorFallback(_ fallback: Value) -> Loadable<Value> {
         if case let .failure(error) = self {
-            assertionFailure("error")
+            assertionFailure("error \(error)")
             return .success(fallback)
         }
         return self

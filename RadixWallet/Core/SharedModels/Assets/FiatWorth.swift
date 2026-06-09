@@ -16,6 +16,10 @@ struct FiatWorth: Hashable {
 	enum Worth: Hashable {
 		case known(Decimal192)
 		case unknown
+
+		func unknownFallback(_ value: Decimal192 = .zero) -> Self {
+			.known(value)
+		}
 	}
 
 	var isVisible: Bool

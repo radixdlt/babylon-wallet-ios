@@ -24,8 +24,8 @@ extension GatewaysClient: TestDependencyKey {
 	static let noop = Self(
 		currentGatewayValues: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		gatewaysValues: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		getAllGateways: { [.nebunet] },
-		getCurrentGateway: { .nebunet },
+		getAllGateways: { [Gateway.mainnet] },
+		getCurrentGateway: { .mainnet },
 		addGateway: { _ in },
 		removeGateway: { _ in },
 		changeGateway: { _ in },
