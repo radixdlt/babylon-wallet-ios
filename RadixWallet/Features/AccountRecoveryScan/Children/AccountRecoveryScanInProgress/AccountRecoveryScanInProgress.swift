@@ -307,10 +307,9 @@ extension AccountRecoveryScanInProgress {
 		assert(accounts.count == batchSize)
 		state.status = .scanningNetworkForActiveAccounts
 		loggerGlobal.debug("Scanning ledger with accounts with addresses: \(accounts.map(\.address))")
-		return .run { [networkID = state.networkID] send in
+		return .run { send in
 			let deletedAccountAddresses: [AccountAddress] = try await SargonOS.shared
 				.checkAccountsDeletedOnLedger(
-					networkId: networkID,
 					accountAddresses: accounts.map(\.address)
 				)
 				.compactMap { accountAddress, isDeleted in

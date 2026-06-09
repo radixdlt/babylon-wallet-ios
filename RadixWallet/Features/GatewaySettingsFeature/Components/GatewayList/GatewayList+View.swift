@@ -53,7 +53,7 @@ struct GatewayList_Preview: PreviewProvider {
 extension GatewayList.State {
 	static let previewValue = Self(
 		gateways: [
-			.previewValue1, .previewValue2, .previewValue3,
+			.previewValue1, .previewValue2,
 		].asIdentified()
 	)
 }

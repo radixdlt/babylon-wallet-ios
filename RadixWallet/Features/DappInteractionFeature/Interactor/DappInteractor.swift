@@ -503,7 +503,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 	}
 
 	private func networkName(for networkID: NetworkID) -> String {
-		Gateway.forNetwork(id: networkID).network.displayDescription
+		try! NetworkDefinition.lookupBy(id: networkID).displayDescription
 	}
 }
 
