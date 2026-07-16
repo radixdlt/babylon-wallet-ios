@@ -2188,6 +2188,8 @@ internal enum L10n {
       internal static let deriveAccountsMessage = L10n.tr("Localizable", "factorSourceActions_device_deriveAccountsMessage", fallback: "Authenticate to your phone to sign.")
       /// Use your phone’s biometrics or PIN
       internal static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Use your phone’s biometrics or PIN")
+      /// The seed phrase could not be read from secure storage. Enter it to continue.
+      internal static let mnemonicUnavailableMessage = L10n.tr("Localizable", "factorSourceActions_device_mnemonicUnavailableMessage", fallback: "The seed phrase could not be read from secure storage. Enter it to continue.")
       /// Use your phone’s biometrics or PIN to sign
       internal static let signMessage = L10n.tr("Localizable", "factorSourceActions_device_signMessage", fallback: "Use your phone’s biometrics or PIN to sign")
     }

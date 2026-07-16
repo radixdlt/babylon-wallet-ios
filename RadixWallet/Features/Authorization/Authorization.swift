@@ -23,9 +23,6 @@ struct Authorization: FeatureReducer {
 		case cancelled
 	}
 
-	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.errorQueue) var errorQueue
-
 	var body: some ReducerOf<Self> {
 		Scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess) {
 			FactorSourceAccess()
@@ -45,21 +42,11 @@ struct Authorization: FeatureReducer {
 	}
 
 	func authorize(factorSource: PrivateFactorSource) -> Effect<Action> {
-		.run { send in
-			switch factorSource {
-			case let .device(device):
-				let _ = try secureStorageClient.loadMnemonic(factorSourceID: device.id, notifyIfMissing: false)
-				await send(.delegate(.authorized))
-			default:
-				fatalError("Authorization should always take place with DeviceFactorSource")
-			}
-		} catch: { error, _ in
-			if !error.isUserCanceledKeychainAccess {
-				// If user cancelled the operation, we will allow them to retry.
-				// In any other situation we handle the error.
-				errorQueue.schedule(error)
-			}
+		guard case .device = factorSource else {
+			assertionFailure("Authorization should always take place with DeviceFactorSource")
+			return .none
 		}
+		return .send(.delegate(.authorized))
 	}
 }
 

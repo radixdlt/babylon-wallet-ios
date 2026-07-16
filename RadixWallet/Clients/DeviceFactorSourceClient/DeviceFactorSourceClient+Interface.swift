@@ -7,81 +7,28 @@ struct DeviceFactorSourceClient {
 	/// - their mnmemonic is not backed up (entity was created but seed phrase never written down).
 	var entitiesInBadState: EntitiesInBadState
 
-	var derivePublicKeys: DerivePublicKeys
+	var loadMnemonic: LoadMnemonic
 }
 
-// MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
+// MARK: - DeviceFactorSourceClient
 extension DeviceFactorSourceClient {
 	typealias EntitiesInBadState = @Sendable () async throws -> AnyAsyncSequence<(withoutControl: AddressesOfEntitiesInBadState, unrecoverable: AddressesOfEntitiesInBadState)>
-	typealias DerivePublicKeys = @Sendable (KeyDerivationRequestPerFactorSource) async throws -> [HierarchicalDeterministicFactorInstance]
+	typealias LoadMnemonic = @Sendable (FactorSourceIdFromHash) throws -> MnemonicWithPassphrase
 }
 
-// MARK: - FailedToFindDeviceFactorSourceForSigning
-struct FailedToFindDeviceFactorSourceForSigning: Swift.Error {}
+// MARK: - DeviceMnemonicLoadError
+enum DeviceMnemonicLoadError: Error, Hashable {
+	/// The user explicitly cancelled native authentication or Keychain access.
+	case cancelledByUser
 
-// MARK: - IncorrectSignatureCountExpectedExactlyOne
-struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
-extension DeviceFactorSourceClient {
-	func signTransaction(
-		input: PerFactorSourceInputOfTransactionIntent
-	) async throws -> [HdSignatureOfTransactionIntentHash] {
-		let factorSourceId = input.factorSourceId
-		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
-		return mnemonicWithPassphrase.signTransaction(input: input)
-	}
+	/// Secure storage conclusively contains no mnemonic for the factor source.
+	case missing
 
-	func signSubintent(
-		input: PerFactorSourceInputOfSubintent
-	) async throws -> [HdSignatureOfSubintentHash] {
-		let factorSourceId = input.factorSourceId
-		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
-		return mnemonicWithPassphrase.signSubintent(input: input)
-	}
-
-	func signAuth(
-		input: PerFactorSourceInputOfAuthIntent
-	) async throws -> [HdSignatureOfAuthIntentHash] {
-		let factorSourceId = input.factorSourceId
-		let mnemonicWithPassphrase = try loadMnemonic(factorSourceId: factorSourceId)
-		return mnemonicWithPassphrase.signAuth(input: input)
-	}
-
-	private func loadMnemonic(factorSourceId: FactorSourceIdFromHash) throws -> MnemonicWithPassphrase {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-
-		guard
-			let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId)
-		else {
-			throw FailedToFindDeviceFactorSourceForSigning()
-		}
-		return mnemonicWithPassphrase
-	}
-
-	private func sign(
-		factorSourceId: FactorSourceIDFromHash,
-		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		hashedData: Hash,
-		ownedFactorInstances: [OwnedFactorInstance]
-	) async throws -> Set<SignatureOfEntity> {
-		var signatures = Set<SignatureOfEntity>()
-
-		for ownedFactorInstance in ownedFactorInstances {
-			let factorInstance = ownedFactorInstance.factorInstance
-			if factorInstance.factorSourceID != factorSourceId {
-				let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
-				loggerGlobal.critical(.init(stringLiteral: errMsg))
-				assertionFailure(errMsg)
-			}
-
-			let signatureWithPublicKey = mnemonicWithPassphrase.sign(hash: hashedData, path: factorInstance.derivationPath)
-
-			signatures.insert(.init(ownedFactorInstance: ownedFactorInstance, signatureWithPublicKey: signatureWithPublicKey))
-		}
-
-		return signatures
-	}
+	/// Secure storage may contain a mnemonic, but it could not be read or decoded.
+	case readFailure
 }
 
+// MARK: - MnemonicWithPassphrase
 extension MnemonicWithPassphrase {
 	func signTransaction(
 		input: PerFactorSourceInputOfTransactionIntent

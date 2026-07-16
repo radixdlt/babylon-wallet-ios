@@ -40,7 +40,6 @@ struct Signing: FeatureReducer {
 		case finished(Signatures)
 	}
 
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -77,8 +76,8 @@ private extension Signing {
 	func sign(purpose: State.Purpose, factorSource: PrivateFactorSource) -> Effect<Action> {
 		.run { send in
 			let signatures = switch factorSource {
-			case .device:
-				try await signDevice(purpose: purpose)
+			case let .device(_, mnemonicWithPassphrase):
+				signDevice(purpose: purpose, mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 			case let .ledger(ledger):
 				try await signLedger(purpose: purpose, ledger: ledger)
@@ -86,7 +85,7 @@ private extension Signing {
 			case let .arculusCard(arculus, pin):
 				try await signArculus(purpose: purpose, arculus: arculus, pin: pin)
 
-			case let .offDeviceMnemonic(fs, mwp):
+			case let .offDeviceMnemonic(_, mwp):
 				signOffDeviceMnemonic(purpose: purpose, mnemonicWithPassphrase: mwp)
 
 			default:
@@ -116,16 +115,19 @@ private extension Signing {
 		}
 	}
 
-	func signDevice(purpose: State.Purpose) async throws -> Signatures {
+	func signDevice(
+		purpose: State.Purpose,
+		mnemonicWithPassphrase: MnemonicWithPassphrase
+	) -> Signatures {
 		switch purpose {
 		case let .transaction(input):
-			try await .transaction(deviceFactorSourceClient.signTransaction(input: input))
+			.transaction(mnemonicWithPassphrase.signTransaction(input: input))
 
 		case let .subintent(input):
-			try await .subintent(deviceFactorSourceClient.signSubintent(input: input))
+			.subintent(mnemonicWithPassphrase.signSubintent(input: input))
 
 		case let .auth(input):
-			try await .auth(deviceFactorSourceClient.signAuth(input: input))
+			.auth(mnemonicWithPassphrase.signAuth(input: input))
 		}
 	}
 
@@ -173,13 +175,6 @@ private extension Signing {
 		send: Send<Signing.Action>
 	) async {
 		switch factorSource {
-		case .device:
-			if !error.isUserCanceledKeychainAccess {
-				// If user cancelled the operation, we will allow them to retry.
-				// In any other situation we handle the error.
-				errorQueue.schedule(error)
-			}
-
 		case .ledger:
 			if error.isUserRejectedSigningOnLedgerDevice {
 				// If user rejected signature on ledger device, we will inform the delegate to dismiss the signing sheet.
@@ -189,7 +184,7 @@ private extension Signing {
 				errorQueue.schedule(error)
 			}
 
-		default:
+		case .device, .arculusCard, .offDeviceMnemonic, .password:
 			errorQueue.schedule(error)
 		}
 	}

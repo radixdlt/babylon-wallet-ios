@@ -27,7 +27,6 @@ struct SpotCheck: FeatureReducer {
 		case validated
 	}
 
-	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -65,8 +64,7 @@ private extension SpotCheck {
 		.run { send in
 			let input: SpotCheckInput
 			switch factorSource {
-			case let .device(device):
-				let mnemonicWithPassphrase = try loadMnemonic(id: device.id)
+			case let .device(_, mnemonicWithPassphrase):
 				input = .software(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 			case .ledger:
@@ -82,29 +80,8 @@ private extension SpotCheck {
 			if factorSource.factorSource.spotCheck(input: input) {
 				await send(.internal(.spotCheckSucceeded(factorSource.factorSource.id)))
 			}
-		} catch: { error, send in
-			await handleError(factorSource: factorSource, error: error, send: send)
-		}
-	}
-
-	private func handleError(factorSource: PrivateFactorSource, error: Error, send: Send<SpotCheck.Action>) async {
-		switch factorSource {
-		case .device:
-			if !error.isUserCanceledKeychainAccess {
-				// If user cancelled the operation, we will allow them to retry.
-				// In any other situation we handle the error.
-				errorQueue.schedule(error)
-			}
-
-		default:
+		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
-	}
-
-	private func loadMnemonic(id: FactorSourceIdFromHash) throws -> MnemonicWithPassphrase {
-		guard let result = try secureStorageClient.loadMnemonic(factorSourceID: id, notifyIfMissing: false) else {
-			throw CommonError.UnableToLoadMnemonicFromSecureStorage(badValue: id.toString())
-		}
-		return result
 	}
 }
