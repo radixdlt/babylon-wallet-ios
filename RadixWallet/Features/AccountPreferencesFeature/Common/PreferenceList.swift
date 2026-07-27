@@ -81,18 +81,17 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 		.textCase(nil)
 	}
 
+	@ViewBuilder
 	private func accesory(for row: Row) -> some SwiftUI.View {
-		Group {
-			if case let .selection(selection) = viewState.mode {
-				if row.id == selection {
-					Image(asset: AssetResource.check)
-				} else {
-					// Put a placeholder for unselected items.
-					FixedSpacer(width: .medium1)
-				}
+		if case let .selection(selection) = viewState.mode {
+			if row.id == selection {
+				Image(asset: AssetResource.check)
 			} else {
-				Image(asset: AssetResource.chevronRight)
+				// Put a placeholder for unselected items.
+				FixedSpacer(width: .medium1)
 			}
+		} else {
+			Image(asset: AssetResource.chevronRight)
 		}
 	}
 
