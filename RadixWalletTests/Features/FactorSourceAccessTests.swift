@@ -27,6 +27,26 @@ final class DeviceMnemonicFactorSourceAccessTests: TestCase {
 		await store.receive(.delegate(.perform(.device(factorSource, mnemonicWithPassphrase))))
 	}
 
+	func testMismatchedStoredMnemonicEntersManualInputWithoutSaving() async {
+		let factorSource = PrivateHierarchicalDeterministicFactorSource.testValueZooVote.factorSource
+		let mismatchedMnemonic = MnemonicWithPassphrase.testValueAbandonArt
+		let store = TestStore(
+			initialState: FactorSourceAccess.State(factorSource: factorSource.asGeneral, purpose: .signature)
+		) {
+			FactorSourceAccess()
+		} withDependencies: {
+			$0.deviceFactorSourceClient.loadMnemonic = { _ in mismatchedMnemonic }
+		}
+
+		await store.send(.view(.onFirstTask)) {
+			$0.accessMode = .loadingDeviceMnemonic
+		}
+		await store.receive(.internal(.deviceMnemonicLoaded(factorSource, mismatchedMnemonic))) {
+			$0.accessMode = .manualDeviceMnemonic
+			$0.deviceMnemonic = .init(factorSource: factorSource, persistence: .ephemeral)
+		}
+	}
+
 	func testMissingStoredMnemonicEntersManualInputAndEnablesSaving() async {
 		let factorSource = PrivateHierarchicalDeterministicFactorSource.testValueZooVote.factorSource
 		let loadCount = LockIsolated(0)

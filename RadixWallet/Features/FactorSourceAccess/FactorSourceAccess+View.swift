@@ -143,7 +143,8 @@ extension DeviceMnemonicFactorSourceAccess {
 							primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: true),
 							placeholder: L10n.ImportMnemonic.passphrasePlaceholder,
 							text: $store.bip39Passphrase.sending(\.view.passphraseChanged),
-							hint: .info(L10n.ImportMnemonic.passphraseHint)
+							hint: .info(L10n.ImportMnemonic.passphraseHint),
+							preventScreenshot: true
 						)
 						.autocorrectionDisabled()
 					}

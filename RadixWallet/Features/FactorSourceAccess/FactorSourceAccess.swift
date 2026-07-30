@@ -188,6 +188,11 @@ struct FactorSourceAccess: FeatureReducer {
 			guard state.accessMode == .loadingDeviceMnemonic else {
 				return .none
 			}
+			guard factorSource.id.spotCheck(input: .software(mnemonicWithPassphrase: mnemonicWithPassphrase)) else {
+				state.accessMode = .manualDeviceMnemonic
+				state.deviceMnemonic = .init(factorSource: factorSource, persistence: .ephemeral)
+				return .none
+			}
 			state.accessMode = .completed
 			state.deviceMnemonic = nil
 			return .send(.delegate(.perform(.device(factorSource, mnemonicWithPassphrase))))
