@@ -1313,13 +1313,13 @@
 		A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */; };
 		A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */; };
 		A4F30C942C7CA71400F983D6 /* WithNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */; };
+		C0D3F0023C75A00100000001 /* FactorSourceAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0013C75A00100000001 /* FactorSourceAccessTests.swift */; };
 		C9EE850CC0FEC284D889E837 /* SignalingServersSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595C13FB3D7F5C6F7FCE06F8 /* SignalingServersSettings+Reducer.swift */; };
 		E622FF902CE7984B00489BA5 /* DebugFactorInstancesCacheContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E622FF8F2CE7984B00489BA5 /* DebugFactorInstancesCacheContents+View.swift */; };
 		E622FF912CE7984B00489BA5 /* DebugFactorInstancesCacheContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E622FF8E2CE7984B00489BA5 /* DebugFactorInstancesCacheContents.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicGridTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicGridTests.swift */; };
-		C0D3F0023C75A00100000001 /* FactorSourceAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D3F0013C75A00100000001 /* FactorSourceAccessTests.swift */; };
 		E634CA2F2AFD25B100C43DB7 /* DebugKeychainContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E634CA2D2AFD25B100C43DB7 /* DebugKeychainContents+View.swift */; };
 		E634CA302AFD25B100C43DB7 /* DebugKeychainContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E634CA2E2AFD25B100C43DB7 /* DebugKeychainContents.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
@@ -2719,12 +2719,12 @@
 		A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Live.swift"; sourceTree = "<group>"; };
 		A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Test.swift"; sourceTree = "<group>"; };
 		A4F30C932C7CA71400F983D6 /* WithNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithNavigationBar.swift; sourceTree = "<group>"; };
+		C0D3F0013C75A00100000001 /* FactorSourceAccessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccessTests.swift; sourceTree = "<group>"; };
 		E622FF8E2CE7984B00489BA5 /* DebugFactorInstancesCacheContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugFactorInstancesCacheContents.swift; sourceTree = "<group>"; };
 		E622FF8F2CE7984B00489BA5 /* DebugFactorInstancesCacheContents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DebugFactorInstancesCacheContents+View.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicGridTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicGridTests.swift; sourceTree = "<group>"; };
-		C0D3F0013C75A00100000001 /* FactorSourceAccessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccessTests.swift; sourceTree = "<group>"; };
 		E634CA2D2AFD25B100C43DB7 /* DebugKeychainContents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DebugKeychainContents+View.swift"; sourceTree = "<group>"; };
 		E634CA2E2AFD25B100C43DB7 /* DebugKeychainContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugKeychainContents.swift; sourceTree = "<group>"; };
 		E64463FD2B75304C0006CAF8 /* Dictionary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extensions.swift"; sourceTree = "<group>"; };
@@ -10352,8 +10352,10 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
 				kind = exactVersion;
-				version = 1.23.1;
+				version = 1.26.1;
 			};
+			traits = (
+			);
 		};
 		A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */ = {
 			isa = XCRemoteSwiftPackageReference;
