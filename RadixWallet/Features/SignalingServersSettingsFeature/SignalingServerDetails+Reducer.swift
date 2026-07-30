@@ -50,7 +50,11 @@ struct SignalingServerDetails: FeatureReducer {
 		}
 
 		var isEditMode: Bool {
-			if case .edit = mode { true } else { false }
+			if case .edit = mode {
+				true
+			} else {
+				false
+			}
 		}
 
 		var canAddStunURL: Bool {

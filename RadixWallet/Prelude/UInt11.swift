@@ -59,7 +59,9 @@ extension UInt11 {
 	}
 
 	init?(bits: some Collection<Bool>) {
-		if bits.count > UInt11.bitWidth { return nil }
+		if bits.count > UInt11.bitWidth {
+			return nil
+		}
 		self.init(bits.binaryString, radix: 2)
 	}
 }

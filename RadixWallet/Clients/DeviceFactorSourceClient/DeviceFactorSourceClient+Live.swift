@@ -83,21 +83,29 @@ extension DeviceFactorSourceClient: DependencyKey {
 			.eraseToAnyAsyncSequence()
 		}
 
-		let derivePublicKeys: DerivePublicKeys = { request in
-			let factorSourceId = request.factorSourceId
-			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(factorSourceID: factorSourceId, notifyIfMissing: false) else {
-				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceId)'")
-				throw FailedToFindFactorSource()
+		let loadMnemonic: LoadMnemonic = { factorSourceId in
+			do {
+				guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(
+					factorSourceID: factorSourceId,
+					notifyIfMissing: false
+				) else {
+					throw DeviceMnemonicLoadError.missing
+				}
+				return mnemonicWithPassphrase
+			} catch let error as DeviceMnemonicLoadError {
+				throw error
+			} catch {
+				if error.isUserCanceledKeychainAccess {
+					throw DeviceMnemonicLoadError.cancelledByUser
+				}
+				loggerGlobal.error("Failed to load Device mnemonic: \(error)")
+				throw DeviceMnemonicLoadError.readFailure
 			}
-			return mnemonicWithPassphrase.derivePublicKeys(
-				paths: request.derivationPaths,
-				factorSourceId: factorSourceId
-			)
 		}
 
 		return Self(
 			entitiesInBadState: entitiesInBadState,
-			derivePublicKeys: derivePublicKeys
+			loadMnemonic: loadMnemonic
 		)
 	}
 }

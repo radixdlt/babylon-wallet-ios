@@ -78,6 +78,9 @@ extension FactorSourceAccess.State {
 	}
 
 	var isRetryEnabled: Bool {
+		guard accessMode == .automatic else {
+			return false
+		}
 		guard let factorSource else {
 			return false
 		}

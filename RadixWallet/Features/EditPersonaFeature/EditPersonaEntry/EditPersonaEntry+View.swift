@@ -53,7 +53,11 @@ extension EditPersonaEntry {
 									.frame(.verySmall, alignment: .trailing)
 							}
 							.modifier {
-								if viewStore.canBeDeleted { $0 } else { $0.hidden() }
+								if viewStore.canBeDeleted {
+									$0
+								} else {
+									$0.hidden()
+								}
 							}
 						}
 					}

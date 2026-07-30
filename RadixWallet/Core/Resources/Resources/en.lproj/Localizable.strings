@@ -1143,6 +1143,7 @@ Code: %@";
 "factorSourceActions_createKey_title" = "Creating Key";
 "factorSourceActions_spotCheck_title" = "Check Factor";
 "factorSourceActions_device_deriveAccountsMessage" = "Authenticate to your phone to sign.";
+"factorSourceActions_device_mnemonicUnavailableMessage" = "The seed phrase could not be read from secure storage. Enter it to continue.";
 "factorSourceActions_device_signMessage" = "Use your phone’s biometrics or PIN to sign";
 "factorSourceActions_device_message" = "Use your phone’s biometrics or PIN";
 "factorSourceActions_ledger_signMessage" = "Use your **Ledger Nano** to sign. Make sure it’s connected to a computer with a linked Radix Connector browser extension.

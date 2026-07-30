@@ -12,12 +12,12 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 
 	static let noop = Self(
 		entitiesInBadState: { throw NoopError() },
-		derivePublicKeys: { _ in throw NoopError() }
+		loadMnemonic: { _ in throw NoopError() }
 	)
 
 	static let testValue = Self(
 		entitiesInBadState: unimplemented("\(Self.self).entitiesInBadState"),
-		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys")
+		loadMnemonic: unimplemented("\(Self.self).loadMnemonic")
 	)
 }
 

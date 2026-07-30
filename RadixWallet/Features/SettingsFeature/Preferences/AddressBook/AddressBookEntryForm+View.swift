@@ -47,7 +47,9 @@ extension AddressBookEntryForm {
 		}
 
 		private var isEditing: Bool {
-			if case .edit = store.mode { return true }
+			if case .edit = store.mode {
+				return true
+			}
 			return false
 		}
 

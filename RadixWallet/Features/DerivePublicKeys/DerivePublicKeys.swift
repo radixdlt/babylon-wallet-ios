@@ -29,7 +29,6 @@ struct DerivePublicKeys: FeatureReducer {
 		case handleFactorInstances([HierarchicalDeterministicFactorInstance])
 	}
 
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -54,9 +53,7 @@ struct DerivePublicKeys: FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .handleFactorInstances(factorInstances):
-			let factorSourceId = state.input.factorSourceId.asGeneral
-			return .send(.delegate(.finished(factorInstances)))
-			// .merge(with: updateFactorSourceLastUsedEffect(factorSourceId: factorSourceId))
+			.send(.delegate(.finished(factorInstances)))
 		}
 	}
 }
@@ -65,8 +62,11 @@ private extension DerivePublicKeys {
 	func derivePublicKeys(factorSource: PrivateFactorSource, input: KeyDerivationRequestPerFactorSource) -> Effect<Action> {
 		.run { send in
 			let factorInstances = switch factorSource {
-			case .device:
-				try await deviceFactorSourceClient.derivePublicKeys(input)
+			case let .device(_, mnemonicWithPassphrase):
+				mnemonicWithPassphrase.derivePublicKeys(
+					paths: input.derivationPaths,
+					factorSourceId: input.factorSourceId
+				)
 
 			case let .ledger(ledger):
 				try await ledgerHardwareWalletClient.derivePublicKeys(.init(ledger: ledger, input: input))
@@ -84,21 +84,7 @@ private extension DerivePublicKeys {
 				fatalError("Not implemented")
 			}
 			await send(.internal(.handleFactorInstances(factorInstances)))
-		} catch: { error, send in
-			await handleError(factorSource: factorSource, error: error, send: send)
-		}
-	}
-
-	private func handleError(factorSource: PrivateFactorSource, error: Error, send: Send<DerivePublicKeys.Action>) async {
-		switch factorSource {
-		case .device:
-			if !error.isUserCanceledKeychainAccess {
-				// If user cancelled the operation, we will allow them to retry.
-				// In any other situation we handle the error.
-				errorQueue.schedule(error)
-			}
-
-		default:
+		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
 	}

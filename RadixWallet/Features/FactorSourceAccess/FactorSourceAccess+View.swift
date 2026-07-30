@@ -76,6 +76,8 @@ extension FactorSourceAccess {
 		private var input: some SwiftUI.View {
 			if let child = store.password {
 				PasswordFactorSourceAccess.View(store: child)
+			} else if let child = store.deviceMnemonic {
+				DeviceMnemonicFactorSourceAccess.View(store: child)
 			} else if let child = store.offDeviceMnemonic {
 				OffDeviceMnemonicFactorSourceAccess.View(store: child)
 			} else if let child = store.arculus {
@@ -107,12 +109,68 @@ private extension StoreOf<FactorSourceAccess> {
 		scope(state: \.password, action: \.child.password)
 	}
 
+	var deviceMnemonic: Store<DeviceMnemonicFactorSourceAccess.State, DeviceMnemonicFactorSourceAccess.Action>? {
+		scope(state: \.deviceMnemonic, action: \.child.deviceMnemonic)
+	}
+
 	var offDeviceMnemonic: Store<OffDeviceMnemonicFactorSourceAccess.State, OffDeviceMnemonicFactorSourceAccess.Action>? {
 		scope(state: \.offDeviceMnemonic, action: \.child.offDeviceMnemonic)
 	}
 
 	var arculus: Store<ArculusFactorSourceAccess.State, ArculusFactorSourceAccess.Action>? {
 		scope(state: \.arculus, action: \.child.arculus)
+	}
+}
+
+// MARK: - DeviceMnemonicFactorSourceAccess.View
+extension DeviceMnemonicFactorSourceAccess {
+	struct View: SwiftUI.View {
+		@Perception.Bindable var store: StoreOf<DeviceMnemonicFactorSourceAccess>
+
+		var body: some SwiftUI.View {
+			WithPerceptionTracking {
+				VStack(alignment: .leading, spacing: .medium3) {
+					Text(L10n.FactorSourceActions.Device.mnemonicUnavailableMessage)
+						.textStyle(.body1Regular)
+						.foregroundColor(.primaryText)
+						.multilineTextAlignment(.center)
+
+					ImportMnemonicGrid.View(store: store.grid)
+						.padding(.horizontal, -.small1)
+
+					if store.isAdvancedMode {
+						AppTextField(
+							primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: true),
+							placeholder: L10n.ImportMnemonic.passphrasePlaceholder,
+							text: $store.bip39Passphrase.sending(\.view.passphraseChanged),
+							hint: .info(L10n.ImportMnemonic.passphraseHint)
+						)
+						.autocorrectionDisabled()
+					}
+
+					Button(store.isAdvancedMode ? L10n.ImportMnemonic.regularModeButton : L10n.ImportMnemonic.advancedModeButton) {
+						store.send(.view(.toggleModeButtonTapped))
+					}
+					.buttonStyle(.blueText)
+
+					if let hint = store.hint {
+						Hint(viewState: hint)
+					}
+
+					Button(L10n.Common.confirm) {
+						store.send(.view(.confirmButtonTapped))
+					}
+					.buttonStyle(.primaryRectangular)
+					.controlState(store.confirmButtonControlState)
+				}
+			}
+		}
+	}
+}
+
+private extension StoreOf<DeviceMnemonicFactorSourceAccess> {
+	var grid: StoreOf<ImportMnemonicGrid> {
+		scope(state: \.grid, action: \.child.grid)
 	}
 }
 

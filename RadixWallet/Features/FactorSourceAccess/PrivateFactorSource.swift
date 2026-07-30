@@ -3,10 +3,9 @@ import Foundation
 // MARK: - PrivateFactorSource
 /// An enum containing the necessary information to use a given `FactorSource`.
 ///
-/// This becomes handy to unify factor sources that can be used directly (`device`, `ledger` & `arculusCard`) and those
-/// that require user input to retrieve the associated `MnemonicWithPassphrase` (`offDeviceMnemonic` & `password`).
+/// This becomes handy to unify factor sources with the private input resolved by their access UI.
 enum PrivateFactorSource: Hashable {
-	case device(DeviceFactorSource)
+	case device(DeviceFactorSource, MnemonicWithPassphrase)
 	case ledger(LedgerHardwareWalletFactorSource)
 	case arculusCard(ArculusCardFactorSource, _ pin: String)
 	case offDeviceMnemonic(OffDeviceMnemonicFactorSource, MnemonicWithPassphrase)
@@ -16,7 +15,7 @@ enum PrivateFactorSource: Hashable {
 extension PrivateFactorSource {
 	var factorSource: FactorSource {
 		switch self {
-		case let .device(device):
+		case let .device(device, _):
 			device.asGeneral
 		case let .ledger(ledger):
 			ledger.asGeneral

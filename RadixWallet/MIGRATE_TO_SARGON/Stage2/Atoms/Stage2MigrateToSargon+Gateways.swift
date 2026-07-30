@@ -5,7 +5,9 @@ import Sargon
 struct DiscrepancyOtherShouldNotContainCurrent: Swift.Error {}
 extension SavedGateways {
 	mutating func changeCurrentToMainnetIfNeeded() {
-		if current == .mainnet { return }
+		if current == .mainnet {
+			return
+		}
 		try? changeCurrent(to: .mainnet)
 	}
 
