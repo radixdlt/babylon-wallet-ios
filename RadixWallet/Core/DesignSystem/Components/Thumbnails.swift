@@ -352,6 +352,7 @@ struct LoadableImagePlaceholderBehaviour {
 	}
 }
 
+import ImageIO
 import Nuke
 
 extension ImagePipeline {
@@ -362,6 +363,47 @@ extension ImagePipeline {
 		return ImagePipeline { config in
 			config.dataCache = dataCache
 			config.imageCache = ImageCache.shared
+			config.makeImageDecoder = { context in
+				AnimatedWebPDecoder(context: context) ?? ImageDecoderRegistry.shared.decoder(for: context)
+			}
 		}
 	}()
+}
+
+/// NukeUI only animates GIFs, so animated WebP images are transcoded to GIF.
+/// The image service already does this for hosted images, but returns `data:` URLs untouched.
+struct AnimatedWebPDecoder: ImageDecoding {
+	init?(context: ImageDecodingContext) {
+		guard context.isCompleted, AssetType(context.data) == .webp else { return nil }
+	}
+
+	func decode(_ data: Data) throws -> ImageContainer {
+		var container = try ImageDecoders.Default().decode(data)
+		if let gifData = Self.gifData(fromAnimatedWebP: data) {
+			container.type = .gif
+			container.data = gifData
+		}
+		return container
+	}
+
+	private static func gifData(fromAnimatedWebP data: Data) -> Data? {
+		guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+		let frameCount = CGImageSourceGetCount(source)
+		guard frameCount > 1 else { return nil }
+
+		let gifData = NSMutableData()
+		guard let destination = CGImageDestinationCreateWithData(gifData, AssetType.gif.rawValue as CFString, frameCount, nil) else { return nil }
+
+		for index in 0 ..< frameCount {
+			// Not caching decoded frames keeps memory at about one frame, even for long animations
+			guard let frame = CGImageSourceCreateImageAtIndex(source, index, [kCGImageSourceShouldCache: false] as CFDictionary) else { return nil }
+			let properties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+			let webPProperties = properties?[kCGImagePropertyWebPDictionary] as? [CFString: Any]
+			let delayTime = webPProperties?[kCGImagePropertyWebPUnclampedDelayTime] as? Double ?? webPProperties?[kCGImagePropertyWebPDelayTime] as? Double ?? 0.1
+			CGImageDestinationAddImage(destination, frame, [kCGImagePropertyGIFDictionary: [kCGImagePropertyGIFDelayTime: delayTime]] as CFDictionary)
+		}
+
+		guard CGImageDestinationFinalize(destination) else { return nil }
+		return gifData as Data
+	}
 }
