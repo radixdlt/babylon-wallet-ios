@@ -31,9 +31,13 @@ extension PreAuthorizationClient: DependencyKey {
 		}
 
 		let buildSubintent: BuildSubintent = { request in
-			try await SargonOS.shared.createSubintent(
-				intentDiscriminator: request.intentDiscriminator,
+			let manifest = try await SargonOS.shared.modifySubintentManifest(
 				subintentManifest: request.manifest,
+				guarantees: []
+			)
+			return try await SargonOS.shared.createSubintent(
+				intentDiscriminator: request.intentDiscriminator,
+				subintentManifest: manifest,
 				expiration: request.expiration,
 				message: request.message,
 				header: request.header
