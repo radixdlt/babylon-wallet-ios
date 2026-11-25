@@ -22,5 +22,6 @@ extension InteractionReview {
 
 		var shieldUpdate: InteractionReview.ShieldState? = nil
 		var confirmShieldUpdate: InteractionReview.ShieldState? = nil
+		var controlOperations: [InteractionReview.ControlOperation]? = nil
 	}
 }

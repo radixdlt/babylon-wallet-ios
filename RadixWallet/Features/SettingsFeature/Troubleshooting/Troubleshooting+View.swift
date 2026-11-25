@@ -168,16 +168,20 @@ private extension SettingsRow.Kind {
 extension RawManifestTransaction.State {
 	var viewState: RawManifestTransaction.ViewState {
 		.init(
+			mode: mode,
 			manifest: manifest,
-			sendButtonState: isSending ? .loading(.local) : (canSend ? .enabled : .disabled)
+			sendButtonState: isSending ? .loading(.local) : (canSend ? .enabled : .disabled),
+			preAuthorizationResult: preAuthorizationResult
 		)
 	}
 }
 
 extension RawManifestTransaction {
 	struct ViewState: Equatable {
+		let mode: State.Mode
 		let manifest: String
 		let sendButtonState: ControlState
+		let preAuthorizationResult: String?
 	}
 
 	@MainActor
@@ -197,9 +201,46 @@ extension RawManifestTransaction.View {
 			VStack(spacing: .zero) {
 				ScrollView {
 					VStack(alignment: .leading, spacing: .medium2) {
-						Text("Enter a raw transaction manifest to preview and submit to the network.")
+						#if DEBUG
+						Picker(
+							"Mode",
+							selection: viewStore.binding(
+								get: \.mode,
+								send: RawManifestTransaction.ViewAction.modeChanged
+							)
+						) {
+							ForEach(RawManifestTransaction.State.Mode.allCases, id: \.self) { mode in
+								Text(mode.rawValue).tag(mode)
+							}
+						}
+						.pickerStyle(.segmented)
+						#endif
+
+						Text(viewStore.mode == .transaction
+							? "Enter a raw transaction manifest to preview and submit to the network."
+							: "Enter a raw subintent manifest (ending in YIELD_TO_PARENT) to send as a pre-authorization request.")
 							.textStyle(.body1Regular)
 							.foregroundColor(.secondaryText)
+
+						if let result = viewStore.preAuthorizationResult {
+							VStack(alignment: .leading, spacing: .small2) {
+								Text("Signed subintent")
+									.textStyle(.body1Header)
+								Text(result)
+									.textStyle(.monospace)
+									.textSelection(.enabled)
+								Button {
+									pasteboardClient.copyString(result)
+								} label: {
+									Label("Copy result", systemImage: "doc.on.doc")
+										.labelStyle(.titleAndIcon)
+								}
+								.buttonStyle(.secondaryRectangular(shouldExpand: true))
+							}
+							.padding(.medium3)
+							.background(.primaryBackground)
+							.roundedCorners(strokeColor: .border)
+						}
 
 						HStack(spacing: .small2) {
 							Button {
@@ -247,7 +288,7 @@ extension RawManifestTransaction.View {
 
 				Separator()
 
-				Button("Transaction Preview") {
+				Button(viewStore.mode == .transaction ? "Transaction Preview" : "Pre-authorization Preview") {
 					viewStore.send(.sendTapped)
 				}
 				.buttonStyle(.primaryRectangular(shouldExpand: true))

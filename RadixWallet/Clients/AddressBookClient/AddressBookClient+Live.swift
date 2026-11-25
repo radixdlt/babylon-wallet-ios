@@ -8,20 +8,20 @@ extension AddressBookClient: DependencyKey {
 
 	static func live() -> Self {
 		Self(
-			addEntry: { address, name, note in
-				try await SargonOs.shared.addAddressBookEntry(address: address, name: name, note: note)
+			addEntry: { target, name, note in
+				try await SargonOs.shared.addAddressBookEntry(target: target, name: name, note: note)
 			},
-			entryByAddress: { address in
-				try SargonOs.shared.addressBookEntryByAddress(address: address)
+			entryByTarget: { target in
+				try SargonOs.shared.addressBookEntry(target: target)
 			},
 			entriesOnCurrentNetwork: {
 				try SargonOs.shared.addressBookOnCurrentNetwork()
 			},
-			deleteEntry: { address in
-				try await SargonOs.shared.deleteAddressBookEntry(address: address)
+			deleteEntry: { target in
+				try await SargonOs.shared.deleteAddressBookEntry(target: target)
 			},
-			updateEntry: { address, name, note in
-				try await SargonOs.shared.updateAddressBookEntry(address: address, name: name, note: note)
+			updateEntry: { target, name, note in
+				try await SargonOs.shared.updateAddressBookEntry(target: target, name: name, note: note)
 			}
 		)
 	}

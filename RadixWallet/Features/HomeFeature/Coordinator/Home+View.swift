@@ -115,9 +115,9 @@ private extension View {
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.accountDetails, action: \.accountDetails)) {
-			AccountDetails.View(store: $0)
-		}
+		modifier(AccountDetailsDestinationModifier(
+			store: destinationStore.scope(state: \.accountDetails, action: \.accountDetails)
+		))
 	}
 
 	private func createAccount(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -166,6 +166,38 @@ private extension View {
 		sheet(store: destinationStore.scope(state: \.handleACTimedRecovery, action: \.handleACTimedRecovery)) { store in
 			NavigationStack {
 				HandleAccessControllerTimedRecovery.View(store: store)
+			}
+		}
+	}
+}
+
+// MARK: - AccountDetailsDestinationModifier
+private struct AccountDetailsDestinationModifier: ViewModifier {
+	let store: PresentationStoreOf<AccountDetails>
+
+	func body(content: Content) -> some View {
+		WithViewStore(
+			store,
+			observe: { $0.wrappedValue?.navigationPresentationID }
+		) { viewStore in
+			content.navigationDestination(
+				item: Binding(
+					get: { viewStore.state },
+					set: { newValue in
+						#if DEBUG
+						loggerGlobal.notice(
+							"[HomeNavigation] accountDetails itemBinding old=\(viewStore.state.map { String($0) } ?? "nil") new=\(newValue.map { String($0) } ?? "nil")"
+						)
+						#endif
+						guard newValue == nil, viewStore.state != nil else { return }
+						viewStore.send(.dismiss)
+					}
+				)
+			) { _ in
+				IfLetStore(
+					store.scope(state: \.wrappedValue, action: \.presented),
+					then: AccountDetails.View.init(store:)
+				)
 			}
 		}
 	}

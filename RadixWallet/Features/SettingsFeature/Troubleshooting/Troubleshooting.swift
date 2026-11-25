@@ -154,8 +154,17 @@ struct Troubleshooting: FeatureReducer {
 // MARK: - RawManifestTransaction
 struct RawManifestTransaction: FeatureReducer {
 	struct State: Hashable {
+		enum Mode: String, CaseIterable, Hashable {
+			case transaction = "Transaction"
+			/// DEBUG tool: sends the manifest as a dApp-style pre-authorization (subintent) request.
+			case preAuthorization = "Pre-authorization"
+		}
+
+		var mode: Mode = .transaction
 		var manifest: String = ""
 		var isSending: Bool = false
+		/// Debug summary of the last signed subintent returned by the pre-authorization flow.
+		var preAuthorizationResult: String?
 
 		var canSend: Bool {
 			!manifest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -164,11 +173,13 @@ struct RawManifestTransaction: FeatureReducer {
 
 	enum ViewAction: Equatable {
 		case manifestChanged(String)
+		case modeChanged(State.Mode)
 		case sendTapped
 	}
 
 	enum InternalAction: Equatable {
 		case interactionCompleted
+		case preAuthorizationSigned(String)
 	}
 
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
@@ -185,13 +196,24 @@ struct RawManifestTransaction: FeatureReducer {
 			state.manifest = manifest
 			return .none
 
+		case let .modeChanged(mode):
+			state.mode = mode
+			state.preAuthorizationResult = nil
+			return .none
+
 		case .sendTapped:
 			guard state.canSend, !state.isSending else {
 				return .none
 			}
 
 			state.isSending = true
-			return submitTransaction(state.manifest)
+			state.preAuthorizationResult = nil
+			switch state.mode {
+			case .transaction:
+				return submitTransaction(state.manifest)
+			case .preAuthorization:
+				return submitPreAuthorization(state.manifest)
+			}
 		}
 	}
 
@@ -199,6 +221,10 @@ struct RawManifestTransaction: FeatureReducer {
 		switch internalAction {
 		case .interactionCompleted:
 			state.isSending = false
+			return .none
+
+		case let .preAuthorizationSigned(summary):
+			state.preAuthorizationResult = summary
 			return .none
 		}
 	}
@@ -230,6 +256,45 @@ struct RawManifestTransaction: FeatureReducer {
 				}
 			} catch {
 				errorQueue.schedule(error)
+			}
+
+			await send(.internal(.interactionCompleted))
+		}
+	}
+
+	private func submitPreAuthorization(_ manifestString: String) -> Effect<Action> {
+		.run { send in
+			let request = DappToWalletInteractionSubintentRequestItem(
+				version: 1,
+				unvalidatedManifest: .init(subintentManifestString: manifestString, blobs: Blobs([])),
+				message: "Debug pre-authorization",
+				expiration: .afterDelay(.init(expireAfterSeconds: 600)),
+				header: nil
+			)
+
+			let result = await dappInteractionClient.addWalletInteraction(
+				.preAuthorization(.init(request: request)),
+				.rawManifestTransaction
+			)
+
+			switch result.p2pResponse {
+			case let .dapp(.success(success)):
+				if case let .preAuthorization(preAuthorization) = success.items {
+					let signedSubintent = preAuthorization.response.signedSubintent
+					let summary = """
+					Subintent hash: \(signedSubintent.subintent.hash().formatted(.raw))
+					Signatures: \(signedSubintent.subintentSignatures.signatures.count)
+
+					\(signedSubintent.subintent.manifest.manifestString)
+					"""
+					loggerGlobal.notice("[DebugPreAuthorization] Signed subintent\n\(summary)")
+					await send(.internal(.preAuthorizationSigned(summary)))
+				} else {
+					assertionFailure("Not a pre-authorization response for raw subintent manifest")
+				}
+
+			case let .dapp(.failure(failure)):
+				loggerGlobal.notice("[DebugPreAuthorization] Failed: \(failure.error) \(failure.message ?? "")")
 			}
 
 			await send(.internal(.interactionCompleted))

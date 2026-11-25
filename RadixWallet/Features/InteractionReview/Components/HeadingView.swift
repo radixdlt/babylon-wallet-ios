@@ -1,18 +1,24 @@
 import SwiftUI
 
+// MARK: - InteractionReview.HeadingView
 extension InteractionReview {
 	struct HeadingView: View {
 		let heading: String
 		let icon: ImageAsset
+		/// Scales the icon to the heading's icon size, for an asset drawn
+		/// larger than the review's own heading icons.
+		var scalesIcon = false
+		@Environment(\.headingTrailingInset) private var trailingInset
 
-		init(_ heading: String, icon: ImageAsset) {
+		init(_ heading: String, icon: ImageAsset, scalesIcon: Bool = false) {
 			self.heading = heading
 			self.icon = icon
+			self.scalesIcon = scalesIcon
 		}
 
 		var body: some View {
 			HStack(spacing: .small2) {
-				Image(asset: icon)
+				iconImage
 					.frame(.smallest)
 					.padding(.small3)
 					.overlay {
@@ -26,6 +32,17 @@ extension InteractionReview {
 					.lineSpacing(0)
 					.sectionHeading
 					.textCase(.uppercase)
+			}
+			.padding(.trailing, trailingInset)
+			.anchorPreference(key: FirstHeadingBoundsKey.self, value: .bounds) { $0 }
+		}
+
+		@ViewBuilder
+		private var iconImage: some View {
+			if scalesIcon {
+				Image(asset: icon).resizable().scaledToFit()
+			} else {
+				Image(asset: icon)
 			}
 		}
 
@@ -99,9 +116,49 @@ extension InteractionReview {
 			icon: AssetResource.transactionReviewUpdateShield
 		)
 
+		/// An operation on an access controller of an account the wallet may
+		/// only share control of. In the user's terms it is about how the
+		/// account is controlled, not a recovery.
+		static func controlOperation(_ heading: InteractionReview.ControlOperation.Heading) -> HeadingView {
+			let title = switch heading {
+			case .updateAccountControl: "Update account control"
+			case .recoveryFees: "Recovery fees"
+			case .createAccount: "Create account"
+			case .createPersona: "Create persona"
+			}
+			return HeadingView(title, icon: AssetResource.transactionReviewUpdateShield)
+		}
+
 		static let confirmShieldUpdate = HeadingView(
 			L10n.TransactionReview.ConfirmShieldUpdate.sectionTitle,
 			icon: AssetResource.transactionReviewUpdateShield
 		)
+	}
+}
+
+// MARK: - InteractionReview.FirstHeadingBoundsKey
+extension InteractionReview {
+	/// The bounds of the first section heading in a review, for drawing a
+	/// button on its row.
+	struct FirstHeadingBoundsKey: PreferenceKey {
+		static let defaultValue: Anchor<CGRect>? = nil
+
+		static func reduce(value: inout Anchor<CGRect>?, nextValue: () -> Anchor<CGRect>?) {
+			value = value ?? nextValue()
+		}
+	}
+}
+
+// MARK: - HeadingTrailingInsetKey
+private struct HeadingTrailingInsetKey: EnvironmentKey {
+	static let defaultValue: CGFloat = 0
+}
+
+extension EnvironmentValues {
+	/// Room a section heading leaves on its right, e.g. for a button drawn on
+	/// its row.
+	var headingTrailingInset: CGFloat {
+		get { self[HeadingTrailingInsetKey.self] }
+		set { self[HeadingTrailingInsetKey.self] = newValue }
 	}
 }

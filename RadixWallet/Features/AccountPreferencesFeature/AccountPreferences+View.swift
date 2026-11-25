@@ -106,7 +106,7 @@ extension AccountPreferences.View {
 
 					Spacer()
 
-					if !viewStore.isOnMainnet {
+					if SecurityShieldsFeature.isEnabled, !viewStore.isOnMainnet {
 						Button("Apply Shield") {
 							store.send(.view(.applyShieldButtonTapped))
 						}

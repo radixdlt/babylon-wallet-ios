@@ -23,6 +23,7 @@ extension InteractionReview {
 			var accountDepositExceptions: InteractionReview.DepositExceptionsState? = nil
 			var shieldUpdate: InteractionReview.ShieldState? = nil
 			var confirmShieldUpdate: InteractionReview.ShieldState? = nil
+			var controlOperations: [InteractionReview.ControlOperation]? = nil
 
 			/// The proofs are set here (within the resolve logic) but may be rendered and handled by the parent view, in the case they are placed outside the Sections (TransactionReview).
 			var proofs: Proofs.State? = nil
@@ -195,6 +196,7 @@ extension InteractionReview {
 				state.stopTimedRecovery = sections.stopTimedRecovery
 				state.shieldUpdate = sections.shieldUpdate
 				state.confirmShieldUpdate = sections.confirmShieldUpdate
+				state.controlOperations = sections.controlOperations
 				return .none
 			}
 		}
@@ -202,8 +204,8 @@ extension InteractionReview {
 		func reduce(into state: inout State, parentAction: InternalAction.ParentAction) -> Effect<Action> {
 			switch parentAction {
 			case let .resolveExecutionSummary(executionSummary, networkID):
-				.run { send in
-					let sections = try await sections(for: executionSummary, networkID: networkID)
+				.run { [kind = state.kind] send in
+					let sections = try await sections(for: executionSummary, networkID: networkID, kind: kind)
 					await send(.internal(.setSections(sections)))
 				} catch: { error, _ in
 					errorQueue.schedule(error)

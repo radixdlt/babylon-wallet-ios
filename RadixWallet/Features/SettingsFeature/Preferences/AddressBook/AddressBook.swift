@@ -54,7 +54,7 @@ struct AddressBook: FeatureReducer {
 		}
 
 		enum DeleteAlert: Hashable {
-			case confirmTapped(Address)
+			case confirmTapped(AddressBookEntryTarget)
 			case cancelTapped
 		}
 	}
@@ -89,7 +89,7 @@ struct AddressBook: FeatureReducer {
 					ButtonState(role: .cancel, action: .cancelTapped) {
 						TextState(L10n.Common.cancel)
 					}
-					ButtonState(role: .destructive, action: .confirmTapped(entry.address)) {
+					ButtonState(role: .destructive, action: .confirmTapped(entry.target)) {
 						TextState(L10n.AddressBook.delete)
 					}
 				},
@@ -118,9 +118,9 @@ struct AddressBook: FeatureReducer {
 			state.destination = nil
 			return loadEntries()
 
-		case let .deleteAlert(.confirmTapped(address)):
+		case let .deleteAlert(.confirmTapped(target)):
 			return .run { send in
-				_ = try await addressBookClient.deleteEntry(address)
+				_ = try await addressBookClient.deleteEntry(target)
 				await send(.internal(.deletedEntry))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

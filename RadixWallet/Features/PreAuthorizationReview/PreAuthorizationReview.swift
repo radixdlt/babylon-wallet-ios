@@ -162,8 +162,19 @@ struct PreAuthorizationReview: FeatureReducer {
 				return handleSignedSubinent(state: &state, signedSubintent: .init(subintent: subintent, subintentSignatures: .init(signatures: [])))
 			}
 
+			// The reviewed summary tells Sargon which roles of the access
+			// controllers it calls to sign for.
+			let executionSummary: ExecutionSummary? = if case let .enclosed(value) = preview.kind {
+				value.summary
+			} else {
+				nil
+			}
 			return .run { send in
-				let signedSubintent = try await SargonOS.shared.signSubintent(transactionIntent: subintent, roleKind: .primary)
+				let signedSubintent = try await SargonOS.shared.signSubintent(
+					transactionIntent: subintent,
+					roleKind: .primary,
+					executionSummary: executionSummary
+				)
 				await send(.delegate(.signedPreAuthorization(signedSubintent)))
 
 			} catch: { error, send in

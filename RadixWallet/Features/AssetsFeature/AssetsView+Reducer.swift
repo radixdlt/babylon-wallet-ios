@@ -67,7 +67,7 @@ struct AssetsView: FeatureReducer {
 	}
 
 	enum ViewAction: Equatable {
-		case onFirstTask
+		case onFirstAppear
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
 		case chooseButtonTapped(State.Mode.SelectedAssets)
@@ -122,7 +122,7 @@ struct AssetsView: FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onFirstTask:
+		case .onFirstAppear:
 			guard !state.isLoadingResources else {
 				return .none
 			}

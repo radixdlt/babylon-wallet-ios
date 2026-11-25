@@ -18,12 +18,8 @@ extension Main {
 		}
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { _ in
-				NavigationStack {
-					TabView {
-						tabs
-					}
-				}
+			TabView {
+				tabs
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()

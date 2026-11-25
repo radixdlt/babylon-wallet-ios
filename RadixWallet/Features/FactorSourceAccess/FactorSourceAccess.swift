@@ -152,7 +152,7 @@ struct FactorSourceAccess: FeatureReducer {
 				state.accessMode = .loadingDeviceMnemonic
 				return loadDeviceMnemonic(deviceFactorSource)
 			}
-			guard let privateFactorSource = state.factorSource?.asPrivate else {
+			guard let privateFactorSource = state.factorSource?.asImmediatelyAvailablePrivateFactorSource else {
 				return .none
 			}
 			return .send(.delegate(.perform(privateFactorSource)))
@@ -345,7 +345,7 @@ private extension AlertState<FactorSourceAccess.Destination.ErrorAlert> {
 }
 
 private extension FactorSource {
-	var asPrivate: PrivateFactorSource? {
+	var asImmediatelyAvailablePrivateFactorSource: PrivateFactorSource? {
 		switch self {
 		case .device:
 			nil // Device access must first resolve its mnemonic.

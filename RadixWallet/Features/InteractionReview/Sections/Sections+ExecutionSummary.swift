@@ -6,7 +6,7 @@ extension InteractionReview.Sections {
 	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
 	typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
 
-	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Common.SectionsData? {
+	func sections(for summary: ExecutionSummary, networkID: NetworkID, kind: InteractionReview.Kind) async throws -> Common.SectionsData? {
 		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
 
@@ -39,59 +39,8 @@ extension InteractionReview.Sections {
 			return newlyCreatedMetadata
 		}
 
-		switch summary.detailedClassification {
-		case nil:
-			return nil
-
-		case let .securifyEntity(entityAddresses):
-			guard let entityAddress = entityAddresses.first,
-			      let entity = try await extractEntity(entityAddress) else { return nil }
-
-			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entityAddress)
-
-			return Common.SectionsData(
-				shieldUpdate: .init(
-					entity: entity,
-					shield: shield
-				)
-			)
-
-		case let .accessControllerRecovery(acAddresses):
-			guard let acAddress = acAddresses.first else {
-				return nil
-			}
-			let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
-			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entity.asGeneral.address)
-
-			return Common.SectionsData(
-				shieldUpdate: .init(
-					entity: entity,
-					shield: shield
-				)
-			)
-
-		case let .accessControllerConfirmTimedRecovery(acAddresses):
-			guard let acAddress = acAddresses.first else {
-				return nil
-			}
-			let entity = try SargonOs.shared.entityByAccessControllerAddress(address: acAddress)
-			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entity.asGeneral.address)
-
-			return Common.SectionsData(
-				confirmShieldUpdate: .init(
-					entity: entity,
-					shield: shield
-				)
-			)
-
-		case let .accessControllerStopTimedRecovery(acAddresses):
-			let stopRecovery: Common.StopTimedRecoveryState? = try await extractStopTimedRecovery(acAddresses: acAddresses)
-
-			return Common.SectionsData(
-				stopTimedRecovery: stopRecovery
-			)
-
-		case .general, .transfer:
+		/// Withdrawals, deposits, dApps used and proofs, as for any transfer.
+		func transferSections() async -> Common.SectionsData? {
 			do {
 				let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 				let withdrawals = try await extractWithdrawals(
@@ -126,6 +75,83 @@ extension InteractionReview.Sections {
 				print("error \(error)")
 				return nil
 			}
+		}
+
+		/// The entity and provisional shield of an access controller of the
+		/// wallet's own, for its shield update reviews. The shield views are for
+		/// transactions on an entity with a provisional shield; anything else,
+		/// e.g. a shared account, even one in the Profile, shows the operation.
+		func ownShield(_ acAddresses: [AccessControllerAddress]) -> Common.ShieldState? {
+			guard kind == .transaction,
+			      let acAddress = acAddresses.first,
+			      let entity = try? SargonOs.shared.entityByAccessControllerAddress(address: acAddress),
+			      let shield = try? SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entity.asGeneral.address)
+			else { return nil }
+			return .init(entity: entity, shield: shield)
+		}
+
+		switch summary.detailedClassification {
+		case nil:
+			return nil
+
+		case let .securifyEntity(entityAddresses):
+			guard let entityAddress = entityAddresses.first,
+			      let entity = try await extractEntity(entityAddress) else { return nil }
+
+			let shield = try SargonOs.shared.provisionalSecurityStructureOfFactorSourcesFromAddressOfAccountOrPersona(addressOfAccountOrPersona: entityAddress)
+
+			return Common.SectionsData(
+				shieldUpdate: .init(
+					entity: entity,
+					shield: shield
+				)
+			)
+
+		case let .accessControllerRecovery(acAddresses, recoveryProposals):
+			if let shield = ownShield(acAddresses) {
+				return Common.SectionsData(shieldUpdate: shield)
+			}
+			return await Common.SectionsData(controlOperations: resolvingControlledAccounts(recoveryProposals.map(Common.ControlOperation.init(recovery:))))
+
+		case let .accessControllerTimedRecovery(acAddresses, timedRecoveries):
+			if let shield = ownShield(acAddresses) {
+				return Common.SectionsData(shieldUpdate: shield)
+			}
+			return await Common.SectionsData(controlOperations: resolvingControlledAccounts(timedRecoveries.map(Common.ControlOperation.init(timedRecovery:))))
+
+		case let .accessControllerConfirmRecovery(acAddresses, confirmations):
+			if let shield = ownShield(acAddresses) {
+				return Common.SectionsData(confirmShieldUpdate: shield)
+			}
+			return await Common.SectionsData(controlOperations: resolvingControlledAccounts(confirmations.map(Common.ControlOperation.init(confirmation:))))
+
+		case let .accessControllerCancelRecovery(acAddresses, cancellations):
+			// Stopping a timed recovery of the wallet's own entity, in a
+			// transaction. A pre-authorization always shows the operations.
+			if kind == .transaction,
+			   let acAddress = acAddresses.first,
+			   (try? SargonOs.shared.entityByAccessControllerAddress(address: acAddress)) != nil
+			{
+				return try await Common.SectionsData(stopTimedRecovery: extractStopTimedRecovery(acAddresses: acAddresses))
+			}
+			return await Common.SectionsData(controlOperations: resolvingControlledAccounts(cancellations.map(Common.ControlOperation.init(cancellation:))))
+
+		case let .securifiedEntityCreation(createdEntities):
+			return Common.SectionsData(controlOperations: createdEntities.map(Common.ControlOperation.init(created:)))
+
+		case let .accessControllerPrimaryRoleLock(_, operations):
+			return await Common.SectionsData(controlOperations: resolvingControlledAccounts(operations.map(Common.ControlOperation.init(primaryRoleLock:))))
+
+		case let .accessControllerRecoveryFee(_, contributions, withdrawals, _, _):
+			var sections = await transferSections() ?? Common.SectionsData()
+			sections.controlOperations = await resolvingControlledAccounts(
+				contributions.map(Common.ControlOperation.init(recoveryFeeContribution:))
+					+ withdrawals.map(Common.ControlOperation.init(recoveryFeeWithdrawal:))
+			)
+			return sections
+
+		case .general, .transfer:
+			return await transferSections()
 
 		case let .poolContribution(poolAddresses, poolContributions):
 			// All resources that are part of the pool
@@ -360,6 +386,29 @@ extension InteractionReview.Sections {
 					return .external(address, approved: false, addressBookName: entry?.name.value)
 				}
 			}
+	}
+
+	/// The operations with the accounts they control resolved against the
+	/// user's: an account in the Profile is drawn as the user's own, others
+	/// as external, named as in the address book. Left unresolved, and so
+	/// drawn as external, if the user's accounts can't be read.
+	func resolvingControlledAccounts(_ operations: [Common.ControlOperation]) async -> [Common.ControlOperation] {
+		func controlledAccountAddress(_ operation: Common.ControlOperation) -> AccountAddress? {
+			guard !operation.createsEntity, case let .account(address) = operation.controlledEntity else { return nil }
+			return address
+		}
+
+		let addresses = operations.compactMap(controlledAccountAddress)
+		guard !addresses.isEmpty, let accounts = try? await extractUserAccounts(addresses) else {
+			return operations
+		}
+		return operations.map { operation in
+			var operation = operation
+			if let address = controlledAccountAddress(operation) {
+				operation.controlledAccount = accounts.first { $0.address == address }
+			}
+			return operation
+		}
 	}
 
 	func extractEntity(_ address: AddressOfAccountOrPersona) async throws -> AccountOrPersona? {

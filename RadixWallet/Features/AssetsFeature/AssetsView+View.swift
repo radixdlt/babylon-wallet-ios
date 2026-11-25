@@ -95,8 +95,8 @@ extension AssetsView {
 					Color.secondaryBackground
 						.ignoresSafeArea(edges: .bottom)
 				}
-				.onFirstTask { @MainActor in
-					viewStore.send(.onFirstTask)
+				.onFirstAppear {
+					viewStore.send(.onFirstAppear)
 				}
 			}
 		}
