@@ -1,6 +1,16 @@
 import ComposableArchitecture
 import Sargon
 
+// MARK: - SecurityShieldsFeature
+/// Whether the wallet offers Security Shields (MFA): setting up, listing and
+/// applying them to accounts and personas. Hidden on every network for now;
+/// before, they were offered on Stokenet only, and the gates still check that.
+/// The MFA signature resources (signing keys) screen in the Security Center
+/// stays available, as shared control uses it.
+enum SecurityShieldsFeature {
+	static let isEnabled = false
+}
+
 // MARK: - SecurityCenter
 struct SecurityCenter: FeatureReducer {
 	struct State: Hashable {

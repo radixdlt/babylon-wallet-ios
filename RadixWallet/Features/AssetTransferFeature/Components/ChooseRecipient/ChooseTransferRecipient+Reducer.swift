@@ -178,7 +178,7 @@ struct ChooseTransferRecipient: FeatureReducer {
 			return .none
 
 		case let .addressBookEntrySelected(entry):
-			guard case let .account(address) = entry.address else {
+			guard case let .account(address)? = entry.target.address else {
 				return .none
 			}
 			return .send(.delegate(.handleResult(.addressOfExternalAccount(value: address))))

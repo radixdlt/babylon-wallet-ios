@@ -33,20 +33,16 @@ struct Authorization: FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .factorSourceAccess(.delegate(.perform(factorSource))):
-			authorize(factorSource: factorSource)
+			guard case .device = factorSource else {
+				assertionFailure("Authorization should always take place with DeviceFactorSource")
+				return .none
+			}
+			return .send(.delegate(.authorized))
 		case .factorSourceAccess(.delegate(.cancel)):
-			.send(.delegate(.cancelled))
+			return .send(.delegate(.cancelled))
 		default:
-			.none
-		}
-	}
-
-	func authorize(factorSource: PrivateFactorSource) -> Effect<Action> {
-		guard case .device = factorSource else {
-			assertionFailure("Authorization should always take place with DeviceFactorSource")
 			return .none
 		}
-		return .send(.delegate(.authorized))
 	}
 }
 

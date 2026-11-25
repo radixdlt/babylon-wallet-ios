@@ -137,7 +137,7 @@ struct MfaFactorInstance {
 		let factorSourcesByID = try Dictionary(keysWithValues: factorSources.map { ($0.id, $0) })
 		let profileAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 		let addressBookEntries = try addressBookClient.entriesOnCurrentNetwork()
-		let addressBookEntriesByAddress = try Dictionary(keysWithValues: addressBookEntries.map { ($0.address, $0) })
+		let addressBookEntriesByTarget = try Dictionary(keysWithValues: addressBookEntries.map { ($0.target, $0) })
 
 		return used.map { usedResource in
 			let factorSource = factorSourcesByID[usedResource.mfaFactorInstance.factorInstance.factorSourceId.asGeneral]
@@ -145,7 +145,7 @@ struct MfaFactorInstance {
 				State.UsedByAccount(
 					address: address,
 					profileAccount: profileAccounts[id: address],
-					addressBookName: addressBookEntriesByAddress[address.asGeneral]?.name.value
+					addressBookName: addressBookEntriesByTarget[.globalAddress(value: address.asGeneral)]?.name.value
 				)
 			}
 

@@ -3,7 +3,7 @@ import SwiftUI
 
 extension SecurityCenter.State {
 	var kinds: [SecurityProblemKind] {
-		if isStokenet {
+		if SecurityShieldsFeature.isEnabled, isStokenet {
 			SecurityProblemKind.allCases
 		} else {
 			SecurityProblemKind.allCases.filter {

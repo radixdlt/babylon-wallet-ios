@@ -56,13 +56,18 @@ extension AddressBookEntryForm {
 		@ViewBuilder
 		private var addressSection: some SwiftUI.View {
 			if !store.isAddressEditable {
-				if let address = store.addressToSave {
+				if let target = store.addressToSave {
 					HStack {
-						if let identifiableAddress = LedgerIdentifiable.Address(address: address) {
+						if case let .nonFungible(id) = target {
+							AddressView(.address(.nonFungibleGlobalID(id)))
+								.foregroundColor(.secondaryText)
+						} else if let address = target.address,
+						          let identifiableAddress = LedgerIdentifiable.Address(address: address)
+						{
 							AddressView(.address(identifiableAddress))
 								.foregroundColor(.secondaryText)
 						} else {
-							Text(address.formatted(.default))
+							Text(target.rawString)
 								.textStyle(.body1Regular)
 								.foregroundColor(.secondaryText)
 								.lineLimit(1)

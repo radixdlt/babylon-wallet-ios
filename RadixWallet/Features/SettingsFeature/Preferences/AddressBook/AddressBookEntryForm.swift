@@ -32,24 +32,30 @@ struct AddressBookEntryForm: FeatureReducer {
 				self.name = ""
 				self.note = ""
 			case let .edit(entry):
-				self.address = entry.address.address
+				self.address = entry.target.rawString
 				self.name = entry.name.value
 				self.note = entry.note ?? ""
 			}
 		}
 
-		var validatedAddress: Address? {
-			try? Address(validatingAddress: address.trimmingWhitespacesAndNewlines())
+		/// What the typed text names: an address, or a non-fungible such as
+		/// the signature resource of someone's key.
+		var validatedAddress: AddressBookEntryTarget? {
+			let text = address.trimmingWhitespacesAndNewlines()
+			if let address = try? Address(validatingAddress: text) {
+				return .globalAddress(value: address)
+			}
+			return (try? NonFungibleGlobalID(text)).map { .nonFungible(value: $0) }
 		}
 
-		var addressToSave: Address? {
+		var addressToSave: AddressBookEntryTarget? {
 			switch mode {
 			case .add:
 				validatedAddress
 			case let .addWithAddress(address):
-				address
+				.globalAddress(value: address)
 			case let .edit(entry):
-				entry.address
+				entry.target
 			}
 		}
 
@@ -176,7 +182,7 @@ struct AddressBookEntryForm: FeatureReducer {
 					false
 				}
 
-				if shouldRejectOwnedAddress, case let .account(accountAddress) = address {
+				if shouldRejectOwnedAddress, case let .account(accountAddress)? = address.address {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if accounts.contains(where: { $0.address == accountAddress }) {
 						await send(.internal(.ownAccountAddressNotAllowed))

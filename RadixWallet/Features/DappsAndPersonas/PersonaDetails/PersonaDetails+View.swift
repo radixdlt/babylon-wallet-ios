@@ -375,7 +375,7 @@ extension PersonaDetails.View {
 
 								Spacer()
 
-								if viewStore.isOnStokenet {
+								if SecurityShieldsFeature.isEnabled, viewStore.isOnStokenet {
 									Button("Apply Shield") {
 										store.send(.view(.applyShieldButtonTapped))
 									}

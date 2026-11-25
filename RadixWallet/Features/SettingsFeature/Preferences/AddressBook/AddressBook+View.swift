@@ -67,7 +67,7 @@ extension AddressBook {
 					.foregroundColor(.primaryText)
 
 				HStack(spacing: .small2) {
-					addressView(entry.address)
+					targetView(entry.target)
 
 					HStack(spacing: .small1) {
 						actionButton(asset: AssetResource.create, accessibilityLabel: L10n.AddressBook.edit) {
@@ -91,6 +91,20 @@ extension AddressBook {
 			}
 			.padding(.medium3)
 			.addressBookEntrySurface()
+		}
+
+		@ViewBuilder
+		private func targetView(_ target: AddressBookEntryTarget) -> some SwiftUI.View {
+			switch target {
+			case let .globalAddress(address):
+				addressView(address)
+			case let .nonFungible(id):
+				// e.g. the signature resource of someone's key
+				AddressView(.address(.nonFungibleGlobalID(id)))
+					.foregroundColor(.secondaryText)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.layoutPriority(1)
+			}
 		}
 
 		@ViewBuilder

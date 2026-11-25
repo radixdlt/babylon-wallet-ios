@@ -38,18 +38,19 @@ extension InteractionReview {
 				HStack(spacing: .small3) {
 					AssetIcon(.asset(.copy))
 					Text(L10n.Common.copy)
-						.textStyle(.body1Header)
+						.textStyle(.body2Header)
 				}
 				.foregroundColor(.primaryText)
 			}
-			.buttonStyle(.secondaryRectangular)
+			// Secondary actions, as small as the review's toolbar button.
+			.buttonStyle(.secondaryRectangular(isInToolbar: true))
 		}
 
 		private var toggleButton: some View {
 			Group {
 				if let toggleAction {
 					Button(asset: AssetResource.iconTxnBlocks, action: toggleAction)
-						.buttonStyle(.secondaryRectangular)
+						.buttonStyle(.secondaryRectangular(isInToolbar: true))
 				}
 			}
 		}

@@ -63,7 +63,7 @@ extension ChooseTransferRecipient.State {
 		guard let address = validatedManualAccountAddress else {
 			return nil
 		}
-		return addressBookEntries.first(where: { $0.address == address.asGeneral })
+		return addressBookEntries.first(where: { $0.target.address == address.asGeneral })
 	}
 
 	var canStoreValidatedManualRecipientInAddressBook: Bool {
@@ -78,7 +78,7 @@ extension ChooseTransferRecipient.State {
 
 	var selectableAddressBookEntries: [AddressBookEntry] {
 		addressBookEntries.filter { entry in
-			guard case let .account(address) = entry.address else {
+			guard case let .account(address)? = entry.target.address else {
 				return false
 			}
 			return !chooseAccounts.filteredAccounts.contains(address)
@@ -195,7 +195,7 @@ extension ChooseTransferRecipient {
 									Text(entry.name.value)
 										.textStyle(.body1Header)
 										.foregroundColor(.primaryText)
-									if case let .account(address) = entry.address {
+									if case let .account(address)? = entry.target.address {
 										AddressView(.address(.account(address)))
 											.foregroundColor(.secondaryText)
 									}

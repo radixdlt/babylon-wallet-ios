@@ -143,19 +143,30 @@ extension PreAuthorizationReview {
 				messageSection(with: message)
 				sections
 			}
-			.padding(.top, .large2 + .small3)
+			// The headings leave room on their right for the raw manifest button,
+			// which sits on the first heading's row instead of above it.
+			.environment(\.headingTrailingInset, showRawManifestButton ? .large1 + .medium3 : 0)
+			.padding(.top, .medium3 + .small3)
 			.padding(.horizontal, .small1)
 			.padding(.bottom, .medium1)
-			.overlay(alignment: .topTrailing) {
+			.overlayPreferenceValue(Common.FirstHeadingBoundsKey.self) { firstHeading in
 				if showRawManifestButton {
-					Button(asset: AssetResource.code) {
-						store.send(.view(.toggleDisplayModeButtonTapped))
+					// On the first heading's row, whatever the review starts with.
+					GeometryReader { proxy in
+						let midY = firstHeading.map { proxy[$0].midY } ?? .medium3 + .toolbarButtonHeight / 2
+						// As small as the transaction review's toolbar button: it's a
+						// secondary action.
+						Button(asset: AssetResource.code) {
+							store.send(.view(.toggleDisplayModeButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular(isInToolbar: true))
+						.frame(maxWidth: .infinity, alignment: .trailing)
+						.padding(.trailing, .small1)
+						.offset(y: midY - .toolbarButtonHeight / 2)
 					}
-					.buttonStyle(.secondaryRectangular)
-					.padding(.medium3)
 				}
 			}
-			.frame(minHeight: .standardButtonHeight + 2 * .medium3, alignment: .top)
+			.frame(minHeight: .toolbarButtonHeight + 2 * .medium3, alignment: .top)
 		}
 
 		@ViewBuilder

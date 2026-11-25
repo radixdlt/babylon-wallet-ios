@@ -480,7 +480,7 @@ struct TransactionReview: FeatureReducer {
 		guard let reviewedTx = state.reviewedTransaction else {
 			return .none
 		}
-		guard case let .accessControllerRecovery(acAddresses) = reviewedTx.executionSummary.detailedClassification,
+		guard case let .accessControllerRecovery(acAddresses, _) = reviewedTx.executionSummary.detailedClassification,
 		      let acAddress = acAddresses.first
 		else {
 			fatalError("Bad implementation: timed recovery manifest, but the classification is not recovery")

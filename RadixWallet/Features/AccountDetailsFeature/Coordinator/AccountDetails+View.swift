@@ -31,6 +31,7 @@ extension AccountDetails {
 
 	@MainActor
 	struct View: SwiftUI.View {
+		@Environment(\.dismiss) private var dismiss
 		private let store: StoreOf<AccountDetails>
 
 		init(store: StoreOf<AccountDetails>) {
@@ -60,6 +61,7 @@ extension AccountDetails {
 					ToolbarItem(placement: .navigationBarLeading) {
 						BackButton {
 							viewStore.send(.backButtonTapped)
+							dismiss()
 						}
 						.foregroundColor(.white)
 					}
@@ -74,6 +76,16 @@ extension AccountDetails {
 				}
 			}
 			.destinations(with: store)
+			.onAppear {
+				#if DEBUG
+				loggerGlobal.notice("[HomeNavigation] AccountDetails.View.onAppear")
+				#endif
+			}
+			.onDisappear {
+				#if DEBUG
+				loggerGlobal.notice("[HomeNavigation] AccountDetails.View.onDisappear")
+				#endif
+			}
 		}
 
 		func header(with viewStore: ViewStore<AccountDetails.ViewState, AccountDetails.ViewAction>) -> some SwiftUI.View {

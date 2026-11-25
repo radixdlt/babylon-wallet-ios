@@ -26,12 +26,7 @@ struct TransactionFee: Hashable {
 		includeLockFee: Bool
 	) throws {
 		// Check if this is an access controller recovery transaction
-		let isAccessControllerRecovery = switch executionSummary.detailedClassification {
-		case .accessControllerRecovery, .accessControllerConfirmTimedRecovery, .accessControllerStopTimedRecovery:
-			true
-		default:
-			false
-		}
+		let isAccessControllerRecovery = executionSummary.detailedClassification?.isAccessControllerOperation ?? false
 
 		let feeSummary: FeeSummary = try .init(
 			executionCost: executionSummary.feeSummary.executionCost,

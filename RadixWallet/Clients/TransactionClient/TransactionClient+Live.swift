@@ -68,10 +68,12 @@ extension MyEntitiesInvolvedInTransaction {
 		allPersonas: [Persona],
 		executionSummary: ExecutionSummary
 	) throws -> Self {
-		let addressOfSecurifiedEntity: AddressOfAccountOrPersona? = switch executionSummary.detailedClassification {
-		case let .accessControllerRecovery(acAddresses), let .accessControllerConfirmTimedRecovery(acAddresses), let .accessControllerStopTimedRecovery(acAddresses):
-			try? SargonOs.shared.entityByAccessControllerAddress(address: acAddresses.first!).address
-		default:
+		let addressOfSecurifiedEntity: AddressOfAccountOrPersona? = if let classification = executionSummary.detailedClassification,
+		                                                               classification.isAccessControllerOperation,
+		                                                               let acAddress = classification.accessControllerAddresses?.first
+		{
+			try? SargonOs.shared.entityByAccessControllerAddress(address: acAddress).address
+		} else {
 			nil
 		}
 
@@ -344,7 +346,13 @@ extension TransactionClient {
 		let totalCost = request.transactionFee.totalFee.max
 		let allSignerEntities = request.transactionSigners.intentSignerEntitiesOrEmpty()
 
-		if case let .accessControllerRecovery(acAddresses) = request.executionSummary.detailedClassification, let acAddress = acAddresses.first {
+		// A recovery, timed or not, may pay its fee from the access controller's
+		// recovery fee vault.
+		let recoveryAcAddresses: [AccessControllerAddress]? = switch request.executionSummary.detailedClassification {
+		case let .accessControllerRecovery(acAddresses, _), let .accessControllerTimedRecovery(acAddresses, _): acAddresses
+		default: nil
+		}
+		if let acAddress = recoveryAcAddresses?.first {
 			@Dependency(\.accessControllerClient) var accessControllerClient
 			let details = try await accessControllerClient.getAccessControllerStateDetails(acAddress)
 			if let feePayerCandidate = feePayerCandidates.first, details.xrdBalance >= totalCost {

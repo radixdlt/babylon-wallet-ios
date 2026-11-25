@@ -6,6 +6,7 @@ struct AccountDetails: FeatureReducer {
 	struct State: Hashable, AccountWithInfoHolder {
 		var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
+		let navigationPresentationID: UInt
 		var securityProblemsConfig: EntitySecurityProblemsView.Config
 		fileprivate var problems: [SecurityProblem] = []
 		var showFiatWorth: Bool
@@ -16,9 +17,11 @@ struct AccountDetails: FeatureReducer {
 
 		init(
 			accountWithInfo: AccountWithInfo,
+			navigationPresentationID: UInt = 0,
 			showFiatWorth: Bool
 		) {
 			self.accountWithInfo = accountWithInfo
+			self.navigationPresentationID = navigationPresentationID
 			self.showFiatWorth = showFiatWorth
 			self.assets = AssetsView.State(
 				account: accountWithInfo.account,
@@ -168,7 +171,10 @@ struct AccountDetails: FeatureReducer {
 			.merge(with: accountLockerClaimsEffect(state: state))
 
 		case .backButtonTapped:
-			return .send(.delegate(.dismiss))
+			#if DEBUG
+			loggerGlobal.notice("[HomeNavigation] AccountDetails.backButtonTapped")
+			#endif
+			return .none
 
 		case .preferencesButtonTapped:
 			state.destination = .preferences(.init(account: state.account))

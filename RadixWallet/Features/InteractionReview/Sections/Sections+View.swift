@@ -8,6 +8,10 @@ extension InteractionReview.Sections.State {
 			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
 			showTransferLine: withdrawals != nil && deposits != nil,
 			showProofs: kind == .preAuthorization,
+			hasMiddleSections: dAppsUsed != nil || deposits != nil
+				|| contributingToPools != nil || redeemingFromPools != nil
+				|| stakingToValidators != nil || unstakingFromValidators != nil || claimingFromValidators != nil
+				|| (kind == .preAuthorization && proofs != nil),
 			showPossibleDappCalls: dAppsUsed?.showPossibleDappCalls == true,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
@@ -16,6 +20,7 @@ extension InteractionReview.Sections.State {
 			accountDepositExceptions: accountDepositExceptions,
 			shieldUpdate: shieldUpdate,
 			confirmShieldUpdate: confirmShieldUpdate,
+			controlOperations: controlOperations,
 			stopTimedRecovery: stopTimedRecovery
 		)
 	}
@@ -29,6 +34,9 @@ extension InteractionReview.Sections {
 		let isExpandedRedeemingFromPools: Bool
 		let showTransferLine: Bool
 		let showProofs: Bool
+		/// Whether any section between withdrawals and deposit settings shows:
+		/// without one, their group would still take its spacing.
+		let hasMiddleSections: Bool
 		let showPossibleDappCalls: Bool
 
 		let stakingToValidators: InteractionReview.ValidatorsState?
@@ -38,6 +46,7 @@ extension InteractionReview.Sections {
 		let accountDepositExceptions: InteractionReview.DepositExceptionsState?
 		let shieldUpdate: InteractionReview.ShieldState?
 		let confirmShieldUpdate: InteractionReview.ShieldState?
+		let controlOperations: [InteractionReview.ControlOperation]?
 		let stopTimedRecovery: InteractionReview.StopTimedRecoveryState?
 
 		var isExpandedStakingToValidators: Bool {
@@ -64,26 +73,28 @@ extension InteractionReview.Sections {
 					stopTimedRecovery(viewStore.stopTimedRecovery)
 					withdrawals
 
-					VStack(alignment: .leading, spacing: .medium1) {
-						contributingToPools(viewStore.isExpandedContributingToPools)
-						redeemingFromPools(viewStore.isExpandedRedeemingFromPools)
+					if viewStore.hasMiddleSections {
+						VStack(alignment: .leading, spacing: .medium1) {
+							contributingToPools(viewStore.isExpandedContributingToPools)
+							redeemingFromPools(viewStore.isExpandedRedeemingFromPools)
 
-						stakingToValidators(viewStore.stakingToValidators)
-						unstakingFromValidators(viewStore.unstakingFromValidators)
-						claimingFromValidators(viewStore.claimingFromValidators)
+							stakingToValidators(viewStore.stakingToValidators)
+							unstakingFromValidators(viewStore.unstakingFromValidators)
+							claimingFromValidators(viewStore.claimingFromValidators)
 
-						dAppsUsed(viewStore.isExpandedDappsUsed, showPossibleDappCalls: viewStore.showPossibleDappCalls)
+							dAppsUsed(viewStore.isExpandedDappsUsed, showPossibleDappCalls: viewStore.showPossibleDappCalls)
 
-						deposits
+							deposits
 
-						if viewStore.showProofs {
-							proofs
+							if viewStore.showProofs {
+								proofs
+							}
 						}
-					}
-					.frame(maxWidth: .infinity, alignment: .leading) // necessary?
-					.background(alignment: .trailing) {
-						if viewStore.showTransferLine {
-							Common.TransferLineView()
+						.frame(maxWidth: .infinity, alignment: .leading) // necessary?
+						.background(alignment: .trailing) {
+							if viewStore.showTransferLine {
+								Common.TransferLineView()
+							}
 						}
 					}
 
@@ -91,6 +102,7 @@ extension InteractionReview.Sections {
 					accountDepositExceptions(viewStore.accountDepositExceptions)
 					shieldUpdate(viewStore.shieldUpdate)
 					confirmShieldUpdate(viewStore.confirmShieldUpdate)
+					controlOperations(viewStore.controlOperations)
 				}
 				.animation(.easeInOut, value: viewStore.isExpandedDappsUsed)
 				.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
@@ -273,6 +285,18 @@ extension InteractionReview.Sections {
 				VStack(alignment: .leading, spacing: .small2) {
 					Common.HeadingView.confirmShieldUpdate
 					Common.ShieldView(viewState: viewState)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private func controlOperations(_ operations: [InteractionReview.ControlOperation]?) -> some SwiftUI.View {
+			if let operations {
+				ForEach(operations, id: \.self) { operation in
+					VStack(alignment: .leading, spacing: .small2) {
+						Common.HeadingView.controlOperation(operation.heading)
+						InteractionReview.RecoveryProposalView(operation: operation)
+					}
 				}
 			}
 		}

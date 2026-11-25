@@ -27,9 +27,9 @@ final class AddressBookFeatureTests: TestCase {
 
 	func test_editSaveUsesOriginalAddressAndTrimsFields() async throws {
 		var entry = newAddressBookEntrySample()
-		entry.address = ResourceAddress.sample.asGeneral
+		entry.target = .globalAddress(value: ResourceAddress.sample.asGeneral)
 
-		let updatedEntry = ActorIsolated<(Address, DisplayName, String?)?>(nil)
+		let updatedEntry = ActorIsolated<(AddressBookEntryTarget, DisplayName, String?)?>(nil)
 		let store = TestStore(
 			initialState: AddressBookEntryForm.State(mode: .edit(entry)),
 			reducer: AddressBookEntryForm.init
@@ -53,13 +53,13 @@ final class AddressBookFeatureTests: TestCase {
 		await store.receive(.delegate(.saved))
 
 		let saved = try await XCTUnwrap(updatedEntry.value)
-		XCTAssertEqual(saved.0, entry.address)
+		XCTAssertEqual(saved.0, entry.target)
 		XCTAssertEqual(saved.1, DisplayName(value: "Alice"))
 		XCTAssertEqual(saved.2, "Friend from exchange")
 	}
 
 	func test_addSaveWithNonAccountAddressPersistsGenericAddress() async throws {
-		let savedEntry = ActorIsolated<(Address, DisplayName, String?)?>(nil)
+		let savedEntry = ActorIsolated<(AddressBookEntryTarget, DisplayName, String?)?>(nil)
 		let store = TestStore(
 			initialState: AddressBookEntryForm.State(mode: .add),
 			reducer: AddressBookEntryForm.init
@@ -82,9 +82,35 @@ final class AddressBookFeatureTests: TestCase {
 		await store.receive(.delegate(.saved))
 
 		let saved = try await XCTUnwrap(savedEntry.value)
-		XCTAssertEqual(saved.0, ResourceAddress.sample.asGeneral)
+		XCTAssertEqual(saved.0, .globalAddress(value: ResourceAddress.sample.asGeneral))
 		XCTAssertEqual(saved.1, DisplayName(value: "XRD"))
 		XCTAssertEqual(saved.2, "Token resource")
+	}
+
+	func test_addSaveWithNonFungibleGlobalIDNamesTheNonFungible() async throws {
+		let savedEntry = ActorIsolated<(AddressBookEntryTarget, DisplayName, String?)?>(nil)
+		let key = NonFungibleGlobalID.sample
+		let store = TestStore(
+			initialState: AddressBookEntryForm.State(mode: .add),
+			reducer: AddressBookEntryForm.init
+		) {
+			$0.addressBookClient.addEntry = { target, name, note in
+				await savedEntry.setValue((target, name, note))
+			}
+		}
+
+		await store.send(.view(.addressChanged(key.toRawString()))) {
+			$0.address = key.toRawString()
+		}
+		await store.send(.view(.nameChanged("Alice"))) {
+			$0.name = "Alice"
+		}
+		await store.send(.view(.saveButtonTapped))
+		await store.receive(.delegate(.saved))
+
+		let saved = try await XCTUnwrap(savedEntry.value)
+		XCTAssertEqual(saved.0, .nonFungible(value: key))
+		XCTAssertEqual(saved.1, DisplayName(value: "Alice"))
 	}
 
 	func test_addSaveWithOwnedAccountShowsAlertAndDoesNotPersist() async {
@@ -116,13 +142,13 @@ final class AddressBookFeatureTests: TestCase {
 
 	func test_transferRecipientAddressBookEntriesAreLimitedToAccountAddresses() {
 		var accountEntry = newAddressBookEntrySample()
-		accountEntry.address = AccountAddress.sampleOther.asGeneral
+		accountEntry.target = .globalAddress(value: AccountAddress.sampleOther.asGeneral)
 
 		var ownAccountEntry = newAddressBookEntrySampleOther()
-		ownAccountEntry.address = AccountAddress.sample.asGeneral
+		ownAccountEntry.target = .globalAddress(value: AccountAddress.sample.asGeneral)
 
 		var resourceEntry = newAddressBookEntrySample()
-		resourceEntry.address = ResourceAddress.sample.asGeneral
+		resourceEntry.target = .globalAddress(value: ResourceAddress.sample.asGeneral)
 
 		var state = ChooseTransferRecipient.State(
 			networkID: .mainnet,

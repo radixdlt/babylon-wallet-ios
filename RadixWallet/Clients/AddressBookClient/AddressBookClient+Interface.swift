@@ -3,18 +3,44 @@ import Sargon
 // MARK: - AddressBookClient
 struct AddressBookClient {
 	var addEntry: AddEntry
-	var entryByAddress: EntryByAddress
+	var entryByTarget: EntryByTarget
 	var entriesOnCurrentNetwork: EntriesOnCurrentNetwork
 	var deleteEntry: DeleteEntry
 	var updateEntry: UpdateEntry
 }
 
 extension AddressBookClient {
-	typealias AddEntry = @Sendable (Address, DisplayName, String?) async throws -> Void
-	typealias EntryByAddress = @Sendable (Address) throws -> AddressBookEntry
+	typealias AddEntry = @Sendable (AddressBookEntryTarget, DisplayName, String?) async throws -> Void
+	typealias EntryByTarget = @Sendable (AddressBookEntryTarget) throws -> AddressBookEntry
 	typealias EntriesOnCurrentNetwork = @Sendable () throws -> [AddressBookEntry]
-	typealias DeleteEntry = @Sendable (Address) async throws -> Bool
-	typealias UpdateEntry = @Sendable (Address, DisplayName, String?) async throws -> Bool
+	typealias DeleteEntry = @Sendable (AddressBookEntryTarget) async throws -> Bool
+	typealias UpdateEntry = @Sendable (AddressBookEntryTarget, DisplayName, String?) async throws -> Bool
+}
+
+extension AddressBookClient {
+	/// The entry naming `address`.
+	func entryByAddress(_ address: Address) throws -> AddressBookEntry {
+		try entryByTarget(.globalAddress(value: address))
+	}
+}
+
+extension AddressBookEntryTarget {
+	/// The address it names, if it names an address and not a non-fungible.
+	var address: Address? {
+		if case let .globalAddress(value) = self {
+			value
+		} else {
+			nil
+		}
+	}
+
+	/// How it is written, e.g. typed into the address book form.
+	var rawString: String {
+		switch self {
+		case let .globalAddress(value): value.address
+		case let .nonFungible(value): value.toRawString()
+		}
+	}
 }
 
 extension DependencyValues {
@@ -32,7 +58,7 @@ extension Sequence<AddressBookEntry> {
 				return nameComparison == .orderedAscending
 			}
 
-			return lhs.address.address.localizedStandardCompare(rhs.address.address) == .orderedAscending
+			return lhs.target.rawString.localizedStandardCompare(rhs.target.rawString) == .orderedAscending
 		}
 	}
 }

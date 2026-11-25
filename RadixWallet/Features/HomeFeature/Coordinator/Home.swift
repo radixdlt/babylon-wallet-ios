@@ -24,28 +24,41 @@ struct Home: FeatureReducer {
 
 		// MARK: - Destination
 		@PresentationState
-		var destination: Destination.State? = nil {
-			didSet {
-				guard destination == nil else { return }
-				showNextDestination()
-			}
-		}
+		var destination: Destination.State?
 
+		private var accountDetailsPresentationID: UInt = 0
 		private var destinationsQueue: [Destination.State] = []
 
 		init() {}
 
 		mutating func addDestination(_ destination: Destination.State) {
+			logHomeNavigation(
+				"add requested=\(destination.diagnosticsName) current=\(self.destination?.diagnosticsName ?? "nil") queue=\(destinationsQueue.count)"
+			)
 			if self.destination == nil {
 				self.destination = destination
 			} else {
 				destinationsQueue.append(destination)
 			}
+			logHomeNavigation(
+				"add completed current=\(self.destination?.diagnosticsName ?? "nil") queue=\(destinationsQueue.count)"
+			)
 		}
 
 		mutating func showNextDestination() {
+			logHomeNavigation(
+				"showNext current=\(destination?.diagnosticsName ?? "nil") queue=\(destinationsQueue.count)"
+			)
 			guard !destinationsQueue.isEmpty else { return }
 			destination = destinationsQueue.removeFirst()
+			logHomeNavigation(
+				"showNext completed current=\(destination?.diagnosticsName ?? "nil") queue=\(destinationsQueue.count)"
+			)
+		}
+
+		mutating func nextAccountDetailsPresentationID() -> UInt {
+			accountDetailsPresentationID &+= 1
+			return accountDetailsPresentationID
 		}
 	}
 
@@ -63,6 +76,7 @@ struct Home: FeatureReducer {
 		case currentGatewayChanged(to: Gateway)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
+		case showNextDestination
 		case showLinkConnectorIfNeeded
 		case setSecurityProblems([SecurityProblem])
 		case setAccountLockerClaims(ClaimsPerAccount)
@@ -281,6 +295,13 @@ struct Home: FeatureReducer {
 			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
 			return .none
 
+		case .showNextDestination:
+			logHomeNavigation(
+				"internal.showNextDestination current=\(state.destination?.diagnosticsName ?? "nil")"
+			)
+			state.showNextDestination()
+			return .none
+
 		case .showLinkConnectorIfNeeded:
 			let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
 				.approveRelinkAfterProfileRestore
@@ -337,7 +358,16 @@ struct Home: FeatureReducer {
 			guard let accountRow = state.accountRows[id: id] else { return .none }
 			switch delegateAction {
 			case .openDetails:
-				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
+				let presentationID = state.nextAccountDetailsPresentationID()
+				logHomeNavigation(
+					"openDetails id=\(presentationID) current=\(state.destination?.diagnosticsName ?? "nil") account=\(id)"
+				)
+				state.destination = .accountDetails(.init(
+					accountWithInfo: accountRow.accountWithInfo,
+					navigationPresentationID: presentationID,
+					showFiatWorth: state.showFiatWorth
+				))
+				logHomeNavigation("openDetails completed id=\(presentationID) current=accountDetails")
 				return .none
 			case let .presentSecurityProblemHandler(.securityCenter(securityCenterState)):
 				state.destination = .securityCenter(securityCenterState)
@@ -365,11 +395,12 @@ struct Home: FeatureReducer {
 	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .accountDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
+			logHomeNavigation(
+				"accountDetails delegate.dismiss current=\(state.destination?.diagnosticsName ?? "nil")"
+			)
+			return .send(.destination(.dismiss))
 
 		case let .relinkConnector(.delegate(.newConnection(connectedClient))):
-			state.destination = nil
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
 			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
 			return .run { _ in
@@ -378,14 +409,13 @@ struct Home: FeatureReducer {
 				loggerGlobal.error("Failed P2PLink, error \(error)")
 				errorQueue.schedule(error)
 			}
+			.merge(with: .send(.destination(.dismiss)))
 
 		case .displayMnemonic(.delegate(.backedUp)):
-			state.destination = nil
-			return .none
+			return .send(.destination(.dismiss))
 
 		case .enterMnemonic(.delegate(.imported)):
-			state.destination = nil
-			return .none
+			return .send(.destination(.dismiss))
 
 		default:
 			return .none
@@ -393,6 +423,9 @@ struct Home: FeatureReducer {
 	}
 
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		logHomeNavigation(
+			"presentation.dismiss currentBeforePresentationReducer=\(state.destination?.diagnosticsName ?? "nil")"
+		)
 		switch state.destination {
 		case .relinkConnector:
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
@@ -401,8 +434,10 @@ struct Home: FeatureReducer {
 			break
 		}
 
-		state.showNextDestination()
-		return .none
+		// Allow the presentation reducer to nil the current destination before
+		// advancing the queue. Replacing it inline can make NavigationStack
+		// continuously retry the same pop transition.
+		return .send(.internal(.showNextDestination))
 	}
 
 	func loadGateways() -> Effect<Action> {
@@ -504,6 +539,29 @@ struct Home: FeatureReducer {
 			}
 		}
 	}
+}
+
+private extension Home.Destination.State {
+	var diagnosticsName: String {
+		switch self {
+		case .accountDetails: "accountDetails"
+		case .createAccount: "createAccount"
+		case .acknowledgeJailbreakAlert: "acknowledgeJailbreakAlert"
+		case .relinkConnector: "relinkConnector"
+		case .securityCenter: "securityCenter"
+		case .p2pLinks: "p2pLinks"
+		case .dAppsDirectory: "dAppsDirectory"
+		case .displayMnemonic: "displayMnemonic"
+		case .enterMnemonic: "enterMnemonic"
+		case .handleACTimedRecovery: "handleACTimedRecovery"
+		}
+	}
+}
+
+private func logHomeNavigation(_ message: @autoclosure () -> String) {
+	#if DEBUG
+	loggerGlobal.notice("[HomeNavigation] \(message())")
+	#endif
 }
 
 extension Home.AccountRow.State {

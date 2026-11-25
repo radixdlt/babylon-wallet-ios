@@ -911,6 +911,7 @@
 		A089DC982E38864600866A47 /* ArculusCreatePIN+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC972E38864600866A47 /* ArculusCreatePIN+View.swift */; };
 		A089DC992E38864600866A47 /* ArculusCreatePIN.swift in Sources */ = {isa = PBXBuildFile; fileRef = A089DC962E38864600866A47 /* ArculusCreatePIN.swift */; };
 		A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */; };
+		A0FEAF900000000000000002 /* InteractionReview-RecoveryProposalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0FEAF900000000000000001 /* InteractionReview-RecoveryProposalView.swift */; };
 		A08BBA622DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */; };
 		A08BBA642DAE348700534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */; };
 		A08BBA662DAE502900534B67 /* AddFactorSource-NameFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08BBA652DAE501300534B67 /* AddFactorSource-NameFactorSource.swift */; };
@@ -2317,6 +2318,7 @@
 		A089DC962E38864600866A47 /* ArculusCreatePIN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArculusCreatePIN.swift; sourceTree = "<group>"; };
 		A089DC972E38864600866A47 /* ArculusCreatePIN+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArculusCreatePIN+View.swift"; sourceTree = "<group>"; };
 		A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-ShieldView.swift"; sourceTree = "<group>"; };
+		A0FEAF900000000000000001 /* InteractionReview-RecoveryProposalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InteractionReview-RecoveryProposalView.swift"; sourceTree = "<group>"; };
 		A08BBA612DAE330700534B67 /* AddFactorSource-ConfirmSeedPhrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase.swift"; sourceTree = "<group>"; };
 		A08BBA632DAE347E00534B67 /* AddFactorSource-ConfirmSeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-ConfirmSeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A08BBA652DAE501300534B67 /* AddFactorSource-NameFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AddFactorSource-NameFactorSource.swift"; sourceTree = "<group>"; };
@@ -6534,6 +6536,7 @@
 			isa = PBXGroup;
 			children = (
 				A08BBA5E2DAD49D500534B67 /* InteractionReview-ShieldView.swift */,
+				A0FEAF900000000000000001 /* InteractionReview-RecoveryProposalView.swift */,
 			);
 			path = Shield;
 			sourceTree = "<group>";
@@ -9428,6 +9431,7 @@
 				48CFC5E42ADC10DA00E77A5C /* AppearanceID+Extra.swift in Sources */,
 				A40815532C7E0D08005E65B9 /* AccountAuthorizedDepositorsResourceBadge.swift in Sources */,
 				A08BBA602DAD49D500534B67 /* InteractionReview-ShieldView.swift in Sources */,
+				A0FEAF900000000000000002 /* InteractionReview-RecoveryProposalView.swift in Sources */,
 				48CFC5AE2ADC10DA00E77A5C /* CheckmarkView.swift in Sources */,
 				48CFC6912ADC10DB00E77A5C /* MigratedAccount.swift in Sources */,
 				A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */,
